@@ -3,7 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sword, Hammer, Pickaxe, LogOut, User, Shield, Users, Settings } from 'lucide-react';
+import { Sword, Hammer, Pickaxe, LogOut, User, Shield, Users, Settings, Loader2 } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
 import { getUserClans } from '@/lib/auth';
 
@@ -72,7 +72,11 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center justify-center p-8 relative">
       {/* Auth status in top right */}
       <div className="absolute top-4 right-4">
-        {loading ? null : user ? (
+        {loading ? (
+          <div className="flex items-center gap-2 text-slate-400">
+            <Loader2 className="w-4 h-4 animate-spin" />
+          </div>
+        ) : user ? (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-slate-300">
               {profile?.discord_avatar ? (
@@ -158,32 +162,42 @@ export default function Home() {
       </div>
 
       {/* User's clans section */}
-      {user && !clansLoading && userClans.length > 0 && (
+      {user && (
         <div className="mt-12 w-full max-w-2xl mx-auto">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 justify-center">
             <Shield className="w-5 h-5 text-orange-400" />
             Your Clans
           </h2>
-          <div className="grid gap-3">
-            {userClans.map((clan) => (
-              <Link
-                key={clan.id}
-                href={`/${clan.slug}`}
-                className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
-                  <span className="text-white font-medium group-hover:text-orange-300 transition-colors">
-                    {clan.name}
+          {clansLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+            </div>
+          ) : userClans.length > 0 ? (
+            <div className="grid gap-3">
+              {userClans.map((clan) => (
+                <Link
+                  key={clan.id}
+                  href={`/${clan.slug}`}
+                  className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
+                    <span className="text-white font-medium group-hover:text-orange-300 transition-colors">
+                      {clan.name}
+                    </span>
+                  </div>
+                  <span className={`text-sm ${getRoleColor(clan.role)}`}>
+                    {clan.role}
+                    {clan.isCreator && ' (creator)'}
                   </span>
-                </div>
-                <span className={`text-sm ${getRoleColor(clan.role)}`}>
-                  {clan.role}
-                  {clan.isCreator && ' (creator)'}
-                </span>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-slate-500 py-4">
+              You haven&apos;t joined any clans yet. Enter a clan name above to get started!
+            </p>
+          )}
         </div>
       )}
 
