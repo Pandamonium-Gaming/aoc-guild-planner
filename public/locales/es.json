@@ -1,0 +1,128 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "error": "Error",
+    "success": "Éxito",
+    "settings": "Configuración",
+    "back": "Volver",
+    "home": "Inicio",
+    "signIn": "Iniciar sesión con Discord",
+    "signOut": "Cerrar sesión",
+    "saving": "Guardando...",
+    "saved": "¡Guardado!"
+  },
+  "nav": {
+    "characters": "Personajes",
+    "events": "Eventos",
+    "parties": "Grupos",
+    "matrix": "Matriz",
+    "manage": "Gestionar"
+  },
+  "clan": {
+    "create": "Crear Clan",
+    "createDescription": "El clan {{name}} no existe todavía. ¿Te gustaría crearlo?",
+    "youWillBeAdmin": "Serás el Administrador del clan",
+    "applyToJoin": "Solicitar unirse",
+    "applicationPending": "Solicitud pendiente",
+    "pendingApproval": "Tu solicitud está pendiente de aprobación por los oficiales del clan.",
+    "characters_count": "{{count}} personajes",
+    "noCharacters": "Aún no hay personajes. ¡Añade tu primer personaje arriba!",
+    "noCharactersMatch": "Ningún personaje coincide con tus filtros."
+  },
+  "character": {
+    "addCharacter": "Añadir Personaje",
+    "editCharacter": "Editar Personaje",
+    "name": "Nombre del Personaje",
+    "race": "Raza",
+    "primaryArchetype": "Arquetipo Primario",
+    "secondaryArchetype": "Arquetipo Secundario",
+    "level": "Nivel",
+    "mainCharacter": "Personaje Principal",
+    "professions": "Profesiones",
+    "searchPlaceholder": "Buscar personajes..."
+  },
+  "party": {
+    "createParty": "Crear Grupo",
+    "editParty": "Editar Grupo",
+    "partyName": "Nombre del Grupo",
+    "description": "Descripción",
+    "addCharacterToParty": "Añadir Personaje",
+    "emptySlot": "Hueco vacío",
+    "noChars": "Sin personajes",
+    "select": "Seleccionar..."
+  },
+  "event": {
+    "createEvent": "Crear Evento",
+    "editEvent": "Editar Evento",
+    "upcomingEvents": "Próximos Eventos",
+    "noEvents": "No hay eventos programados",
+    "rsvp": "Confirmar asistencia",
+    "attending": "Asistiré",
+    "maybe": "Quizás",
+    "declined": "No asistiré"
+  },
+  "recruitment": {
+    "settings": "Configuración de Reclutamiento",
+    "publicProfile": "Perfil Público",
+    "publicProfileDesc": "Permitir que cualquiera vea la página pública de tu guild",
+    "openRecruitment": "Reclutamiento Abierto",
+    "openRecruitmentDesc": "Permitir que los jugadores envíen solicitudes",
+    "publicDescription": "Descripción Pública",
+    "recruitmentMessage": "Mensaje de Reclutamiento",
+    "viewPublicPage": "Ver Página Pública",
+    "saveSettings": "Guardar Configuración",
+    "applications": "Solicitudes",
+    "noApplications": "Aún no hay solicitudes",
+    "accept": "Aceptar",
+    "reject": "Rechazar"
+  },
+  "members": {
+    "title": "Miembros",
+    "pending": "Pendientes",
+    "noPending": "No hay solicitudes pendientes",
+    "promote": "Ascender",
+    "demote": "Degradar",
+    "remove": "Eliminar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "profile": "Perfil",
+    "displayName": "Nombre para mostrar",
+    "displayNameHint": "Así aparecerá tu nombre para otros miembros del clan.",
+    "timezone": "Zona horaria",
+    "yourTimezone": "Tu zona horaria",
+    "autoDetect": "Detectar automáticamente",
+    "currentTime": "Tu hora actual:",
+    "language": "Idioma",
+    "languageHint": "Elige tu idioma preferido para la interfaz.",
+    "saveChanges": "Guardar Cambios"
+  },
+  "matrix": {
+    "coverage": "Cobertura",
+    "supplyChain": "Cadena de Suministro",
+    "gm": "GM",
+    "master": "Master",
+    "missing": "Faltantes"
+  },
+  "discord": {
+    "integration": "Integración con Discord",
+    "webhookUrl": "URL del Webhook",
+    "webhookHint": "Obtén esto de Discord: Configuración del Servidor → Integraciones → Webhooks → Nuevo Webhook",
+    "testWebhook": "Probar Webhook",
+    "eventNotifications": "Notificaciones de Eventos",
+    "eventNotificationsDesc": "Notificar cuando se creen nuevos eventos",
+    "announcementNotifications": "Notificaciones de Anuncios",
+    "announcementNotificationsDesc": "Notificar cuando se publiquen anuncios"
+  }
+}

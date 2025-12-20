@@ -10,13 +10,17 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
+      console.log('Auth callback processing...');
       const { error } = await supabase.auth.getSession();
       
       if (error) {
-        console.error('Auth callback error:', error);
-        router.push('/?error=auth_failed');
+        console.error('Auth callback getSession error:', error);
+        console.error('Error message:', error.message);
+        router.push('/?error=auth_failed&details=' + encodeURIComponent(error.message));
         return;
       }
+      
+      console.log('Auth callback success, session retrieved.');
 
       // Check if there's a redirect URL in localStorage
       const redirectTo = localStorage.getItem('authRedirectTo');
