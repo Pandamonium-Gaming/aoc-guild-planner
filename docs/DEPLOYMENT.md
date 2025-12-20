@@ -1,4 +1,4 @@
-# Deployment Guide - AoC Profession Planner
+# Deployment Guide - AoC Guild Planner
 
 ## Prerequisites
 
@@ -43,7 +43,7 @@
 
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click **New Application**
-3. Name it: `AoC Profession Planner`
+3. Name it: `AoC Guild Planner`
 4. Go to **OAuth2** → **General**
 5. Copy **Client ID** and **Client Secret**
 6. Add redirect URI:

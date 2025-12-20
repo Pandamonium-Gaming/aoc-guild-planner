@@ -1,4 +1,4 @@
-# AoC Profession Planner
+# AoC Guild Planner
 
 Guild artisan profession planner for Ashes of Creation.
 

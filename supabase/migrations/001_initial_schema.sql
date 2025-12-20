@@ -1,5 +1,5 @@
 -- =====================================================
--- AoC Profession Planner - Database Schema
+-- AoC Guild Planner - Database Schema
 -- Phase 1: Authentication & Security
 -- =====================================================
 
