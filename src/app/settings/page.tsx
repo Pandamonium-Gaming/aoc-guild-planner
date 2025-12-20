@@ -44,7 +44,8 @@ export default function SettingsPage() {
           timezone,
           display_name: displayName.trim() || null
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select();
 
       if (updateError) throw updateError;
       

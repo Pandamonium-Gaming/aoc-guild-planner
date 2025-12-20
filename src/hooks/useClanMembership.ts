@@ -134,7 +134,8 @@ export function useClanMembership(clanId: string | null, userId: string | null):
         approved_at: new Date().toISOString(),
         approved_by: userId,
       })
-      .eq('id', membershipId);
+      .eq('id', membershipId)
+      .select();
 
     if (error) throw error;
     await refresh();
@@ -144,7 +145,8 @@ export function useClanMembership(clanId: string | null, userId: string | null):
     const { error } = await supabase
       .from('clan_members')
       .delete()
-      .eq('id', membershipId);
+      .eq('id', membershipId)
+      .select();
 
     if (error) throw error;
     await refresh();
@@ -154,7 +156,8 @@ export function useClanMembership(clanId: string | null, userId: string | null):
     const { error } = await supabase
       .from('clan_members')
       .update({ role })
-      .eq('id', membershipId);
+      .eq('id', membershipId)
+      .select();
 
     if (error) throw error;
     await refresh();

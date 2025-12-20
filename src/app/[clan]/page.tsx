@@ -7,17 +7,20 @@ import { useAuthContext } from '@/components/AuthProvider';
 import { useClanData } from '@/hooks/useClanData';
 import { useClanMembership } from '@/hooks/useClanMembership';
 import { useEvents } from '@/hooks/useEvents';
+import { useParties } from '@/hooks/useParties';
 import { CharacterCard } from '@/components/MemberCard';
 import { AddCharacterButton } from '@/components/AddCharacterButton';
 import { CharacterForm } from '@/components/CharacterForm';
 import { ClanMatrix } from '@/components/ClanMatrix';
 import { EventsList } from '@/components/EventsList';
+import { PartiesList } from '@/components/PartiesList';
 import { CharacterFiltersBar, CharacterFilters, DEFAULT_FILTERS, filterCharacters } from '@/components/CharacterFilters';
 import { ClanSettings } from '@/components/ClanSettings';
+import { RecruitmentSettings } from '@/components/RecruitmentSettings';
 import { createClan, getClanBySlug } from '@/lib/auth';
 import { CharacterWithProfessions } from '@/lib/types';
 
-type Tab = 'characters' | 'events' | 'matrix' | 'manage';
+type Tab = 'characters' | 'events' | 'parties' | 'matrix' | 'manage';
 
 export default function ClanPage({ params }: { params: Promise<{ clan: string }> }) {
   const { clan: clanSlug } = use(params);
@@ -88,6 +91,17 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     updateAnnouncement,
     deleteAnnouncement,
   } = useEvents(clanId, user?.id || null);
+
+  // Parties hook
+  const {
+    parties,
+    createParty,
+    updateParty,
+    deleteParty,
+    assignCharacter,
+    removeFromRoster,
+    toggleConfirmed,
+  } = useParties(clanId, characters);
 
   const loading = authLoading || membershipLoading || dataLoading || clanExists === null;
 
@@ -339,6 +353,13 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
                 isActive={activeTab === 'matrix'}
                 onClick={() => setActiveTab('matrix')}
               />
+              <TabButton
+                icon={<Users size={18} />}
+                label="Parties"
+                isActive={activeTab === 'parties'}
+                onClick={() => setActiveTab('parties')}
+                badge={parties.length || undefined}
+              />
               {canManageMembers && (
                 <TabButton
                   icon={<Settings size={18} />}
@@ -423,6 +444,20 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
             onUpdateAnnouncement={updateAnnouncement}
             onDeleteAnnouncement={deleteAnnouncement}
           />
+        ) : activeTab === 'parties' ? (
+          <PartiesList
+            parties={parties}
+            characters={characters}
+            clanId={clanId!}
+            userId={user.id}
+            canManage={canManageMembers}
+            onCreateParty={createParty}
+            onUpdateParty={updateParty}
+            onDeleteParty={deleteParty}
+            onAssignCharacter={assignCharacter}
+            onRemoveFromRoster={removeFromRoster}
+            onToggleConfirmed={toggleConfirmed}
+          />
         ) : activeTab === 'matrix' ? (
           <ClanMatrix members={characters} />
         ) : activeTab === 'manage' && canManageMembers ? (
@@ -445,6 +480,14 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
                 currentWebhookUrl={clan.discord_webhook_url || ''}
                 notifyOnEvents={clan.notify_on_events ?? true}
                 notifyOnAnnouncements={clan.notify_on_announcements ?? true}
+              />
+            )}
+            
+            {/* Recruitment Settings (Admin only) */}
+            {membership?.role === 'admin' && clan && (
+              <RecruitmentSettings
+                clanId={clan.id}
+                clanSlug={clanSlug}
               />
             )}
           </div>

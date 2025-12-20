@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Cinzel } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
@@ -15,8 +15,25 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
-  title: "AoC Profession Planner",
-  description: "Guild artisan profession planner for Ashes of Creation",
+  title: "AoC Guild Planner",
+  description: "Plan and coordinate professions for your Ashes of Creation guild",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Guild Planner",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f97316",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -26,6 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+      </head>
       <body
         className={`${inter.variable} ${cinzel.variable} font-sans antialiased bg-slate-950 text-slate-100 min-h-screen`}
       >
@@ -36,8 +57,21 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+
+        {/* Service Worker Registration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js')
+                    .catch(err => console.log('SW registration failed:', err));
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
 }
-

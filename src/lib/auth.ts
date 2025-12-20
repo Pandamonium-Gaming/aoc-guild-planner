@@ -105,7 +105,8 @@ export async function updateDisplayName(userId: string, displayName: string) {
   const { error } = await supabase
     .from('users')
     .update({ display_name: displayName })
-    .eq('id', userId);
+    .eq('id', userId)
+    .select();
   
   if (error) throw error;
 }
@@ -136,7 +137,8 @@ export async function applyToClan(clanId: string, userId: string) {
       clan_id: clanId,
       user_id: userId,
       role: 'pending',
-    });
+    })
+    .select();
   
   if (error) throw error;
 }
@@ -152,7 +154,8 @@ export async function acceptMember(membershipId: string, approvedBy: string) {
       approved_at: new Date().toISOString(),
       approved_by: approvedBy,
     })
-    .eq('id', membershipId);
+    .eq('id', membershipId)
+    .select();
   
   if (error) throw error;
 }
@@ -164,7 +167,8 @@ export async function removeMember(membershipId: string) {
   const { error } = await supabase
     .from('clan_members')
     .delete()
-    .eq('id', membershipId);
+    .eq('id', membershipId)
+    .select();
   
   if (error) throw error;
 }
@@ -176,7 +180,8 @@ export async function updateMemberRole(membershipId: string, newRole: 'admin' | 
   const { error } = await supabase
     .from('clan_members')
     .update({ role: newRole })
-    .eq('id', membershipId);
+    .eq('id', membershipId)
+    .select();
   
   if (error) throw error;
 }
@@ -204,7 +209,8 @@ export async function createClan(slug: string, name: string, userId: string) {
       is_creator: true,
       approved_at: new Date().toISOString(),
       approved_by: userId,
-    });
+    })
+    .select();
   
   if (memberError) throw memberError;
   

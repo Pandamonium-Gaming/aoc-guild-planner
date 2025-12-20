@@ -116,3 +116,59 @@ export const RANK_COLORS: Record<RankLevel, { text: string; border: string; bg: 
     glow: 'shadow-green-500/50'
   },
 };
+
+// Party types
+export type PartyRole = 'tank' | 'healer' | 'dps' | 'support';
+
+export interface Party {
+  id: string;
+  clan_id: string;
+  name: string;
+  description?: string;
+  tanks_needed: number;
+  healers_needed: number;
+  dps_needed: number;
+  support_needed: number;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PartyRoster {
+  id: string;
+  party_id: string;
+  character_id: string;
+  role: PartyRole;
+  is_confirmed: boolean;
+  assigned_at: string;
+}
+
+export interface PartyWithRoster extends Party {
+  roster: (PartyRoster & { character?: CharacterWithProfessions })[];
+}
+
+// Party role configuration
+export const PARTY_ROLES: Record<PartyRole, { name: string; icon: string; color: string }> = {
+  tank: { name: 'Tank', icon: '🛡️', color: 'text-blue-400' },
+  healer: { name: 'Healer', icon: '💚', color: 'text-green-400' },
+  dps: { name: 'DPS', icon: '⚔️', color: 'text-red-400' },
+  support: { name: 'Support', icon: '✨', color: 'text-yellow-400' },
+};
+
+// Recruitment types
+export interface RecruitmentApplication {
+  id: string;
+  clan_id: string;
+  user_id?: string;
+  discord_username: string;
+  character_name?: string;
+  primary_class?: string;
+  experience?: string;
+  availability?: string;
+  message?: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+  review_notes?: string;
+}

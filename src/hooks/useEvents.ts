@@ -146,7 +146,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
     const { error: updateError } = await supabase
       .from('events')
       .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (updateError) {
       setError(updateError.message);
@@ -166,7 +167,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
     const { error: deleteError } = await supabase
       .from('events')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (deleteError) {
       setError(deleteError.message);
@@ -196,7 +198,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
         responded_at: new Date().toISOString(),
       }, {
         onConflict: 'event_id,user_id'
-      });
+      })
+      .select();
 
     if (rsvpError) {
       setError(rsvpError.message);
@@ -247,7 +250,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
       .from('event_rsvps')
       .delete()
       .eq('event_id', eventId)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .select();
 
     if (deleteError) {
       setError(deleteError.message);
@@ -296,7 +300,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
     const { error: updateError } = await supabase
       .from('announcements')
       .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (updateError) {
       setError(updateError.message);
@@ -311,7 +316,8 @@ export function useEvents(clanId: string | null, userId: string | null): UseEven
     const { error: deleteError } = await supabase
       .from('announcements')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (deleteError) {
       setError(deleteError.message);

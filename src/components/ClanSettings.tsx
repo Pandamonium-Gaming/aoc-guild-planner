@@ -43,7 +43,8 @@ export function ClanSettings({
           notify_on_events: eventsEnabled,
           notify_on_announcements: announcementsEnabled,
         })
-        .eq('id', clanId);
+        .eq('id', clanId)
+        .select();
 
       if (updateError) throw updateError;
 

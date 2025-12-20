@@ -125,7 +125,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         secondary_archetype: data.secondary_archetype || null,
         level: data.level || 1,
         is_main: data.is_main || false,
-      });
+      })
+      .select();
 
     if (insertError) {
       console.error('Error adding character:', insertError);
@@ -141,7 +142,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     const { error: updateError } = await supabase
       .from('members')
       .update(data)
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (updateError) {
       console.error('Error updating character:', updateError);
@@ -157,7 +159,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     const { error: deleteError } = await supabase
       .from('members')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (deleteError) {
       console.error('Error deleting character:', deleteError);
@@ -217,7 +220,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
           .from('member_professions')
           .delete()
           .eq('member_id', characterId)
-          .eq('profession', professionId);
+          .eq('profession', professionId)
+          .select();
 
         if (deleteError) throw deleteError;
       } else {
@@ -226,7 +230,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
           .upsert(
             { member_id: characterId, profession: professionId, rank },
             { onConflict: 'member_id,profession' }
-          );
+          )
+          .select();
 
         if (upsertError) throw upsertError;
       }
