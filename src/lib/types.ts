@@ -38,12 +38,29 @@ export interface Clan {
   created_at: string;
 }
 
-export interface Member {
+// Race and Archetype types (match database ENUMs)
+export type Race = 'kaelar' | 'vaelune' | 'dunir' | 'nikua' | 
+                   'empyrean' | 'pyrai' | 'renkai' | 'vek' | 'tulnar';
+
+export type Archetype = 'tank' | 'cleric' | 'mage' | 'fighter' | 
+                        'ranger' | 'bard' | 'rogue' | 'summoner';
+
+// Character (formerly Member) - represents a game character
+export interface Character {
   id: string;
   clan_id: string;
+  user_id: string | null;
   name: string;
+  race: Race | null;
+  primary_archetype: Archetype | null;
+  secondary_archetype: Archetype | null;
+  level: number;
+  is_main: boolean;
   created_at: string;
 }
+
+// Legacy alias for compatibility
+export type Member = Character;
 
 export interface MemberProfession {
   id: string;
@@ -52,10 +69,13 @@ export interface MemberProfession {
   rank: RankLevel;
 }
 
-// Extended member with professions loaded
-export interface MemberWithProfessions extends Member {
+// Extended character with professions loaded
+export interface CharacterWithProfessions extends Character {
   professions: MemberProfession[];
 }
+
+// Legacy alias for compatibility
+export type MemberWithProfessions = CharacterWithProfessions;
 
 // Clan coverage statistics
 export interface ProfessionCoverage {

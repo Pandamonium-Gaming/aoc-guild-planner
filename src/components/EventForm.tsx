@@ -1,0 +1,242 @@
+'use client';
+
+import { useState } from 'react';
+import { X, Calendar } from 'lucide-react';
+import { Event, EventType, EVENT_TYPES, utcToLocal } from '@/lib/events';
+
+interface EventFormData {
+  title: string;
+  description: string;
+  event_type: EventType;
+  starts_at: string;
+  ends_at: string;
+  location: string;
+  max_attendees: string;
+}
+
+interface EventFormProps {
+  initialData?: Partial<Event>;
+  clanId: string;
+  userId: string;
+  onSubmit: (event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>) => Promise<void>;
+  onCancel: () => void;
+  isEditing?: boolean;
+}
+
+export function EventForm({ 
+  initialData, 
+  clanId,
+  userId,
+  onSubmit, 
+  onCancel,
+  isEditing = false 
+}: EventFormProps) {
+  const [formData, setFormData] = useState<EventFormData>({
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    event_type: initialData?.event_type || 'other',
+    starts_at: initialData?.starts_at ? utcToLocal(initialData.starts_at) : '',
+    ends_at: initialData?.ends_at ? utcToLocal(initialData.ends_at) : '',
+    location: initialData?.location || '',
+    max_attendees: initialData?.max_attendees?.toString() || '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.title.trim()) {
+      setError('Title is required');
+      return;
+    }
+    if (!formData.starts_at) {
+      setError('Start time is required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await onSubmit({
+        clan_id: clanId,
+        created_by: userId,
+        title: formData.title.trim(),
+        description: formData.description.trim() || null,
+        event_type: formData.event_type,
+        starts_at: new Date(formData.starts_at).toISOString(),
+        ends_at: formData.ends_at ? new Date(formData.ends_at).toISOString() : null,
+        location: formData.location.trim() || null,
+        max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save event');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-orange-400" />
+            {isEditing ? 'Edit Event' : 'Create Event'}
+          </h2>
+          <button
+            onClick={onCancel}
+            className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Event Title *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="e.g., Weekly Dungeon Run"
+              autoFocus
+            />
+          </div>
+
+          {/* Event Type */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Event Type
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {Object.entries(EVENT_TYPES).map(([id, type]) => {
+                const isSelected = formData.event_type === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, event_type: id as EventType })}
+                    className={`flex flex-col items-center p-2 rounded-lg text-xs transition-all cursor-pointer ${
+                      isSelected
+                        ? 'ring-2 ring-offset-2 ring-offset-slate-900'
+                        : 'bg-slate-800 hover:bg-slate-700'
+                    }`}
+                    style={isSelected ? { 
+                      backgroundColor: type.color + '30',
+                      color: type.color
+                    } : undefined}
+                  >
+                    <span className="text-lg">{type.icon}</span>
+                    <span className={isSelected ? '' : 'text-slate-300'}>{type.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Start Time */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Start Date & Time *
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.starts_at}
+              onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+
+          {/* End Time */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              End Date & Time <span className="text-slate-500">(optional)</span>
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.ends_at}
+              onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Location <span className="text-slate-500">(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="e.g., Node 5 - Dungeon Entrance"
+            />
+          </div>
+
+          {/* Max Attendees */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Max Attendees <span className="text-slate-500">(optional)</span>
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={formData.max_attendees}
+              onChange={(e) => setFormData({ ...formData, max_attendees: e.target.value })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Leave empty for unlimited"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Description <span className="text-slate-500">(optional)</span>
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              placeholder="Additional details about the event..."
+            />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+              {error}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Event'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

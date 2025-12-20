@@ -2,60 +2,58 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Clan, MemberWithProfessions, RankLevel } from '@/lib/types';
+import { Clan, CharacterWithProfessions, RankLevel, Race, Archetype } from '@/lib/types';
+
+// Character data for creating/updating
+export interface CharacterData {
+  name: string;
+  race?: Race | null;
+  primary_archetype?: Archetype | null;
+  secondary_archetype?: Archetype | null;
+  level?: number;
+  is_main?: boolean;
+}
 
 interface UseClanDataReturn {
   clan: Clan | null;
-  members: MemberWithProfessions[];
+  characters: CharacterWithProfessions[];
   loading: boolean;
   error: string | null;
   // Actions
+  addCharacter: (data: CharacterData) => Promise<void>;
+  updateCharacter: (id: string, data: Partial<CharacterData>) => Promise<void>;
+  deleteCharacter: (id: string) => Promise<void>;
+  setProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
+  refresh: () => Promise<void>;
+  // Legacy aliases
+  members: CharacterWithProfessions[];
   addMember: (name: string) => Promise<void>;
   updateMember: (id: string, name: string) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
-  setProfessionRank: (memberId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
-  refresh: () => Promise<void>;
 }
 
 export function useClanData(clanSlug: string): UseClanDataReturn {
   const [clan, setClan] = useState<Clan | null>(null);
-  const [members, setMembers] = useState<MemberWithProfessions[]>([]);
+  const [characters, setCharacters] = useState<CharacterWithProfessions[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch or create clan
-  const fetchOrCreateClan = useCallback(async (): Promise<Clan | null> => {
+  // Fetch clan (no longer auto-creates - that's handled by UI)
+  const fetchClan = useCallback(async (): Promise<Clan | null> => {
     try {
-      // Try to find existing clan
       const { data: existingClan, error: fetchError } = await supabase
         .from('clans')
         .select('*')
         .eq('slug', clanSlug)
-        .single();
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 = no rows returned, which is fine
+      if (fetchError) {
         throw fetchError;
       }
 
-      if (existingClan) {
-        return existingClan as Clan;
-      }
-
-      // Create new clan
-      const { data: newClan, error: createError } = await supabase
-        .from('clans')
-        .insert({
-          slug: clanSlug,
-          name: clanSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-        })
-        .select()
-        .single();
-
-      if (createError) throw createError;
-      return newClan as Clan;
+      return existingClan as Clan | null;
     } catch (err) {
-      console.error('Error fetching/creating clan:', err);
+      console.error('Error fetching clan:', err);
       setError(err instanceof Error ? err.message : 'Failed to load clan');
       return null;
     }
@@ -67,86 +65,104 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     setError(null);
 
     try {
-      const clanData = await fetchOrCreateClan();
-      if (!clanData) return;
+      const clanData = await fetchClan();
+      if (!clanData) {
+        setLoading(false);
+        return;
+      }
 
       setClan(clanData);
 
-      // Fetch members with their professions
-      const { data: membersData, error: membersError } = await supabase
+      // Fetch characters with their professions
+      const { data: charactersData, error: charactersError } = await supabase
         .from('members')
         .select(`
           *,
           member_professions (*)
         `)
         .eq('clan_id', clanData.id)
+        .order('is_main', { ascending: false })
         .order('name');
 
-      if (membersError) throw membersError;
+      if (charactersError) throw charactersError;
 
-      const membersWithProfessions: MemberWithProfessions[] = (membersData || []).map((member) => ({
-        ...member,
-        professions: member.member_professions || [],
+      const charactersWithProfessions: CharacterWithProfessions[] = (charactersData || []).map((char) => ({
+        ...char,
+        // Ensure defaults for new fields
+        race: char.race || null,
+        primary_archetype: char.primary_archetype || null,
+        secondary_archetype: char.secondary_archetype || null,
+        level: char.level || 1,
+        is_main: char.is_main || false,
+        professions: char.member_professions || [],
       }));
 
-      setMembers(membersWithProfessions);
+      setCharacters(charactersWithProfessions);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
     }
-  }, [fetchOrCreateClan]);
+  }, [fetchClan]);
 
   // Initial fetch
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Add member
-  const addMember = async (name: string) => {
+  // Add character with full data
+  const addCharacter = async (data: CharacterData) => {
     if (!clan) return;
 
     const { error: insertError } = await supabase
       .from('members')
-      .insert({ clan_id: clan.id, name });
+      .insert({ 
+        clan_id: clan.id, 
+        name: data.name,
+        race: data.race || null,
+        primary_archetype: data.primary_archetype || null,
+        secondary_archetype: data.secondary_archetype || null,
+        level: data.level || 1,
+        is_main: data.is_main || false,
+      });
 
     if (insertError) {
-      console.error('Error adding member:', insertError);
+      console.error('Error adding character:', insertError);
       setError(insertError.message);
-      return;
+      throw insertError;
     }
 
     await fetchData();
   };
 
-  // Update member
-  const updateMember = async (id: string, name: string) => {
+  // Update character
+  const updateCharacter = async (id: string, data: Partial<CharacterData>) => {
     const { error: updateError } = await supabase
       .from('members')
-      .update({ name })
+      .update(data)
       .eq('id', id);
 
     if (updateError) {
-      console.error('Error updating member:', updateError);
+      console.error('Error updating character:', updateError);
       setError(updateError.message);
-      return;
+      throw updateError;
     }
 
     await fetchData();
   };
 
-  // Delete member
-  const deleteMember = async (id: string) => {
+  // Delete character
+  const deleteCharacter = async (id: string) => {
     const { error: deleteError } = await supabase
       .from('members')
       .delete()
       .eq('id', id);
 
     if (deleteError) {
-      console.error('Error deleting member:', deleteError);
+      console.error('Error deleting character:', deleteError);
       setError(deleteError.message);
-      return;
+      throw deleteError;
     }
 
     await fetchData();
@@ -154,16 +170,16 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
 
   // Set profession rank (null to remove) - uses optimistic updates
   const setProfessionRank = async (
-    memberId: string,
+    characterId: string,
     professionId: string,
     rank: RankLevel | null
   ) => {
     // Optimistic update - update local state immediately
-    setMembers((prevMembers) =>
-      prevMembers.map((member) => {
-        if (member.id !== memberId) return member;
+    setCharacters((prevCharacters) =>
+      prevCharacters.map((character) => {
+        if (character.id !== characterId) return character;
 
-        let updatedProfessions = [...member.professions];
+        let updatedProfessions = [...character.professions];
 
         if (rank === null) {
           // Remove profession
@@ -183,14 +199,14 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
           } else {
             updatedProfessions.push({
               id: `temp-${Date.now()}`, // Temporary ID
-              member_id: memberId,
+              member_id: characterId,
               profession: professionId,
               rank,
             });
           }
         }
 
-        return { ...member, professions: updatedProfessions };
+        return { ...character, professions: updatedProfessions };
       })
     );
 
@@ -200,7 +216,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         const { error: deleteError } = await supabase
           .from('member_professions')
           .delete()
-          .eq('member_id', memberId)
+          .eq('member_id', characterId)
           .eq('profession', professionId);
 
         if (deleteError) throw deleteError;
@@ -208,7 +224,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         const { error: upsertError } = await supabase
           .from('member_professions')
           .upsert(
-            { member_id: memberId, profession: professionId, rank },
+            { member_id: characterId, profession: professionId, rank },
             { onConflict: 'member_id,profession' }
           );
 
@@ -222,15 +238,25 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     }
   };
 
+  // Legacy aliases for backward compatibility
+  const addMember = async (name: string) => addCharacter({ name });
+  const updateMember = async (id: string, name: string) => updateCharacter(id, { name });
+  const deleteMember = deleteCharacter;
+
   return {
     clan,
-    members,
+    characters,
     loading,
     error,
+    addCharacter,
+    updateCharacter,
+    deleteCharacter,
+    setProfessionRank,
+    refresh: fetchData,
+    // Legacy aliases
+    members: characters,
     addMember,
     updateMember,
     deleteMember,
-    setProfessionRank,
-    refresh: fetchData,
   };
 }

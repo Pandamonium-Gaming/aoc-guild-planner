@@ -1,0 +1,224 @@
+// =====================================================
+// Event Types and Helpers
+// =====================================================
+
+export type EventType = 'raid' | 'siege' | 'gathering' | 'social' | 'other';
+export type RsvpStatus = 'attending' | 'maybe' | 'declined';
+
+// Event type display config
+export const EVENT_TYPES: Record<EventType, { 
+  name: string; 
+  icon: string; 
+  color: string;
+  description: string;
+}> = {
+  raid: { 
+    name: 'Raid', 
+    icon: '⚔️', 
+    color: '#ef4444',
+    description: 'PvE dungeon or boss content'
+  },
+  siege: { 
+    name: 'Siege', 
+    icon: '🏰', 
+    color: '#f97316',
+    description: 'Node siege or castle battle'
+  },
+  gathering: { 
+    name: 'Gathering', 
+    icon: '⛏️', 
+    color: '#22c55e',
+    description: 'Resource gathering expedition'
+  },
+  social: { 
+    name: 'Social', 
+    icon: '🎉', 
+    color: '#8b5cf6',
+    description: 'Social meetup or celebration'
+  },
+  other: { 
+    name: 'Other', 
+    icon: '📅', 
+    color: '#6b7280',
+    description: 'Other clan activity'
+  },
+};
+
+// RSVP status display config
+export const RSVP_STATUSES: Record<RsvpStatus, {
+  name: string;
+  icon: string;
+  color: string;
+}> = {
+  attending: { name: 'Attending', icon: '✅', color: '#22c55e' },
+  maybe: { name: 'Maybe', icon: '❓', color: '#eab308' },
+  declined: { name: 'Declined', icon: '❌', color: '#ef4444' },
+};
+
+// Database types
+export interface Event {
+  id: string;
+  clan_id: string;
+  created_by: string | null;
+  title: string;
+  description: string | null;
+  event_type: EventType;
+  starts_at: string; // ISO timestamp
+  ends_at: string | null;
+  location: string | null;
+  max_attendees: number | null;
+  is_cancelled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventRsvp {
+  id: string;
+  event_id: string;
+  user_id: string;
+  character_id: string | null;
+  status: RsvpStatus;
+  note: string | null;
+  responded_at: string;
+}
+
+export interface EventWithRsvps extends Event {
+  rsvps: EventRsvp[];
+  rsvp_counts: {
+    attending: number;
+    maybe: number;
+    declined: number;
+  };
+  user_rsvp?: EventRsvp | null;
+}
+
+export interface Announcement {
+  id: string;
+  clan_id: string;
+  created_by: string | null;
+  title: string;
+  content: string;
+  is_pinned: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Common timezones for selection
+export const COMMON_TIMEZONES = [
+  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
+  { value: 'America/New_York', label: 'Eastern Time (US)' },
+  { value: 'America/Chicago', label: 'Central Time (US)' },
+  { value: 'America/Denver', label: 'Mountain Time (US)' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time (US)' },
+  { value: 'Europe/London', label: 'London (GMT/BST)' },
+  { value: 'Europe/Paris', label: 'Central Europe (CET/CEST)' },
+  { value: 'Europe/Madrid', label: 'Spain (CET/CEST)' },
+  { value: 'Europe/Berlin', label: 'Germany (CET/CEST)' },
+  { value: 'Europe/Moscow', label: 'Moscow (MSK)' },
+  { value: 'Asia/Tokyo', label: 'Japan (JST)' },
+  { value: 'Asia/Seoul', label: 'Korea (KST)' },
+  { value: 'Asia/Shanghai', label: 'China (CST)' },
+  { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
+  { value: 'Pacific/Auckland', label: 'New Zealand (NZST/NZDT)' },
+] as const;
+
+/**
+ * Format date/time for display in user's timezone
+ */
+export function formatEventTime(
+  isoDate: string,
+  timezone: string = 'UTC',
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const date = new Date(isoDate);
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: timezone,
+    ...options,
+  };
+  return date.toLocaleString('en-US', defaultOptions);
+}
+
+/**
+ * Format date only (no time)
+ */
+export function formatEventDate(isoDate: string, timezone: string = 'UTC'): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    timeZone: timezone,
+  });
+}
+
+/**
+ * Format time only
+ */
+export function formatTime(isoDate: string, timezone: string = 'UTC'): string {
+  const date = new Date(isoDate);
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: timezone,
+  });
+}
+
+/**
+ * Check if event is in the past
+ */
+export function isEventPast(startsAt: string): boolean {
+  return new Date(startsAt) < new Date();
+}
+
+/**
+ * Check if event is happening now (between start and end)
+ */
+export function isEventNow(startsAt: string, endsAt: string | null): boolean {
+  const now = new Date();
+  const start = new Date(startsAt);
+  const end = endsAt ? new Date(endsAt) : new Date(start.getTime() + 2 * 60 * 60 * 1000); // Default 2h
+  return now >= start && now <= end;
+}
+
+/**
+ * Get relative time string (e.g., "in 2 hours", "3 days ago")
+ */
+export function getRelativeTime(isoDate: string): string {
+  const date = new Date(isoDate);
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const diffMins = Math.round(diffMs / 60000);
+  const diffHours = Math.round(diffMs / 3600000);
+  const diffDays = Math.round(diffMs / 86400000);
+
+  if (Math.abs(diffMins) < 60) {
+    return diffMins > 0 ? `in ${diffMins} min` : `${Math.abs(diffMins)} min ago`;
+  }
+  if (Math.abs(diffHours) < 24) {
+    return diffHours > 0 ? `in ${diffHours}h` : `${Math.abs(diffHours)}h ago`;
+  }
+  return diffDays > 0 ? `in ${diffDays} days` : `${Math.abs(diffDays)} days ago`;
+}
+
+/**
+ * Convert local datetime-local input value to ISO with timezone
+ */
+export function localToUTC(localDatetime: string, timezone: string): string {
+  // Parse the local datetime
+  const date = new Date(localDatetime);
+  return date.toISOString();
+}
+
+/**
+ * Convert ISO date to datetime-local input value
+ */
+export function utcToLocal(isoDate: string): string {
+  const date = new Date(isoDate);
+  // Format as YYYY-MM-DDTHH:mm for datetime-local input
+  return date.toISOString().slice(0, 16);
+}

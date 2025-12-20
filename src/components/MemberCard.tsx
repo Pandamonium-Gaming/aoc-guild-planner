@@ -1,57 +1,74 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2, Edit2, Check, X, AlertTriangle } from 'lucide-react';
-import { MemberWithProfessions, RankLevel, RANK_COLORS } from '@/lib/types';
+import { ChevronDown, ChevronUp, Trash2, Edit2, Check, X, AlertTriangle, Star } from 'lucide-react';
+import { CharacterWithProfessions, RankLevel, RANK_COLORS } from '@/lib/types';
 import { getRankSummary, checkRankLimits, PROFESSIONS_BY_TIER, TIER_CONFIG } from '@/lib/professions';
+import { RACES, ARCHETYPES, getClassName, RaceId, ArchetypeId } from '@/lib/characters';
 import { ProfessionSelector } from './ProfessionSelector';
 
-interface MemberCardProps {
-  member: MemberWithProfessions;
+interface CharacterCardProps {
+  character: CharacterWithProfessions;
   onUpdate: (id: string, name: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onSetProfessionRank: (memberId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
+  onSetProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
+  onEdit?: (character: CharacterWithProfessions) => void;
+  readOnly?: boolean;
 }
 
-export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: MemberCardProps) {
+export function CharacterCard({ 
+  character, 
+  onUpdate, 
+  onDelete, 
+  onSetProfessionRank, 
+  onEdit,
+  readOnly = false 
+}: CharacterCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(member.name);
+  const [editName, setEditName] = useState(character.name);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const warnings = checkRankLimits(member.professions);
-  const summary = getRankSummary(member.professions);
+  const warnings = checkRankLimits(character.professions);
+  const summary = getRankSummary(character.professions);
 
   // Get highest rank for border color
-  const highestRank = member.professions.length > 0 
-    ? (Math.max(...member.professions.map(p => p.rank)) as RankLevel)
+  const highestRank = character.professions.length > 0 
+    ? (Math.max(...character.professions.map(p => p.rank)) as RankLevel)
     : 0;
   const borderColor = highestRank > 0 ? RANK_COLORS[highestRank as RankLevel].border : 'border-slate-700';
   const glowEffect = highestRank === 4 ? `shadow-lg ${RANK_COLORS[4].glow}` : '';
 
+  // Get race and class info
+  const raceInfo = character.race ? RACES[character.race as RaceId] : null;
+  const primaryInfo = character.primary_archetype ? ARCHETYPES[character.primary_archetype as ArchetypeId] : null;
+  const className = character.primary_archetype 
+    ? getClassName(character.primary_archetype as ArchetypeId, character.secondary_archetype as ArchetypeId | null)
+    : null;
+
   const handleSave = async () => {
-    if (editName.trim() && editName !== member.name) {
-      await onUpdate(member.id, editName.trim());
+    if (editName.trim() && editName !== character.name) {
+      await onUpdate(character.id, editName.trim());
     }
     setIsEditing(false);
   };
 
   const handleDelete = async () => {
-    await onDelete(member.id);
+    await onDelete(character.id);
     setIsDeleting(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleSave();
     if (e.key === 'Escape') {
-      setEditName(member.name);
+      setEditName(character.name);
       setIsEditing(false);
     }
   };
 
-  // Get profession rank for a member
+  // Get profession rank for a character
   const getProfessionRank = (professionId: string): RankLevel | null => {
-    const prof = member.professions.find((p) => p.profession === professionId);
+    const prof = character.professions.find((p) => p.profession === professionId);
     return prof ? prof.rank : null;
   };
 
@@ -65,7 +82,7 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
         onClick={() => !isEditing && setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between">
-          {/* Name */}
+          {/* Name and Character Info */}
           <div className="flex-1 min-w-0" onClick={(e) => isEditing && e.stopPropagation()}>
             {isEditing ? (
               <div className="flex items-center gap-2">
@@ -87,7 +104,7 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setEditName(member.name);
+                    setEditName(character.name);
                     setIsEditing(false);
                   }}
                   className="p-1 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
@@ -96,7 +113,31 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
                 </button>
               </div>
             ) : (
-              <h3 className="text-white font-semibold truncate">{member.name}</h3>
+              <div>
+                <div className="flex items-center gap-2">
+                  {character.is_main && (
+                    <Star size={14} className="text-amber-400 fill-amber-400" />
+                  )}
+                  <h3 className="text-white font-semibold truncate">{character.name}</h3>
+                  {character.level > 1 && (
+                    <span className="text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
+                      Lv.{character.level}
+                    </span>
+                  )}
+                </div>
+                {/* Race and Class info */}
+                <div className="flex items-center gap-2 mt-0.5 text-sm">
+                  {raceInfo && (
+                    <span className="text-slate-400">{raceInfo.name}</span>
+                  )}
+                  {className && (
+                    <>
+                      {raceInfo && <span className="text-slate-600">•</span>}
+                      <span style={{ color: primaryInfo?.color }}>{className}</span>
+                    </>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
@@ -117,14 +158,17 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
             )}
 
             {/* Actions - stop propagation to prevent toggle */}
-            {!isEditing && (
+            {!isEditing && !readOnly && (
               <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
-                  className="p-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                >
-                  <Edit2 size={16} />
-                </button>
+                {onEdit && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(character); }}
+                    className="p-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                    title="Edit character details"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                )}
                 {isDeleting ? (
                   <div className="flex items-center gap-1">
                     <button
@@ -177,7 +221,7 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
                     key={profession.id}
                     profession={profession}
                     currentRank={getProfessionRank(profession.id)}
-                    onChange={(rank) => onSetProfessionRank(member.id, profession.id, rank)}
+                    onChange={(rank: RankLevel | null) => onSetProfessionRank(character.id, profession.id, rank)}
                   />
                 ))}
               </div>
@@ -188,3 +232,6 @@ export function MemberCard({ member, onUpdate, onDelete, onSetProfessionRank }: 
     </div>
   );
 }
+
+// Legacy alias for backward compatibility
+export { CharacterCard as MemberCard };

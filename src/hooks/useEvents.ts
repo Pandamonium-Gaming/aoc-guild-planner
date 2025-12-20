@@ -1,0 +1,305 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Event, EventWithRsvps, EventRsvp, RsvpStatus, Announcement } from '@/lib/events';
+
+interface UseEventsReturn {
+  events: EventWithRsvps[];
+  announcements: Announcement[];
+  loading: boolean;
+  error: string | null;
+  // Event actions
+  createEvent: (event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>) => Promise<Event | null>;
+  updateEvent: (id: string, updates: Partial<Event>) => Promise<void>;
+  cancelEvent: (id: string) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  // RSVP actions  
+  setRsvp: (eventId: string, status: RsvpStatus, characterId?: string, note?: string) => Promise<void>;
+  removeRsvp: (eventId: string) => Promise<void>;
+  // Announcement actions
+  createAnnouncement: (announcement: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateAnnouncement: (id: string, updates: Partial<Announcement>) => Promise<void>;
+  deleteAnnouncement: (id: string) => Promise<void>;
+  // Utils
+  refresh: () => Promise<void>;
+}
+
+export function useEvents(clanId: string | null, userId: string | null): UseEventsReturn {
+  const [events, setEvents] = useState<EventWithRsvps[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch all events with RSVPs
+  const fetchEvents = useCallback(async () => {
+    if (!clanId) return;
+
+    try {
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          event_rsvps (*)
+        `)
+        .eq('clan_id', clanId)
+        .gte('starts_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24h + future
+        .order('starts_at', { ascending: true });
+
+      if (eventsError) throw eventsError;
+
+      // Transform to EventWithRsvps
+      const eventsWithRsvps: EventWithRsvps[] = (eventsData || []).map((event) => {
+        const rsvps = event.event_rsvps || [];
+        return {
+          ...event,
+          rsvps,
+          rsvp_counts: {
+            attending: rsvps.filter((r: EventRsvp) => r.status === 'attending').length,
+            maybe: rsvps.filter((r: EventRsvp) => r.status === 'maybe').length,
+            declined: rsvps.filter((r: EventRsvp) => r.status === 'declined').length,
+          },
+          user_rsvp: userId ? rsvps.find((r: EventRsvp) => r.user_id === userId) || null : null,
+        };
+      });
+
+      setEvents(eventsWithRsvps);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load events');
+    }
+  }, [clanId, userId]);
+
+  // Fetch announcements
+  const fetchAnnouncements = useCallback(async () => {
+    if (!clanId) return;
+
+    try {
+      const { data, error: annError } = await supabase
+        .from('announcements')
+        .select('*')
+        .eq('clan_id', clanId)
+        .order('is_pinned', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (annError) throw annError;
+      setAnnouncements(data || []);
+    } catch (err) {
+      console.error('Error fetching announcements:', err);
+    }
+  }, [clanId]);
+
+  // Fetch all data
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    await Promise.all([fetchEvents(), fetchAnnouncements()]);
+    setLoading(false);
+  }, [fetchEvents, fetchAnnouncements]);
+
+  // Initial fetch
+  useEffect(() => {
+    if (clanId) {
+      fetchData();
+    }
+  }, [clanId, fetchData]);
+
+  // Create event
+  const createEvent = async (
+    event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>
+  ): Promise<Event | null> => {
+    const { data, error: createError } = await supabase
+      .from('events')
+      .insert(event)
+      .select()
+      .single();
+
+    if (createError) {
+      setError(createError.message);
+      throw createError;
+    }
+
+    await fetchEvents();
+    return data;
+  };
+
+  // Update event
+  const updateEvent = async (id: string, updates: Partial<Event>) => {
+    const { error: updateError } = await supabase
+      .from('events')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (updateError) {
+      setError(updateError.message);
+      throw updateError;
+    }
+
+    await fetchEvents();
+  };
+
+  // Cancel event
+  const cancelEvent = async (id: string) => {
+    await updateEvent(id, { is_cancelled: true });
+  };
+
+  // Delete event
+  const deleteEvent = async (id: string) => {
+    const { error: deleteError } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      throw deleteError;
+    }
+
+    await fetchEvents();
+  };
+
+  // Set RSVP
+  const setRsvp = async (
+    eventId: string,
+    status: RsvpStatus,
+    characterId?: string,
+    note?: string
+  ) => {
+    if (!userId) return;
+
+    const { error: rsvpError } = await supabase
+      .from('event_rsvps')
+      .upsert({
+        event_id: eventId,
+        user_id: userId,
+        status,
+        character_id: characterId || null,
+        note: note || null,
+        responded_at: new Date().toISOString(),
+      }, {
+        onConflict: 'event_id,user_id'
+      });
+
+    if (rsvpError) {
+      setError(rsvpError.message);
+      throw rsvpError;
+    }
+
+    // Optimistic update
+    setEvents(prev => prev.map(event => {
+      if (event.id !== eventId) return event;
+      
+      const existingRsvp = event.rsvps.find(r => r.user_id === userId);
+      let newRsvps: EventRsvp[];
+      
+      if (existingRsvp) {
+        newRsvps = event.rsvps.map(r => 
+          r.user_id === userId ? { ...r, status, character_id: characterId || null, note: note || null } : r
+        );
+      } else {
+        newRsvps = [...event.rsvps, {
+          id: `temp-${Date.now()}`,
+          event_id: eventId,
+          user_id: userId,
+          character_id: characterId || null,
+          status,
+          note: note || null,
+          responded_at: new Date().toISOString(),
+        }];
+      }
+
+      return {
+        ...event,
+        rsvps: newRsvps,
+        rsvp_counts: {
+          attending: newRsvps.filter(r => r.status === 'attending').length,
+          maybe: newRsvps.filter(r => r.status === 'maybe').length,
+          declined: newRsvps.filter(r => r.status === 'declined').length,
+        },
+        user_rsvp: newRsvps.find(r => r.user_id === userId) || null,
+      };
+    }));
+  };
+
+  // Remove RSVP
+  const removeRsvp = async (eventId: string) => {
+    if (!userId) return;
+
+    const { error: deleteError } = await supabase
+      .from('event_rsvps')
+      .delete()
+      .eq('event_id', eventId)
+      .eq('user_id', userId);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      throw deleteError;
+    }
+
+    await fetchEvents();
+  };
+
+  // Create announcement
+  const createAnnouncement = async (
+    announcement: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>
+  ) => {
+    const { error: createError } = await supabase
+      .from('announcements')
+      .insert(announcement);
+
+    if (createError) {
+      setError(createError.message);
+      throw createError;
+    }
+
+    await fetchAnnouncements();
+  };
+
+  // Update announcement
+  const updateAnnouncement = async (id: string, updates: Partial<Announcement>) => {
+    const { error: updateError } = await supabase
+      .from('announcements')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (updateError) {
+      setError(updateError.message);
+      throw updateError;
+    }
+
+    await fetchAnnouncements();
+  };
+
+  // Delete announcement
+  const deleteAnnouncement = async (id: string) => {
+    const { error: deleteError } = await supabase
+      .from('announcements')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      throw deleteError;
+    }
+
+    await fetchAnnouncements();
+  };
+
+  return {
+    events,
+    announcements,
+    loading,
+    error,
+    createEvent,
+    updateEvent,
+    cancelEvent,
+    deleteEvent,
+    setRsvp,
+    removeRsvp,
+    createAnnouncement,
+    updateAnnouncement,
+    deleteAnnouncement,
+    refresh: fetchData,
+  };
+}

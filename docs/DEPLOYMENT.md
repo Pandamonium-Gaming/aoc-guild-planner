@@ -5,6 +5,7 @@
 - GitHub account
 - Vercel account (free)
 - Supabase account (free)
+- Discord account (for OAuth)
 
 ---
 
@@ -22,8 +23,10 @@
 
 1. Go to **SQL Editor** in the left sidebar
 2. Click **New Query**
-3. Copy and paste the contents of `supabase/schema.sql`
-4. Click **Run**
+3. Run migrations in order:
+   - First: `supabase/migrations/001_initial_schema.sql`
+   - Then: `supabase/migrations/002_character_management.sql`
+4. Click **Run** for each migration
 
 ### Get API Keys
 
@@ -34,7 +37,31 @@
 
 ---
 
-## Step 2: Configure Environment Variables
+## Step 2: Set Up Discord OAuth
+
+### Create Discord Application
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Click **New Application**
+3. Name it: `AoC Profession Planner`
+4. Go to **OAuth2** → **General**
+5. Copy **Client ID** and **Client Secret**
+6. Add redirect URI:
+   ```
+   https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback
+   ```
+   (Replace YOUR_PROJECT_ID with your Supabase project ID)
+
+### Enable Discord in Supabase
+
+1. In Supabase Dashboard → **Authentication** → **Providers**
+2. Find **Discord** and enable it
+3. Paste **Client ID** and **Client Secret**
+4. Save
+
+---
+
+## Step 3: Configure Environment Variables
 
 ### For Local Development
 
@@ -43,30 +70,40 @@ Create `.env.local` in your project root:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ### For Vercel (Production)
 
 1. In Vercel project → **Settings** → **Environment Variables**
-2. Add both variables for all environments:
+2. Add these variables for all environments:
 
-| Name                            | Value             |
-| ------------------------------- | ----------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your anon key     |
+| Name                            | Value                                                  |
+| ------------------------------- | ------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase URL                                      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your anon key                                          |
+| `NEXT_PUBLIC_SITE_URL`          | Your Vercel URL (e.g., https://aoc-planner.vercel.app) |
 
 ---
 
-## Step 3: Deploy to Vercel
+## Step 4: Deploy to Vercel
 
 ### Connect GitHub to Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in
 2. Click **Add New...** → **Project**
-3. Select your GitHub repository: `aoc-guild-profession-planner`
+3. Select your GitHub repository
 4. Vercel will auto-detect Next.js settings
-5. Add the environment variables from Step 2
+5. Add the environment variables from Step 3
 6. Click **Deploy**
+
+### Update Discord Redirect
+
+After deployment, add your Vercel URL to Discord OAuth:
+
+1. Go to Discord Developer Portal → Your App → OAuth2
+2. Add redirect: `https://YOUR_VERCEL_URL/auth/callback`
+3. Also add to Supabase: **Authentication** → **URL Configuration** → **Site URL**
 
 ### Automatic Deployments
 
@@ -77,21 +114,50 @@ After initial setup:
 
 ---
 
-## Step 4: Verify Deployment
+## Step 5: Verify Deployment
 
-1. Open your Vercel URL (e.g., `aoc-profession-planner.vercel.app`)
-2. Enter a clan name (e.g., "joeva-witness")
-3. Add a member and assign professions
-4. Refresh the page - data should persist
-5. Open in another browser - data should be shared
+1. Open your Vercel URL
+2. Click **Login with Discord**
+3. Authorize the app
+4. Enter a clan name (e.g., "my-guild")
+5. You should become the Admin of the new clan
+6. Try logging in with another Discord account to test the apply/accept flow
+
+---
+
+## Authentication Flow
+
+```
+User visits /my-clan
+       ↓
+Not logged in? → Redirect to /login → Discord OAuth
+       ↓
+Logged in, clan doesn't exist? → Offer to create (become Admin)
+       ↓
+Logged in, not a member? → Apply to join (pending state)
+       ↓
+Pending member? → Wait for Admin/Officer approval
+       ↓
+Approved member → Full access to clan dashboard
+```
 
 ---
 
 ## Troubleshooting
 
-### "Missing Supabase environment variables"
+### "Invalid redirect_uri"
 
-- Check that both env vars are set in Vercel
+- Check Discord Developer Portal redirect URIs match exactly
+- Include both Supabase callback and Vercel callback URLs
+
+### User stuck in loading after Discord login
+
+- Check Supabase Auth logs for errors
+- Verify Site URL is set correctly in Supabase
+
+### Missing Supabase environment variables
+
+- Check that all env vars are set in Vercel
 - Redeploy after adding variables
 
 ### Data not persisting
@@ -100,26 +166,12 @@ After initial setup:
 - Check browser console for errors
 - Verify RLS policies are created (from schema.sql)
 
-### 500 Error on production
-
-- Check Vercel → Deployments → View logs
-- Most likely missing environment variables
-
----
-
-## Updating the App
-
-1. Make changes locally
-2. Test with `npm run dev`
-3. Commit and push to GitHub
-4. Vercel automatically deploys
-
 ---
 
 ## Security Notes
 
-| ✅ Safe to commit | ❌ Never commit  |
-| ----------------- | ---------------- |
-| `.env.example`    | `.env.local`     |
-| Source code       | Service role key |
-| Schema SQL        | Real passwords   |
+| ✅ Safe to commit | ❌ Never commit       |
+| ----------------- | --------------------- |
+| `.env.example`    | `.env.local`          |
+| Source code       | Discord Client Secret |
+| Schema SQL        | Service role key      |

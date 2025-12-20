@@ -1,0 +1,215 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Globe, Save, Check, ArrowLeft, User } from 'lucide-react';
+import { useAuthContext } from '@/components/AuthProvider';
+import { supabase } from '@/lib/supabase';
+import { COMMON_TIMEZONES } from '@/lib/events';
+
+export default function SettingsPage() {
+  const { user, profile, loading } = useAuthContext();
+  const [timezone, setTimezone] = useState('UTC');
+  const [displayName, setDisplayName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Initialize from profile
+  useEffect(() => {
+    if (profile) {
+      setTimezone(profile.timezone || 'UTC');
+      setDisplayName(profile.display_name || '');
+    }
+  }, [profile]);
+
+  // Auto-detect timezone
+  const detectTimezone = () => {
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setTimezone(detected);
+  };
+
+  // Save settings
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    setError(null);
+    setSaved(false);
+
+    try {
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ 
+          timezone,
+          display_name: displayName.trim() || null
+        })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-400 mb-4">Please log in to access settings</p>
+          <Link 
+            href="/login"
+            className="text-orange-400 hover:text-orange-300 underline"
+          >
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Current time example
+  const currentTime = new Date().toLocaleString('en-US', {
+    timeZone: timezone,
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  return (
+    <div className="min-h-screen bg-slate-950">
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
+          <Link 
+            href="/"
+            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </Link>
+          <h1 className="text-xl font-bold text-white">Settings</h1>
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+        {/* Profile Section */}
+        <section className="bg-slate-900/80 backdrop-blur-sm border border-slate-700 rounded-xl p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <User className="w-5 h-5 text-orange-400" />
+            Profile
+          </h2>
+
+          {/* Display Name */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Display Name
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your display name"
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              This is how your name appears to other clan members.
+            </p>
+          </div>
+        </section>
+
+        {/* Timezone Section */}
+        <section className="bg-slate-900/80 backdrop-blur-sm border border-slate-700 rounded-xl p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Globe className="w-5 h-5 text-orange-400" />
+            Timezone
+          </h2>
+
+          {/* Timezone Selector */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Your Timezone
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="flex-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                {COMMON_TIMEZONES.map(tz => (
+                  <option key={tz.value} value={tz.value}>
+                    {tz.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={detectTimezone}
+                className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer text-sm"
+                title="Detect my timezone"
+              >
+                Auto-detect
+              </button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <p className="text-sm text-slate-400 mb-1">Your current time:</p>
+            <p className="text-white font-medium">{currentTime}</p>
+          </div>
+        </section>
+
+        {/* Error */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
+            {error}
+          </div>
+        )}
+
+        {/* Save Button */}
+        <div className="flex justify-end gap-3">
+          <Link
+            href="/"
+            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer"
+          >
+            Cancel
+          </Link>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            {saving ? (
+              <>Saving...</>
+            ) : saved ? (
+              <>
+                <Check size={18} />
+                Saved!
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                Save Changes
+              </>
+            )}
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}
