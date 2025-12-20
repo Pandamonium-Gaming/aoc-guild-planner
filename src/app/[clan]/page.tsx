@@ -33,11 +33,13 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   const [isApplying, setIsApplying] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<CharacterWithProfessions | null>(null);
   const [characterFilters, setCharacterFilters] = useState<CharacterFilters>(DEFAULT_FILTERS);
+  const [checkError, setCheckError] = useState<string | null>(null);
 
   // Fetch clan ID first
   useEffect(() => {
     async function checkClan() {
       console.log('checkClan: starting for slug', clanSlug);
+      setCheckError(null);
       try {
         // Add timeout to prevent infinite hanging
         const timeoutPromise = new Promise<{ id: string } | null>((_, reject) => {
@@ -58,7 +60,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
         }
       } catch (err) {
         console.error('Error checking clan:', err);
-        setClanExists(false);
+        setCheckError(err instanceof Error ? err.message : 'Failed to check clan');
+        // Do NOT set clanExists to false here, or it will show "Create Clan"
       }
     }
     checkClan();
@@ -116,7 +119,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   } = useParties(clanId, characters);
 
   // Loading state - include clanExists check for initial load
-  const loading = authLoading || membershipLoading || (clanExists === null) || (clanExists && dataLoading);
+  const loading = (authLoading || membershipLoading || (clanExists === null) || (clanExists && dataLoading)) && !checkError;
 
   useEffect(() => {
     if (loading) {
@@ -172,6 +175,36 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-orange-400 animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check Error state (Timeout / Connection)
+  if (checkError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-white mb-2">Connection Error</h2>
+          <p className="text-slate-400 mb-6">
+            Unable to connect to the clan service. This might be due to a slow connection or server issue.
+          </p>
+          <div className="bg-slate-800/50 rounded p-4 mb-6 font-mono text-xs text-red-300 text-left overflow-auto max-h-32">
+            {checkError}
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors cursor-pointer"
+          >
+            Retry Connection
+          </button>
+          <Link
+            href="/"
+            className="block mt-4 text-slate-400 hover:text-white transition-colors"
+          >
+            Return Home
+          </Link>
         </div>
       </div>
     );
