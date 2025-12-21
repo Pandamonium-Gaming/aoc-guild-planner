@@ -634,6 +634,8 @@
     "longestStreak": "Racha Más Larga",
     "days": "días",
     "inactiveMembers": "Miembros Inactivos",
+    "activeMembers": "Miembros Activos",
+    "totalMembers": "Total Miembros",
     "markAsActive": "Marcar como Activo",
     "sendReminder": "Enviar Recordatorio",
     "alertLevel": "Nivel de Alerta",
@@ -641,7 +643,15 @@
     "critical": "Crítico",
     "daysInactive": "días inactivo",
     "noInactiveMembers": "Sin Miembros Inactivos",
-    "noInactiveMembersDesc": "¡Todos los miembros de la guild han estado activos recientemente!"
+    "noInactiveMembersDesc": "¡Todos los miembros de la guild han estado activos recientemente!",
+    "inactivityAlerts": "Alertas de Inactividad",
+    "pendingAlerts": "Alertas Pendientes",
+    "acknowledge": "Confirmar",
+    "topActive": "Miembros Más Activos",
+    "activities30d": "actividades (30d)",
+    "never": "Nunca",
+    "noActivityData": "Sin Datos de Actividad",
+    "noActivityDesc": "El seguimiento de actividad aparecerá aquí cuando los miembros empiecen a participar."
   },
   "achievements": {
     "title": "Logros",

@@ -634,6 +634,8 @@
     "longestStreak": "Longest Streak",
     "days": "days",
     "inactiveMembers": "Inactive Members",
+    "activeMembers": "Active Members",
+    "totalMembers": "Total Members",
     "markAsActive": "Mark as Active",
     "sendReminder": "Send Reminder",
     "alertLevel": "Alert Level",
@@ -641,7 +643,15 @@
     "critical": "Critical",
     "daysInactive": "days inactive",
     "noInactiveMembers": "No Inactive Members",
-    "noInactiveMembersDesc": "All guild members have been active recently!"
+    "noInactiveMembersDesc": "All guild members have been active recently!",
+    "inactivityAlerts": "Inactivity Alerts",
+    "pendingAlerts": "Pending Alerts",
+    "acknowledge": "Acknowledge",
+    "topActive": "Top Active Members",
+    "activities30d": "activities (30d)",
+    "never": "Never",
+    "noActivityData": "No Activity Data",
+    "noActivityDesc": "Activity tracking will appear here once members start participating."
   },
   "achievements": {
     "title": "Achievements",

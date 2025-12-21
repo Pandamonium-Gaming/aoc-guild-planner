@@ -3,6 +3,7 @@ import { Inter, Cinzel } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 import { Footer } from "@/components/Footer";
 
 const inter = Inter({
@@ -57,14 +58,16 @@ export default function RootLayout({
         <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-50 -z-10" />
         
         <LanguageProvider>
-          <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              <main className="flex-1">
-                {children}
-              </main>
-            </div>
-            <Footer />
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <div className="flex flex-col min-h-screen">
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+              <Footer />
+            </AuthProvider>
+          </ToastProvider>
         </LanguageProvider>
 
         {/* Service Worker Registration */}
