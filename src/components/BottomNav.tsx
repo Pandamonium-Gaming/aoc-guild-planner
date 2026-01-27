@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, Calendar, Swords, Settings, Warehouse, MoreHorizontal } from 'lucide-react';
+import { Users, Calendar, Grid3X3, Settings, Warehouse, MoreHorizontal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type Tab = 'characters' | 'events' | 'parties' | 'matrix' | 'manage' | 'siege' | 'economy' | 'more';
@@ -16,7 +16,7 @@ export function BottomNav({ activeTab, onTabChange, canManage }: BottomNavProps)
   
   const NAV_ITEMS: { tab: Tab; icon: React.ElementType; labelKey: string; requiresManage?: boolean }[] = [
     { tab: 'characters', icon: Users, labelKey: 'nav.characters' },
-    { tab: 'siege', icon: Swords, labelKey: 'nav.siege' },
+    { tab: 'matrix', icon: Grid3X3, labelKey: 'nav.matrix' },
     { tab: 'economy', icon: Warehouse, labelKey: 'nav.economy' },
     { tab: 'events', icon: Calendar, labelKey: 'nav.events' },
     { tab: 'more', icon: MoreHorizontal, labelKey: 'nav.more' },

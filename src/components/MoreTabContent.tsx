@@ -1,20 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { Trophy, Handshake, Hammer, Grid3X3, Swords } from 'lucide-react';
+import { Trophy, Handshake, Hammer, Swords, Castle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CharacterWithProfessions } from '@/lib/types';
-import { ClanMatrix } from './ClanMatrix';
 import { PartiesList } from './PartiesList';
 import { AchievementsView } from './AchievementsView';
 import { AllianceView } from './AllianceView';
 import { BuildLibrary } from './BuildLibrary';
+import { SiegeTabContent } from './SiegeTabContent';
 import { useParties } from '@/hooks/useParties';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useAlliances } from '@/hooks/useAlliances';
 import { useBuilds } from '@/hooks/useBuilds';
 
-type MoreSubTab = 'parties' | 'matrix' | 'achievements' | 'builds' | 'alliances';
+type MoreSubTab = 'parties' | 'siege' | 'achievements' | 'builds' | 'alliances';
 
 interface MoreTabContentProps {
   clanId: string;
@@ -62,7 +62,7 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
 
   const SUB_TABS = [
     { id: 'parties', icon: Swords, label: t('nav.parties') },
-    { id: 'matrix', icon: Grid3X3, label: t('nav.matrix') },
+    { id: 'siege', icon: Castle, label: t('nav.siege') },
     { id: 'achievements', icon: Trophy, label: t('achievements.title') },
     { id: 'builds', icon: Hammer, label: t('builds.title') },
     { id: 'alliances', icon: Handshake, label: t('alliance.title') },
@@ -105,8 +105,12 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
         />
       )}
 
-      {subTab === 'matrix' && (
-        <ClanMatrix members={characters} />
+      {subTab === 'siege' && (
+        <SiegeTabContent
+          clanId={clanId}
+          characters={characters}
+          isOfficer={isOfficer}
+        />
       )}
 
       {subTab === 'achievements' && (
