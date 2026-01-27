@@ -125,6 +125,7 @@ export async function notifyNewEvent(
 ): Promise<{ success: boolean; error?: string }> {
   const eventType = EVENT_TYPES[event.event_type];
   const startsAt = new Date(event.starts_at);
+  const endsAt = event.ends_at ? new Date(event.ends_at) : null;
   
   // Build direct link to event
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
@@ -138,11 +139,20 @@ export async function notifyNewEvent(
   
   const fields: { name: string; value: string; inline?: boolean }[] = [
     {
-      name: '📅 When',
-      value: `<t:${Math.floor(startsAt.getTime() / 1000)}:F>`,
+      name: '📅 Start Time',
+      value: `<t:${Math.floor(startsAt.getTime() / 1000)}:F>\n<t:${Math.floor(startsAt.getTime() / 1000)}:R>`,
       inline: true,
     },
   ];
+
+  // Add end time if specified
+  if (endsAt) {
+    fields.push({
+      name: '🏁 End Time',
+      value: `<t:${Math.floor(endsAt.getTime() / 1000)}:t>`,
+      inline: true,
+    });
+  }
 
   if (event.location) {
     fields.push({
@@ -152,7 +162,21 @@ export async function notifyNewEvent(
     });
   }
 
-  if (event.max_attendees) {
+  // Build role requirements string if any roles are needed
+  const roleRequirements = [];
+  if (event.tanks_needed > 0) roleRequirements.push(`🛡️ ${event.tanks_needed} Tank${event.tanks_needed > 1 ? 's' : ''}`);
+  if (event.clerics_needed > 0) roleRequirements.push(`✨ ${event.clerics_needed} Cleric${event.clerics_needed > 1 ? 's' : ''}`);
+  if (event.bards_needed > 0) roleRequirements.push(`🎵 ${event.bards_needed} Bard${event.bards_needed > 1 ? 's' : ''}`);
+  if (event.ranged_dps_needed > 0) roleRequirements.push(`🏹 ${event.ranged_dps_needed} Ranged DPS`);
+  if (event.melee_dps_needed > 0) roleRequirements.push(`⚔️ ${event.melee_dps_needed} Melee DPS`);
+
+  if (roleRequirements.length > 0) {
+    fields.push({
+      name: '⚔️ Role Requirements',
+      value: roleRequirements.join('\n'),
+      inline: false,
+    });
+  } else if (event.max_attendees) {
     fields.push({
       name: '👥 Max Attendees',
       value: event.max_attendees.toString(),
@@ -174,7 +198,7 @@ export async function notifyNewEvent(
     content,
     embeds: [{
       title: `${eventType.icon} ${event.title}`,
-      description: `Type: **${eventType.name}**\n\n**👆 Click the event title above to view details and RSVP!**`,
+      description: `**${eventType.name}**\n\n**👆 Click the event title above to view full details and RSVP with your role!**`,
       color: EVENT_TYPE_COLORS[event.event_type] || COLORS.cyan,
       url: eventUrl,
       fields,
