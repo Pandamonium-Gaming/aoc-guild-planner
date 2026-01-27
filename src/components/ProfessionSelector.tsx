@@ -147,14 +147,13 @@ export function ProfessionSelector({
               <span className="text-xs text-slate-300 font-medium">{quality}</span>
             </div>
             <input
-              type="range"
+              type="number"
               min="0"
-              max="100"
-              step="5"
+              step="1"
               value={quality}
-              onChange={(e) => handleQualityChange(parseInt(e.target.value))}
-              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
-              title={`Quality: ${quality}`}
+              onChange={(e) => handleQualityChange(parseInt(e.target.value) || 0)}
+              className="w-full px-3 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+              placeholder="Enter quality score"
             />
           </div>
         </div>

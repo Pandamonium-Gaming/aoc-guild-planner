@@ -71,7 +71,7 @@ export interface MemberProfession {
   profession: string;
   rank: RankLevel; // Certification rank (manual promotion required)
   artisan_level: number; // 0-50: Current skill level (can exceed rank requirements)
-  quality_score: number; // 0-100 quality/proficiency percentage
+  quality_score: number; // Quality/proficiency score (can be in thousands)
 }
 
 // Extended character with professions loaded
