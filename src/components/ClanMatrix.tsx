@@ -11,24 +11,29 @@ interface ClanMatrixProps {
   members: MemberWithProfessions[];
 }
 
+interface MemberInfo {
+  name: string;
+  level: number;
+}
+
 interface ProfessionStats {
   professionId: string;
   name: string;
-  byRank: Record<RankLevel, string[]>; // member names by rank
+  byRank: Record<RankLevel, MemberInfo[]>; // members with levels by rank
   totalCoverage: number; // how many members have this at any level
   highestRank: RankLevel | 0;
 }
 
 function calculateProfessionStats(members: MemberWithProfessions[]): ProfessionStats[] {
   return PROFESSIONS.map((profession) => {
-    const byRank: Record<RankLevel, string[]> = { 1: [], 2: [], 3: [], 4: [] };
+    const byRank: Record<RankLevel, MemberInfo[]> = { 1: [], 2: [], 3: [], 4: [] };
     let totalCoverage = 0;
     let highestRank: RankLevel | 0 = 0;
 
     for (const member of members) {
       const memberProf = member.professions.find((p) => p.profession === profession.id);
       if (memberProf) {
-        byRank[memberProf.rank].push(member.name);
+        byRank[memberProf.rank].push({ name: member.name, level: memberProf.artisan_level });
         totalCoverage++;
         if (memberProf.rank > highestRank) {
           highestRank = memberProf.rank;
@@ -125,7 +130,7 @@ function ProfessionCard({ stats, showDependencies }: { stats: ProfessionStats; s
                   {RANK_NAMES[rank]}:
                 </span>
                 <span className="text-slate-300 ml-2">
-                  {stats.byRank[rank].join(', ')}
+                  {stats.byRank[rank].map(m => `${m.name} (L${m.level})`).join(', ')}
                 </span>
               </div>
             );
