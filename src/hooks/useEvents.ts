@@ -136,11 +136,13 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
   const createEvent = async (
     event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>
   ): Promise<Event | null> => {
+    console.log('Creating event with data:', event);
     const { data, error: createError } = await supabase
       .from('events')
       .insert(event)
       .select()
       .single();
+    console.log('Created event result:', data, 'error:', createError);
 
     if (createError) {
       setError(createError.message);
