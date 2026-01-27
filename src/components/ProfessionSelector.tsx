@@ -152,6 +152,11 @@ export function ProfessionSelector({
               step="1"
               value={quality}
               onChange={(e) => handleQualityChange(parseInt(e.target.value) || 0)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
               className="w-full px-3 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm"
               placeholder="Enter max quality"
               title="Max quality with food, clothes, town buffs, etc."
