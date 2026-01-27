@@ -163,7 +163,7 @@ export async function notifyNewEvent(
     content: '🆕 **New Event Created!**',
     embeds: [{
       title: `${eventType.icon} ${event.title}`,
-      description: `Type: **${eventType.name}**`,
+      description: `Type: **${eventType.name}**\n\n**👆 Click the event title above to view details and RSVP!**`,
       color: EVENT_TYPE_COLORS[event.event_type] || COLORS.cyan,
       url: eventUrl,
       fields,
