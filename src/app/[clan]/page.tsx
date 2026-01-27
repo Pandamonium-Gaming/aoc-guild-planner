@@ -18,6 +18,7 @@ import { ClanSettings } from '@/components/ClanSettings';
 import { RecruitmentSettings } from '@/components/RecruitmentSettings';
 import { BottomNav } from '@/components/BottomNav';
 import { InlineFooter } from '@/components/Footer';
+import { ClanMatrix } from '@/components/ClanMatrix';
 import { SiegeTabContent } from '@/components/SiegeTabContent';
 import { EconomyTabContent } from '@/components/EconomyTabContent';
 import { MoreTabContent } from '@/components/MoreTabContent';
@@ -509,12 +510,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               onUpdateAnnouncement={updateAnnouncement}
               onDeleteAnnouncement={deleteAnnouncement}
             />
-          ) : activeTab === 'siege' ? (
-            <SiegeTabContent
-              clanId={clanId!}
-              characters={characters}
-              isOfficer={canManageMembers}
-            />
+          ) : activeTab === 'matrix' ? (
+            <ClanMatrix members={characters} />
           ) : activeTab === 'economy' ? (
             <EconomyTabContent
               clanId={clanId!}
