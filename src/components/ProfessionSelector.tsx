@@ -22,9 +22,9 @@ export function ProfessionSelector({
   const [isExpanded, setIsExpanded] = useState(false);
   const [level, setLevel] = useState(currentLevel);
   const [quality, setQuality] = useState(currentQuality);
-  const ranks: RankLevel[] = [1, 2, 3, 4];
+  const ranks: RankLevel[] = [2, 3, 4]; // Start at Apprentice - Novice is the default
   
-  // Max level is determined by current certification rank
+  // Max level is determined by current certification rank (or 10 if uncertified/Novice)
   const maxLevel = currentRank ? getMaxLevelForRank(currentRank) : 10;
   const atCap = currentRank ? isAtRankCap(level, currentRank) : false;
   const canCertify = atCap && currentRank !== null && currentRank < 4; // Can't go beyond Grandmaster
