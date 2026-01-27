@@ -38,7 +38,6 @@ export function EventCard({
   canManage = false 
 }: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
   const { showToast } = useToast();
   const { t } = useLanguage();
   
@@ -265,56 +264,27 @@ export function EventCard({
           {/* RSVP buttons */}
           {!event.is_cancelled && !isPast && (
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {(['attending', 'maybe', 'declined'] as RsvpStatus[]).map((status) => {
-                  const rsvpInfo = RSVP_STATUSES[status];
-                  const isSelected = userRsvp?.status === status;
-                  const isDisabled = status === 'attending' && isFull && !isSelected;
-                  
-                  return (
-                    <button
-                      key={status}
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        if (status === 'declined') {
-                          onRsvp(status, null);
-                        } else {
-                          onRsvp(status, selectedRole);
-                        }
-                      }}
-                      disabled={isDisabled}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
-                        isSelected
-                          ? 'ring-2 ring-offset-2 ring-offset-slate-900'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                      } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      style={isSelected ? { 
-                        backgroundColor: rsvpInfo.color + '30',
-                        color: rsvpInfo.color
-                      } : undefined}
-                    >
-                      {status === 'attending' && <Check size={14} />}
-                      {status === 'maybe' && <HelpCircle size={14} />}
-                      {status === 'declined' && <X size={14} />}
-                      {rsvpInfo.name}
-                      {isDisabled && ' (Full)'}
-                    </button>
-                  );
-                })}
-              </div>
-              
               {/* Role selector - show if any roles are needed */}
               {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
                 event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5">Select your role (optional):</label>
+                  <label className="block text-xs text-slate-400 mb-2">
+                    RSVP with role <span className="text-red-400">*</span>
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
                       const role = roleKey as EventRole;
-                      const needed = event[`${roleKey}_needed` as keyof EventWithRsvps] as number;
+                      const fieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                        tank: 'tanks_needed',
+                        cleric: 'clerics_needed',
+                        bard: 'bards_needed',
+                        ranged_dps: 'ranged_dps_needed',
+                        melee_dps: 'melee_dps_needed'
+                      };
+                      const needed = event[fieldMap[role]] as number;
                       if (needed === 0) return null;
                       
-                      const isSelected = selectedRole === role;
+                      const isSelected = userRsvp?.status === 'attending' && userRsvp?.role === role;
                       
                       return (
                         <button
@@ -322,9 +292,9 @@ export function EventCard({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedRole(isSelected ? null : role);
+                            onRsvp('attending', role);
                           }}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                             isSelected
                               ? 'ring-2 ring-offset-2 ring-offset-slate-900'
                               : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
@@ -336,12 +306,84 @@ export function EventCard({
                         >
                           <span>{roleConfig.icon}</span>
                           <span>{roleConfig.name}</span>
+                          {isSelected && <Check size={14} className="ml-1" />}
                         </button>
                       );
                     })}
                   </div>
                 </div>
               )}
+
+              {/* General RSVP options */}
+              <div>
+                <label className="block text-xs text-slate-400 mb-2">
+                  {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
+                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0)
+                    ? 'Or respond:'
+                    : 'RSVP:'}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {/* Only show attending without role if no roles are needed */}
+                  {!(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
+                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+                    <button
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        onRsvp('attending', null);
+                      }}
+                      disabled={isFull && userRsvp?.status !== 'attending'}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                        userRsvp?.status === 'attending' && !userRsvp?.role
+                          ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-green-400'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                      } ${isFull && userRsvp?.status !== 'attending' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={userRsvp?.status === 'attending' && !userRsvp?.role ? { 
+                        backgroundColor: '#22c55e30'
+                      } : undefined}
+                    >
+                      <Check size={14} />
+                      Attending
+                      {isFull && userRsvp?.status !== 'attending' && ' (Full)'}
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      onRsvp('maybe', null);
+                    }}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                      userRsvp?.status === 'maybe'
+                        ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-yellow-400'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                    }`}
+                    style={userRsvp?.status === 'maybe' ? { 
+                      backgroundColor: '#eab30830'
+                    } : undefined}
+                  >
+                    <HelpCircle size={14} />
+                    Maybe
+                  </button>
+                  
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      onRsvp('declined', null);
+                    }}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                      userRsvp?.status === 'declined'
+                        ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-red-400'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                    }`}
+                    style={userRsvp?.status === 'declined' ? { 
+                      backgroundColor: '#ef444430'
+                    } : undefined}
+                  >
+                    <X size={14} />
+                    Decline
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -361,22 +403,22 @@ export function EventCard({
                   onClick={(e) => { e.stopPropagation(); onCancel(); }}
                   className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg cursor-pointer"
                 >
-                  {t('clan.cancelEvent')}
+                  {t('events.cancelEvent')}
                 </button>
               )}
               {onDelete && (
                 <button
                   onClick={(e) => { 
                     e.stopPropagation(); 
-                    if (confirm(t('clan.confirmDeleteEvent', { title: event.title }))) {
+                    if (confirm(t('events.confirmDeleteEvent', { title: event.title }))) {
                       onDelete();
                     }
                   }}
                   className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg cursor-pointer flex items-center gap-1"
-                  title={t('clan.deleteEvent')}
+                  title={t('events.deleteEvent')}
                 >
                   <Trash2 size={14} />
-                  {t('clan.deleteEvent')}
+                  {t('events.deleteEvent')}
                 </button>
               )}
             </div>
