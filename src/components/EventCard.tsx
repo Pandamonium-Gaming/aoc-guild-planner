@@ -41,6 +41,13 @@ export function EventCard({
   const userRsvp = event.user_rsvp;
 
   const totalAttending = event.rsvp_counts.attending + event.rsvp_counts.maybe;
+
+  // Copy event link to clipboard
+  const copyEventLink = () => {
+    const url = `${window.location.origin}${window.location.pathname}?tab=events#event-${event.id}`;
+    navigator.clipboard.writeText(url);
+    showToast('success', 'Event link copied to clipboard!');
+  };
   
   // When calculating if full, exclude current user's RSVP if they have one
   // This allows switching from Maybe to Attending even if at capacity
