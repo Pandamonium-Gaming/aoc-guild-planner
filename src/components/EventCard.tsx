@@ -38,6 +38,7 @@ export function EventCard({
   canManage = false 
 }: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
   const { showToast } = useToast();
   const { t } = useLanguage();
   
@@ -284,7 +285,7 @@ export function EventCard({
                       const needed = event[fieldMap[role]] as number;
                       if (needed === 0) return null;
                       
-                      const isSelected = userRsvp?.status === 'attending' && userRsvp?.role === role;
+                      const isSelected = selectedRole === role;
                       
                       return (
                         <button
@@ -292,7 +293,7 @@ export function EventCard({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onRsvp('attending', role);
+                            setSelectedRole(isSelected ? null : role);
                           }}
                           className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                             isSelected
@@ -347,10 +348,34 @@ export function EventCard({
                     </button>
                   )}
                   
+                  {/* Show attending with role button if roles are needed and a role is selected */}
+                  {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
+                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && selectedRole && (
+                    <button
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        onRsvp('attending', selectedRole);
+                      }}
+                      disabled={isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                        userRsvp?.status === 'attending' && userRsvp?.role === selectedRole
+                          ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-green-400'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                      } ${isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={userRsvp?.status === 'attending' && userRsvp?.role === selectedRole ? { 
+                        backgroundColor: '#22c55e30'
+                      } : undefined}
+                    >
+                      <Check size={14} />
+                      Attending
+                      {isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole) && ' (Full)'}
+                    </button>
+                  )}
+                  
                   <button
                     onClick={(e) => { 
                       e.stopPropagation(); 
-                      onRsvp('maybe', null);
+                      onRsvp('maybe', selectedRole);
                     }}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       userRsvp?.status === 'maybe'
