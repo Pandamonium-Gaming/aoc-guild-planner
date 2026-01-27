@@ -41,7 +41,11 @@
     "continueWithDiscord": "Continue with Discord",
     "comingSoon": "Coming Soon",
     "available": "available",
-    "change": "Change"
+    "change": "Change",
+    "clear": "Clear",
+    "confirmDelete": "Confirm Delete",
+    "loadingError": "Loading Error",
+    "cancelDelete": "Cancel Deletion"
   },
   "nav": {
     "characters": "Characters",
@@ -106,7 +110,8 @@
     "master": "Master",
     "journeyman": "Journeyman",
     "apprentice": "Apprentice",
-    "novice": "Novice"
+    "novice": "Novice",
+    "linkToMain": "Link to Main Character"
   },
   "party": {
     "createParty": "Create Party",
@@ -183,7 +188,8 @@
     "addMember": "Add Member",
     "removeMember": "Remove Member",
     "memberSince": "Member since",
-    "role": "Role"
+    "role": "Role",
+    "changeRole": "Change Role"
   },
   "settings": {
     "title": "Settings",
@@ -277,7 +283,9 @@
     "noProfessions": "No professions",
     "showing": "Showing",
     "of": "of",
-    "characters": "characters"
+    "characters": "characters",
+    "minLevel": "Minimum Level",
+    "maxLevel": "Maximum Level"
   },
   "archetypes": {
     "fighter": "Fighter",

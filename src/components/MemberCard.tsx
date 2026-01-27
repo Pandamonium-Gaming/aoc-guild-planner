@@ -15,6 +15,8 @@ interface CharacterCardProps {
   onSetProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
   onEdit?: (character: CharacterWithProfessions) => void;
   readOnly?: boolean;
+  mainCharacterName?: string; // Name of the main character this alt belongs to
+  altCharacters?: Array<{ id: string; name: string }>; // List of alts for this main character
 }
 
 export function CharacterCard({ 
@@ -23,7 +25,9 @@ export function CharacterCard({
   onDelete, 
   onSetProfessionRank, 
   onEdit,
-  readOnly = false 
+  readOnly = false,
+  mainCharacterName,
+  altCharacters = []
 }: CharacterCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -96,10 +100,12 @@ export function CharacterCard({
                   className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 w-full max-w-[200px]"
                   autoFocus
                   onClick={(e) => e.stopPropagation()}
+                  title={t('character.name')}
                 />
                 <button
                   onClick={(e) => { e.stopPropagation(); handleSave(); }}
                   className="p-1 text-green-400 hover:text-green-300 transition-colors cursor-pointer"
+                  title={t('common.save')}
                 >
                   <Check size={16} />
                 </button>
@@ -110,6 +116,7 @@ export function CharacterCard({
                     setIsEditing(false);
                   }}
                   className="p-1 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                  title={t('common.cancel')}
                 >
                   <X size={16} />
                 </button>
@@ -139,6 +146,19 @@ export function CharacterCard({
                     </>
                   )}
                 </div>
+                {/* Main/Alt relationship */}
+                {mainCharacterName && (
+                  <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                    <span>Alt of</span>
+                    <span className="text-amber-400">{mainCharacterName}</span>
+                  </div>
+                )}
+                {altCharacters.length > 0 && (
+                  <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                    <span>Alts:</span>
+                    <span className="text-slate-400">{altCharacters.map(a => a.name).join(', ')}</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -176,12 +196,14 @@ export function CharacterCard({
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(); }}
                       className="p-1 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                      title={t('common.confirmDelete')}
                     >
                       <Check size={16} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setIsDeleting(false); }}
                       className="p-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                      title={t('common.cancelDelete')}
                     >
                       <X size={16} />
                     </button>
@@ -190,6 +212,7 @@ export function CharacterCard({
                   <button
                     onClick={(e) => { e.stopPropagation(); setIsDeleting(true); }}
                     className="p-1 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                    title={t('common.delete')}
                   >
                     <Trash2 size={16} />
                   </button>

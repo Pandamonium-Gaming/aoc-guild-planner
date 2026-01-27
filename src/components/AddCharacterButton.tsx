@@ -8,9 +8,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AddCharacterButtonProps {
   onAdd: (data: CharacterData) => Promise<void>;
+  availableMainCharacters?: Array<{ id: string; name: string }>;
 }
 
-export function AddCharacterButton({ onAdd }: AddCharacterButtonProps) {
+export function AddCharacterButton({ onAdd, availableMainCharacters = [] }: AddCharacterButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { t } = useLanguage();
 
@@ -36,6 +37,7 @@ export function AddCharacterButton({ onAdd }: AddCharacterButtonProps) {
         <CharacterForm
           onSubmit={handleSubmit}
           onCancel={() => setIsModalOpen(false)}
+          availableMainCharacters={availableMainCharacters}
         />
       )}
     </>

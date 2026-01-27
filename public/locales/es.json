@@ -41,7 +41,11 @@
     "continueWithDiscord": "Continuar con Discord",
     "comingSoon": "Próximamente",
     "available": "disponible",
-    "change": "Cambiar"
+    "change": "Cambiar",
+    "clear": "Limpiar",
+    "confirmDelete": "Confirmar Eliminación",
+    "loadingError": "Error de Carga",
+    "cancelDelete": "Cancelar Eliminación"
   },
   "nav": {
     "characters": "Personajes",
@@ -106,7 +110,8 @@
     "master": "Maestro",
     "journeyman": "Oficial",
     "apprentice": "Aprendiz",
-    "novice": "Novato"
+    "novice": "Novato",
+    "linkToMain": "Vincular al Personaje Principal"
   },
   "party": {
     "createParty": "Crear Grupo",
@@ -183,7 +188,8 @@
     "addMember": "Añadir Miembro",
     "removeMember": "Eliminar Miembro",
     "memberSince": "Miembro desde",
-    "role": "Rol"
+    "role": "Rol",
+    "changeRole": "Cambiar Rol"
   },
   "settings": {
     "title": "Configuración",
@@ -277,7 +283,9 @@
     "noProfessions": "Sin profesiones",
     "showing": "Mostrando",
     "of": "de",
-    "characters": "personajes"
+    "characters": "personajes",
+    "minLevel": "Nivel Mínimo",
+    "maxLevel": "Nivel Máximo"
   },
   "archetypes": {
     "fighter": "Guerrero",

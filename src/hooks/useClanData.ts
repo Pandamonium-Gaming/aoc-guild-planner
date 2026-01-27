@@ -12,6 +12,7 @@ export interface CharacterData {
   secondary_archetype?: Archetype | null;
   level?: number;
   is_main?: boolean;
+  main_character_id?: string | null;
 }
 
 interface UseClanDataReturn {
@@ -94,6 +95,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         secondary_archetype: char.secondary_archetype || null,
         level: char.level || 1,
         is_main: char.is_main || false,
+        main_character_id: char.main_character_id || null,
         professions: char.member_professions || [],
       }));
 
@@ -125,6 +127,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         secondary_archetype: data.secondary_archetype || null,
         level: data.level || 1,
         is_main: data.is_main || false,
+        main_character_id: data.main_character_id || null,
       })
       .select();
 
