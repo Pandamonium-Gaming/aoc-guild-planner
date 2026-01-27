@@ -126,6 +126,14 @@ export interface EventRsvp {
   role: EventRole | null;
   note: string | null;
   responded_at: string;
+  character?: {
+    id: string;
+    name: string;
+  };
+  user?: {
+    id: string;
+    display_name: string | null;
+  };
 }
 
 export interface EventWithRsvps extends Event {

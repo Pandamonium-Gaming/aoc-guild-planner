@@ -41,7 +41,11 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
         .from('events')
         .select(`
           *,
-          event_rsvps (*)
+          event_rsvps (
+            *,
+            character:characters(id, name),
+            user:users(id, display_name)
+          )
         `)
         .eq('clan_id', clanId)
         .gte('starts_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24h + future
