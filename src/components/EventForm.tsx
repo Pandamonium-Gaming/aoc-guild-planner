@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Calendar } from 'lucide-react';
-import { Event, EventType, EVENT_TYPES, EVENT_ROLES, utcToLocal } from '@/lib/events';
+import { Event, EventType, EventRole, EVENT_TYPES, EVENT_ROLES, utcToLocal } from '@/lib/events';
 
 interface EventFormData {
   title: string;
@@ -241,7 +241,14 @@ export function EventForm({
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
-                const fieldName = `${roleKey}_needed` as 'tanks_needed' | 'clerics_needed' | 'bards_needed' | 'ranged_dps_needed' | 'melee_dps_needed';
+                const fieldMap: Record<EventRole, keyof FormData> = {
+                  tank: 'tanks_needed',
+                  cleric: 'clerics_needed',
+                  bard: 'bards_needed',
+                  ranged_dps: 'ranged_dps_needed',
+                  melee_dps: 'melee_dps_needed'
+                };
+                const fieldName = fieldMap[roleKey as EventRole];
                 return (
                   <div key={roleKey} className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5">
