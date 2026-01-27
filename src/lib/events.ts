@@ -2,7 +2,7 @@
 // Event Types and Helpers
 // =====================================================
 
-export type EventType = 'raid' | 'siege' | 'gathering' | 'social' | 'other';
+export type EventType = 'raid' | 'siege' | 'gathering' | 'social' | 'farming_glint' | 'farming_materials' | 'farming_gear' | 'farming_other' | 'other';
 export type RsvpStatus = 'attending' | 'maybe' | 'declined';
 
 // Event type display config
@@ -35,6 +35,30 @@ export const EVENT_TYPES: Record<EventType, {
     icon: '🎉', 
     color: '#8b5cf6',
     description: 'Social meetup or celebration'
+  },
+  farming_glint: { 
+    name: 'Farming (Glint)', 
+    icon: '💎', 
+    color: '#06b6d4',
+    description: 'Glint farming expedition'
+  },
+  farming_materials: { 
+    name: 'Farming (Materials)', 
+    icon: '📦', 
+    color: '#10b981',
+    description: 'Material farming run'
+  },
+  farming_gear: { 
+    name: 'Farming (Gear)', 
+    icon: '🎯', 
+    color: '#8b5cf6',
+    description: 'Gear farming expedition'
+  },
+  farming_other: { 
+    name: 'Farming (Other)', 
+    icon: '🌾', 
+    color: '#84cc16',
+    description: 'Other farming activity'
   },
   other: { 
     name: 'Other', 

@@ -41,6 +41,10 @@ const EVENT_TYPE_COLORS: Record<string, number> = {
   siege: COLORS.orange,
   gathering: COLORS.yellow,
   social: COLORS.green,
+  farming_glint: COLORS.cyan,
+  farming_materials: COLORS.green,
+  farming_gear: COLORS.purple,
+  farming_other: 0x84cc16,
   other: COLORS.cyan,
 };
 
