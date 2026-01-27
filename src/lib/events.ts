@@ -79,6 +79,21 @@ export const RSVP_STATUSES: Record<RsvpStatus, {
   declined: { name: 'Declined', icon: '❌', color: '#ef4444' },
 };
 
+// Role type for events and parties
+export type EventRole = 'tank' | 'healer' | 'dps' | 'support';
+
+// Role display config
+export const EVENT_ROLES: Record<EventRole, {
+  name: string;
+  icon: string;
+  color: string;
+}> = {
+  tank: { name: 'Tank', icon: '🛡️', color: '#3b82f6' },
+  healer: { name: 'Healer', icon: '💚', color: '#22c55e' },
+  dps: { name: 'DPS', icon: '⚔️', color: '#ef4444' },
+  support: { name: 'Support', icon: '✨', color: '#a855f7' },
+};
+
 // Database types
 export interface Event {
   id: string;
@@ -91,6 +106,10 @@ export interface Event {
   ends_at: string | null;
   location: string | null;
   max_attendees: number | null;
+  tanks_needed: number;
+  healers_needed: number;
+  dps_needed: number;
+  support_needed: number;
   is_cancelled: boolean;
   created_at: string;
   updated_at: string;
@@ -102,6 +121,7 @@ export interface EventRsvp {
   user_id: string;
   character_id: string | null;
   status: RsvpStatus;
+  role: EventRole | null;
   note: string | null;
   responded_at: string;
 }
@@ -112,6 +132,12 @@ export interface EventWithRsvps extends Event {
     attending: number;
     maybe: number;
     declined: number;
+  };
+  role_counts: {
+    tank: { attending: number; maybe: number };
+    healer: { attending: number; maybe: number };
+    dps: { attending: number; maybe: number };
+    support: { attending: number; maybe: number };
   };
   user_rsvp?: EventRsvp | null;
 }

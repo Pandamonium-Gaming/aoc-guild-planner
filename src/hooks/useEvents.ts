@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Event, EventWithRsvps, EventRsvp, RsvpStatus, Announcement } from '@/lib/events';
+import { Event, EventWithRsvps, EventRsvp, RsvpStatus, EventRole, Announcement } from '@/lib/events';
 import { notifyNewEvent, notifyAnnouncement } from '@/lib/discord';
 
 interface UseEventsReturn {
@@ -16,7 +16,7 @@ interface UseEventsReturn {
   cancelEvent: (id: string) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   // RSVP actions  
-  setRsvp: (eventId: string, status: RsvpStatus, characterId?: string, note?: string) => Promise<void>;
+  setRsvp: (eventId: string, status: RsvpStatus, role?: EventRole | null, characterId?: string, note?: string) => Promise<void>;
   removeRsvp: (eventId: string) => Promise<void>;
   // Announcement actions
   createAnnouncement: (announcement: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
@@ -59,6 +59,24 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
             attending: rsvps.filter((r: EventRsvp) => r.status === 'attending').length,
             maybe: rsvps.filter((r: EventRsvp) => r.status === 'maybe').length,
             declined: rsvps.filter((r: EventRsvp) => r.status === 'declined').length,
+          },
+          role_counts: {
+            tank: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'tank' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'tank' && r.status === 'maybe').length,
+            },
+            healer: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'healer' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'healer' && r.status === 'maybe').length,
+            },
+            dps: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'dps' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'dps' && r.status === 'maybe').length,
+            },
+            support: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'support' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'support' && r.status === 'maybe').length,
+            },
           },
           user_rsvp: userId ? rsvps.find((r: EventRsvp) => r.user_id === userId) || null : null,
         };
@@ -188,6 +206,7 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
   const setRsvp = async (
     eventId: string,
     status: RsvpStatus,
+    role?: EventRole | null,
     characterId?: string,
     note?: string
   ) => {
@@ -199,6 +218,7 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
         event_id: eventId,
         user_id: userId,
         status,
+        role: role || null,
         character_id: characterId || null,
         note: note || null,
         responded_at: new Date().toISOString(),
@@ -212,40 +232,8 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
       throw rsvpError;
     }
 
-    // Optimistic update
-    setEvents(prev => prev.map(event => {
-      if (event.id !== eventId) return event;
-      
-      const existingRsvp = event.rsvps.find(r => r.user_id === userId);
-      let newRsvps: EventRsvp[];
-      
-      if (existingRsvp) {
-        newRsvps = event.rsvps.map(r => 
-          r.user_id === userId ? { ...r, status, character_id: characterId || null, note: note || null } : r
-        );
-      } else {
-        newRsvps = [...event.rsvps, {
-          id: `temp-${Date.now()}`,
-          event_id: eventId,
-          user_id: userId,
-          character_id: characterId || null,
-          status,
-          note: note || null,
-          responded_at: new Date().toISOString(),
-        }];
-      }
-
-      return {
-        ...event,
-        rsvps: newRsvps,
-        rsvp_counts: {
-          attending: newRsvps.filter(r => r.status === 'attending').length,
-          maybe: newRsvps.filter(r => r.status === 'maybe').length,
-          declined: newRsvps.filter(r => r.status === 'declined').length,
-        },
-        user_rsvp: newRsvps.find(r => r.user_id === userId) || null,
-      };
-    }));
+    // Refresh to get accurate counts
+    await fetchEvents();
   };
 
   // Remove RSVP
