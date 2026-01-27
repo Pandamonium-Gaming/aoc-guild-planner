@@ -34,4 +34,4 @@ END $$;
 
 -- Add comments
 COMMENT ON COLUMN member_professions.artisan_level IS 'Artisan skill level (0-50). Level ranges: 0-9=Novice, 10-19=Apprentice, 20-29=Journeyman, 30-39=Master, 40-50=Grandmaster. Note: Promotion to next rank requires manual certification.';
-COMMENT ON COLUMN member_professions.quality_score IS 'Quality/proficiency percentage (0-100)';
+COMMENT ON COLUMN member_professions.quality_score IS 'Quality/proficiency score (0-100)';

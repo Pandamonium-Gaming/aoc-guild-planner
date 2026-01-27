@@ -144,7 +144,7 @@ export function ProfessionSelector({
               <label className="text-xs text-slate-400">
                 Quality
               </label>
-              <span className="text-xs text-slate-300 font-medium">{quality}%</span>
+              <span className="text-xs text-slate-300 font-medium">{quality}</span>
             </div>
             <input
               type="range"
@@ -154,7 +154,7 @@ export function ProfessionSelector({
               value={quality}
               onChange={(e) => handleQualityChange(parseInt(e.target.value))}
               className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
-              title={`Quality: ${quality}%`}
+              title={`Quality: ${quality}`}
             />
           </div>
         </div>
