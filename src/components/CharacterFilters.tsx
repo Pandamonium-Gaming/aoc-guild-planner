@@ -203,14 +203,35 @@ export function filterCharacters<T extends {
   primary_archetype?: string | null;
   level?: number;
   professions: unknown[];
+  user_id?: string | null;
+  is_main?: boolean;
 }>(
   characters: T[],
   filters: CharacterFilters
 ): T[] {
+  // If there's a search term, we need to include related characters
+  let matchedUserIds = new Set<string>();
+  
+  if (filters.search) {
+    const searchLower = filters.search.toLowerCase();
+    characters.forEach(char => {
+      if (char.name.toLowerCase().includes(searchLower) && char.user_id) {
+        matchedUserIds.add(char.user_id);
+      }
+    });
+  }
+  
   return characters.filter(char => {
-    // Search filter
-    if (filters.search && !char.name.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+    // Search filter - include character if:
+    // 1. Name matches search, OR
+    // 2. Has user_id and that user_id had a character that matched search
+    if (filters.search) {
+      const nameMatches = char.name.toLowerCase().includes(filters.search.toLowerCase());
+      const relatedMatches = char.user_id && matchedUserIds.has(char.user_id);
+      
+      if (!nameMatches && !relatedMatches) {
+        return false;
+      }
     }
 
     // Race filter
