@@ -43,7 +43,7 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
           *,
           event_rsvps (
             *,
-            character:characters(id, name),
+            character:members(id, name),
             user:users(id, display_name)
           )
         `)
