@@ -247,23 +247,26 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
       <div className="flex gap-2 flex-wrap">
         {manageableRoles.length > 0 && (
           <>
-            {manageableRoles.map((role) => (
+            {manageableRoles.map((role) => {
+              const roleConfig = ROLE_CONFIG[role];
+              return (
               <button
                 key={role}
                 onClick={() => setSelectedRole(role)}
                 disabled={!canEditRole}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   selectedRole === role
-                    ? `ring-2 ring-offset-2 ring-offset-slate-900 ${selectedRoleConfig.color}`
+                    ? `ring-2 ring-offset-2 ring-offset-slate-900 ${roleConfig.color}`
                     : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
                 } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                 style={selectedRole === role ? {
-                  backgroundColor: selectedRoleConfig.color.replace('text-', '').slice(0, -2) + '30',
+                  backgroundColor: roleConfig.color.replace('text-', '').slice(0, -2) + '30',
                 } : undefined}
               >
-                {selectedRoleConfig.label}
+                {roleConfig.label}
               </button>
-            ))}
+            );
+            })}
           </>
         )}
         {userRole === 'admin' && (

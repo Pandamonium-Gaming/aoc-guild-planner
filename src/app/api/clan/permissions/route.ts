@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Verify user is admin of the clan
+    // Verify user is admin
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -105,10 +105,10 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!membership || membership.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden - user is not an admin' }, { status: 403 });
     }
 
-    // Fetch permission overrides
+    // Fetch permission overrides - may not exist if table hasn't been created yet
     const { data, error } = await supabaseAdmin
       .from('clan_permission_overrides')
       .select('*')
@@ -116,14 +116,19 @@ export async function GET(request: NextRequest) {
       .order('role', { ascending: true });
 
     if (error) {
+      // If table doesn't exist yet (migration not applied), just return empty
+      if (error.code === 'PGRST116' || error.message?.includes('relation')) {
+        console.warn('clan_permission_overrides table not found, returning empty defaults');
+        return NextResponse.json({ permissions: [] });
+      }
       console.error('Error fetching permissions:', error);
-      return NextResponse.json({ error: 'Failed to fetch permissions' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to fetch permissions', details: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ permissions: data || [] });
   } catch (error) {
     console.error('Error in GET /api/clan/permissions:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', details: String(error) }, { status: 500 });
   }
 }
 
