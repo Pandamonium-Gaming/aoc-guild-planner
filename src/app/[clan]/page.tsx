@@ -17,7 +17,6 @@ import { CharacterFiltersBar, CharacterFilters, DEFAULT_FILTERS, filterCharacter
 import { ClanSettings } from '@/components/ClanSettings';
 import { RecruitmentSettings } from '@/components/RecruitmentSettings';
 import { PermissionsSettings } from '@/components/PermissionsSettings';
-import { RoleManagement } from '@/components/RoleManagement';
 import { BottomNav } from '@/components/BottomNav';
 import { InlineFooter } from '@/components/Footer';
 import { ClanMatrix } from '@/components/ClanMatrix';
@@ -543,6 +542,12 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
             />
           ) : activeTab === 'manage' && canManageMembers ? (
             <div className="space-y-6">
+              {/* Title */}
+              <div>
+                <h2 className="text-2xl font-bold text-white">{t('nav.manage')}</h2>
+                <p className="text-slate-400 mt-1">Manage clan members, roles, and settings</p>
+              </div>
+
               {/* Member Management */}
               <ManageTab
                 members={clanMembers}
@@ -554,23 +559,6 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
                 currentUserId={user.id}
                 t={t}
               />
-
-              {/* Role Management (Officer+) */}
-              {(membership?.role === 'admin' || membership?.role === 'officer') && clan && (
-                <RoleManagement
-                  clanId={clan?.id || ''}
-                  members={clanMembers.map(m => ({
-                    id: m.id,
-                    user_id: m.user_id || '',
-                    role: m.role as 'admin' | 'officer' | 'member' | 'trial' | 'pending',
-                    user: m.user ? {
-                      display_name: m.user.display_name || '',
-                      discord_username: m.user.discord_username || undefined
-                    } : undefined
-                  }))}
-                  userRole={(membership?.role || 'member') as 'admin' | 'officer' | 'member' | 'trial' | 'pending'}
-                />
-              )}
 
               {/* Permissions Settings (Admin only) */}
               {membership?.role === 'admin' && clan && (
