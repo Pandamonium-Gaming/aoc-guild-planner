@@ -7,7 +7,13 @@ function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
-  if (!url || !key) {
+  if (!url) {
+    console.error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+    return null;
+  }
+  
+  if (!key) {
+    console.error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
     return null;
   }
   
@@ -65,7 +71,10 @@ export async function GET(request: NextRequest) {
 
   const supabaseAdmin = getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    console.error('Supabase admin client initialization failed - check environment variables');
+    return NextResponse.json({ 
+      error: 'Server not properly configured. Missing Supabase credentials (SUPABASE_SERVICE_ROLE_KEY).' 
+    }, { status: 500 });
   }
 
   try {
@@ -144,7 +153,10 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      console.error('Supabase admin client initialization failed - check environment variables');
+      return NextResponse.json({ 
+        error: 'Server not properly configured. Missing Supabase credentials (SUPABASE_SERVICE_ROLE_KEY).' 
+      }, { status: 500 });
     }
 
     // Verify user is admin of the clan
