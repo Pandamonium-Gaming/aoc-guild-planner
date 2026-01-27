@@ -131,24 +131,6 @@ export const RANK_COLORS: Record<RankLevel, { text: string; border: string; bg: 
     bg: 'bg-orange-500/20',
     glow: 'shadow-orange-500/50'
   },
-  3: {
-}
-
-// Helper function to get rank name including level range
-export function getRankWithLevelRange(level: number): string {
-  const rank = getRankFromLevel(level);
-  const rankName = RANK_NAMES[rank];
-  return `${rankName} (${level}/50)`;
-}
-
-// Rank color configuration
-export const RANK_COLORS: Record<RankLevel, { text: string; border: string; bg: string; glow: string }> = {
-  4: { 
-    text: 'text-orange-400', 
-    border: 'border-orange-500', 
-    bg: 'bg-orange-500/20',
-    glow: 'shadow-orange-500/50'
-  },
   3: { 
     text: 'text-purple-400', 
     border: 'border-purple-500', 
