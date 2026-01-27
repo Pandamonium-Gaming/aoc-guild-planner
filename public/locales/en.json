@@ -430,7 +430,10 @@
       "victory": "Victory",
       "defeat": "Defeat",
       "draw": "Draw"
-    }
+    },
+    "createEvent": "Create Event",
+    "noUpcoming": "No Upcoming Sieges",
+    "noUpcomingDesc": "Create a siege event to organize your clan."
   },
   "loot": {
     "title": "Loot & DKP",
