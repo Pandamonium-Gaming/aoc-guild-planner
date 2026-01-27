@@ -22,12 +22,13 @@ export function PartyForm({
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [tanks, setTanks] = useState(initialData?.tanks_needed || 1);
-  const [healers, setHealers] = useState(initialData?.healers_needed || 2);
-  const [dps, setDps] = useState(initialData?.dps_needed || 4);
-  const [support, setSupport] = useState(initialData?.support_needed || 1);
+  const [clerics, setClerics] = useState(initialData?.clerics_needed || 2);
+  const [bards, setBards] = useState(initialData?.bards_needed || 1);
+  const [rangedDps, setRangedDps] = useState(initialData?.ranged_dps_needed || 2);
+  const [meleeDps, setMeleeDps] = useState(initialData?.melee_dps_needed || 2);
   const [saving, setSaving] = useState(false);
 
-  const total = tanks + healers + dps + support;
+  const total = tanks + clerics + bards + rangedDps + meleeDps;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +42,10 @@ export function PartyForm({
         name: name.trim(),
         description: description.trim() || undefined,
         tanks_needed: tanks,
-        healers_needed: healers,
-        dps_needed: dps,
-        support_needed: support,
+        clerics_needed: clerics,
+        bards_needed: bards,
+        ranged_dps_needed: rangedDps,
+        melee_dps_needed: meleeDps,
       });
     } finally {
       setSaving(false);
@@ -113,14 +115,16 @@ export function PartyForm({
               Role Requirements
             </label>
             <div className="grid grid-cols-2 gap-3">
-              {(['tank', 'healer', 'dps', 'support'] as PartyRole[]).map(role => {
+              {(['tank', 'cleric', 'bard', 'ranged_dps', 'melee_dps'] as PartyRole[]).map(role => {
                 const config = PARTY_ROLES[role];
                 const value = role === 'tank' ? tanks : 
-                              role === 'healer' ? healers : 
-                              role === 'dps' ? dps : support;
+                              role === 'cleric' ? clerics : 
+                              role === 'bard' ? bards :
+                              role === 'ranged_dps' ? rangedDps : meleeDps;
                 const setValue = role === 'tank' ? setTanks : 
-                                 role === 'healer' ? setHealers : 
-                                 role === 'dps' ? setDps : setSupport;
+                                 role === 'cleric' ? setClerics : 
+                                 role === 'bard' ? setBards :
+                                 role === 'ranged_dps' ? setRangedDps : setMeleeDps;
                 
                 return (
                   <div key={role} className="flex items-center gap-2">

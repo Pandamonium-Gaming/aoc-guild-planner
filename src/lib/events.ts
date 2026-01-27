@@ -80,7 +80,7 @@ export const RSVP_STATUSES: Record<RsvpStatus, {
 };
 
 // Role type for events and parties
-export type EventRole = 'tank' | 'healer' | 'dps' | 'support';
+export type EventRole = 'tank' | 'cleric' | 'bard' | 'ranged_dps' | 'melee_dps';
 
 // Role display config
 export const EVENT_ROLES: Record<EventRole, {
@@ -89,9 +89,10 @@ export const EVENT_ROLES: Record<EventRole, {
   color: string;
 }> = {
   tank: { name: 'Tank', icon: '🛡️', color: '#3b82f6' },
-  healer: { name: 'Healer', icon: '💚', color: '#22c55e' },
-  dps: { name: 'DPS', icon: '⚔️', color: '#ef4444' },
-  support: { name: 'Support', icon: '✨', color: '#a855f7' },
+  cleric: { name: 'Cleric', icon: '✨', color: '#22c55e' },
+  bard: { name: 'Bard', icon: '🎵', color: '#a855f7' },
+  ranged_dps: { name: 'Ranged DPS', icon: '🏹', color: '#ef4444' },
+  melee_dps: { name: 'Melee DPS', icon: '⚔️', color: '#f97316' },
 };
 
 // Database types
@@ -107,9 +108,10 @@ export interface Event {
   location: string | null;
   max_attendees: number | null;
   tanks_needed: number;
-  healers_needed: number;
-  dps_needed: number;
-  support_needed: number;
+  clerics_needed: number;
+  bards_needed: number;
+  ranged_dps_needed: number;
+  melee_dps_needed: number;
   is_cancelled: boolean;
   created_at: string;
   updated_at: string;
@@ -135,9 +137,10 @@ export interface EventWithRsvps extends Event {
   };
   role_counts: {
     tank: { attending: number; maybe: number };
-    healer: { attending: number; maybe: number };
-    dps: { attending: number; maybe: number };
-    support: { attending: number; maybe: number };
+    cleric: { attending: number; maybe: number };
+    bard: { attending: number; maybe: number };
+    ranged_dps: { attending: number; maybe: number };
+    melee_dps: { attending: number; maybe: number };
   };
   user_rsvp?: EventRsvp | null;
 }

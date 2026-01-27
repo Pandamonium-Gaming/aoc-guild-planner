@@ -20,18 +20,20 @@ interface PartyCardProps {
 function getRoleCounts(party: PartyWithRoster): Record<PartyRole, number> {
   return {
     tank: party.roster.filter(r => r.role === 'tank').length,
-    healer: party.roster.filter(r => r.role === 'healer').length,
-    dps: party.roster.filter(r => r.role === 'dps').length,
-    support: party.roster.filter(r => r.role === 'support').length,
+    cleric: party.roster.filter(r => r.role === 'cleric').length,
+    bard: party.roster.filter(r => r.role === 'bard').length,
+    ranged_dps: party.roster.filter(r => r.role === 'ranged_dps').length,
+    melee_dps: party.roster.filter(r => r.role === 'melee_dps').length,
   };
 }
 
 function getRoleNeeded(party: PartyWithRoster): Record<PartyRole, number> {
   return {
     tank: party.tanks_needed,
-    healer: party.healers_needed,
-    dps: party.dps_needed,
-    support: party.support_needed,
+    cleric: party.clerics_needed,
+    bard: party.bards_needed,
+    ranged_dps: party.ranged_dps_needed,
+    melee_dps: party.melee_dps_needed,
   };
 }
 
@@ -47,13 +49,13 @@ export function PartyCard({
 }: PartyCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAssign, setShowAssign] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<PartyRole>('dps');
+  const [selectedRole, setSelectedRole] = useState<PartyRole>('ranged_dps');
   const [assigning, setAssigning] = useState(false);
   const { t } = useLanguage();
 
   const roleCounts = getRoleCounts(party);
   const roleNeeded = getRoleNeeded(party);
-  const totalNeeded = party.tanks_needed + party.healers_needed + party.dps_needed + party.support_needed;
+  const totalNeeded = party.tanks_needed + party.clerics_needed + party.bards_needed + party.ranged_dps_needed + party.melee_dps_needed;
   const totalFilled = party.roster.length;
   const fillPercent = totalNeeded > 0 ? Math.min(100, (totalFilled / totalNeeded) * 100) : 0;
 

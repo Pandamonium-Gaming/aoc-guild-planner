@@ -65,17 +65,21 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
               attending: rsvps.filter((r: EventRsvp) => r.role === 'tank' && r.status === 'attending').length,
               maybe: rsvps.filter((r: EventRsvp) => r.role === 'tank' && r.status === 'maybe').length,
             },
-            healer: {
-              attending: rsvps.filter((r: EventRsvp) => r.role === 'healer' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: EventRsvp) => r.role === 'healer' && r.status === 'maybe').length,
+            cleric: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'cleric' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'cleric' && r.status === 'maybe').length,
             },
-            dps: {
-              attending: rsvps.filter((r: EventRsvp) => r.role === 'dps' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: EventRsvp) => r.role === 'dps' && r.status === 'maybe').length,
+            bard: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'bard' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'bard' && r.status === 'maybe').length,
             },
-            support: {
-              attending: rsvps.filter((r: EventRsvp) => r.role === 'support' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: EventRsvp) => r.role === 'support' && r.status === 'maybe').length,
+            ranged_dps: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'ranged_dps' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'ranged_dps' && r.status === 'maybe').length,
+            },
+            melee_dps: {
+              attending: rsvps.filter((r: EventRsvp) => r.role === 'melee_dps' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: EventRsvp) => r.role === 'melee_dps' && r.status === 'maybe').length,
             },
           },
           user_rsvp: userId ? rsvps.find((r: EventRsvp) => r.user_id === userId) || null : null,

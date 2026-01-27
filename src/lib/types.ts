@@ -153,7 +153,7 @@ export const RANK_COLORS: Record<RankLevel, { text: string; border: string; bg: 
 };
 
 // Party types
-export type PartyRole = 'tank' | 'healer' | 'dps' | 'support';
+export type PartyRole = 'tank' | 'cleric' | 'bard' | 'ranged_dps' | 'melee_dps';
 
 export interface Party {
   id: string;
@@ -161,9 +161,10 @@ export interface Party {
   name: string;
   description?: string;
   tanks_needed: number;
-  healers_needed: number;
-  dps_needed: number;
-  support_needed: number;
+  clerics_needed: number;
+  bards_needed: number;
+  ranged_dps_needed: number;
+  melee_dps_needed: number;
   created_by?: string;
   created_at: string;
   updated_at: string;
@@ -185,9 +186,10 @@ export interface PartyWithRoster extends Party {
 // Party role configuration
 export const PARTY_ROLES: Record<PartyRole, { name: string; icon: string; color: string }> = {
   tank: { name: 'Tank', icon: '🛡️', color: 'text-blue-400' },
-  healer: { name: 'Healer', icon: '💚', color: 'text-green-400' },
-  dps: { name: 'DPS', icon: '⚔️', color: 'text-red-400' },
-  support: { name: 'Support', icon: '✨', color: 'text-yellow-400' },
+  cleric: { name: 'Cleric', icon: '✨', color: 'text-green-400' },
+  bard: { name: 'Bard', icon: '🎵', color: 'text-purple-400' },
+  ranged_dps: { name: 'Ranged DPS', icon: '🏹', color: 'text-red-400' },
+  melee_dps: { name: 'Melee DPS', icon: '⚔️', color: 'text-orange-400' },
 };
 
 export interface RecruitmentApplication {
