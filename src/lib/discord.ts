@@ -120,7 +120,8 @@ export async function notifyNewEvent(
   webhookUrl: string,
   event: Event,
   clanName: string,
-  clanSlug: string
+  clanSlug: string,
+  roleId?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   const eventType = EVENT_TYPES[event.event_type];
   const startsAt = new Date(event.starts_at);
@@ -128,6 +129,12 @@ export async function notifyNewEvent(
   // Build direct link to event
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
   const eventUrl = `${baseUrl}/${clanSlug}?tab=events#event-${event.id}`;
+  
+  // Build content with role ping if provided
+  let content = '🆕 **New Event Created!**';
+  if (roleId) {
+    content = `<@&${roleId}> ${content}`;
+  }
   
   const fields: { name: string; value: string; inline?: boolean }[] = [
     {
@@ -164,7 +171,7 @@ export async function notifyNewEvent(
   }
 
   return sendDiscordWebhook(webhookUrl, {
-    content: '🆕 **New Event Created!**',
+    content,
     embeds: [{
       title: `${eventType.icon} ${event.title}`,
       description: `Type: **${eventType.name}**\n\n**👆 Click the event title above to view details and RSVP!**`,
