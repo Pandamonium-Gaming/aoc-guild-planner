@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserRole, applyToClan, getClanMembership } from '@/lib/auth';
+import { ClanRole } from '@/lib/permissions';
 
 interface ClanMember {
   id: string;
@@ -31,7 +32,7 @@ interface UseClanMembershipReturn {
   apply: () => Promise<void>;
   acceptMember: (membershipId: string) => Promise<void>;
   rejectMember: (membershipId: string) => Promise<void>;
-  updateRole: (membershipId: string, role: 'admin' | 'officer' | 'member') => Promise<void>;
+  updateRole: (membershipId: string, role: ClanRole) => Promise<void>;
   removeMember: (membershipId: string) => Promise<void>;
   refresh: () => Promise<void>;
   // Permission helpers
@@ -158,7 +159,7 @@ export function useClanMembership(clanId: string | null, userId: string | null):
     await refresh();
   };
 
-  const updateRole = async (membershipId: string, role: 'admin' | 'officer' | 'member') => {
+  const updateRole = async (membershipId: string, role: ClanRole) => {
     const { error } = await supabase
       .from('clan_members')
       .update({ role })

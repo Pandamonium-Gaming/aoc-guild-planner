@@ -8,6 +8,7 @@ import { EventForm } from './EventForm';
 import { AnnouncementForm } from './AnnouncementForm';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/contexts/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface EventsListProps {
   events: EventWithRsvps[];
@@ -48,6 +49,11 @@ export function EventsList({
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
   const { t } = useLanguage();
   const { showToast } = useToast();
+  const { hasPermission } = usePermissions(clanId);
+  
+  // Check permissions
+  const canCreateEvent = hasPermission('events_create');
+  const canCreateAnnouncement = hasPermission('announcements_create');
 
   // Copy announcement link to clipboard
   const copyAnnouncementLink = async (announcementId: string) => {
@@ -214,14 +220,26 @@ export function EventsList({
           <div className="flex gap-2">
             <button
               onClick={() => setShowAnnouncementForm(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-sm font-medium rounded-lg transition-colors cursor-pointer border border-amber-500/30"
+              disabled={!canCreateAnnouncement}
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border ${
+                canCreateAnnouncement
+                  ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30 cursor-pointer'
+                  : 'bg-amber-500/10 text-amber-600/50 border-amber-500/10 cursor-not-allowed opacity-50'
+              }`}
+              title={canCreateAnnouncement ? '' : 'You do not have permission to create announcements'}
             >
               <Megaphone size={16} />
               {t('announcements.createAnnouncement')}
             </button>
             <button
               onClick={() => setShowEventForm(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
+              disabled={!canCreateEvent}
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                canCreateEvent
+                  ? 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer'
+                  : 'bg-orange-500/50 text-orange-300/50 cursor-not-allowed opacity-50'
+              }`}
+              title={canCreateEvent ? '' : 'You do not have permission to create events'}
             >
               <Plus size={16} />
               {t('event.createEvent')}
@@ -246,6 +264,7 @@ export function EventsList({
               key={event.id}
               event={event}
               timezone={timezone}
+              clanId={clanId}
               onRsvp={(status, role) => onRsvp(event.id, status, role)}
               onEdit={canManage ? () => setEditingEvent(event) : undefined}
               onCancel={canManage ? () => onCancelEvent(event.id) : undefined}

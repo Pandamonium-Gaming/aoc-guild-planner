@@ -770,5 +770,138 @@
     "searchBuilds": "Buscar builds...",
     "filterByClass": "Filtrar por clase",
     "filterByRole": "Filtrar por rol"
+  },
+  "permissions": {
+    "title": "Permisos de Rol",
+    "manageRoles": "Gestionar Roles",
+    "rolePermissions": "Permisos de Rol",
+    "characters_create": {
+      "name": "Crear Personaje",
+      "description": "Permitir crear nuevos personajes"
+    },
+    "characters_read_all": {
+      "name": "Ver Todos los Personajes",
+      "description": "Ver personajes de todos los miembros"
+    },
+    "characters_edit_own": {
+      "name": "Editar Propio Personaje",
+      "description": "Editar los propios personajes"
+    },
+    "characters_edit_any": {
+      "name": "Editar Cualquier Personaje",
+      "description": "Editar personajes de otros miembros"
+    },
+    "characters_delete_own": {
+      "name": "Eliminar Propio Personaje",
+      "description": "Eliminar los propios personajes"
+    },
+    "characters_delete_any": {
+      "name": "Eliminar Cualquier Personaje",
+      "description": "Eliminar personajes de otros miembros"
+    },
+    "guild_bank_withdraw": {
+      "name": "Retirar del Banco del Clan",
+      "description": "Retirar artículos del banco del clan"
+    },
+    "guild_bank_deposit": {
+      "name": "Depositar en el Banco del Clan",
+      "description": "Depositar artículos en el banco del clan"
+    },
+    "guild_bank_view_history": {
+      "name": "Ver Historial del Banco",
+      "description": "Ver el historial de transacciones del banco"
+    },
+    "events_create": {
+      "name": "Crear Evento",
+      "description": "Crear nuevos eventos"
+    },
+    "events_read": {
+      "name": "Ver Eventos",
+      "description": "Ver todos los eventos"
+    },
+    "events_edit_own": {
+      "name": "Editar Propio Evento",
+      "description": "Editar eventos creados por uno mismo"
+    },
+    "events_edit_any": {
+      "name": "Editar Cualquier Evento",
+      "description": "Editar eventos de otros"
+    },
+    "events_delete_own": {
+      "name": "Eliminar Propio Evento",
+      "description": "Eliminar eventos creados por uno mismo"
+    },
+    "events_delete_any": {
+      "name": "Eliminar Cualquier Evento",
+      "description": "Eliminar eventos de otros"
+    },
+    "events_rsvp": {
+      "name": "RSVP a Eventos",
+      "description": "Responder a invitaciones de eventos"
+    },
+    "parties_create": {
+      "name": "Crear Grupo",
+      "description": "Crear nuevos grupos"
+    },
+    "parties_read": {
+      "name": "Ver Grupos",
+      "description": "Ver todos los grupos"
+    },
+    "parties_edit_own": {
+      "name": "Editar Propio Grupo",
+      "description": "Editar grupos creados por uno mismo"
+    },
+    "parties_edit_any": {
+      "name": "Editar Cualquier Grupo",
+      "description": "Editar grupos de otros"
+    },
+    "parties_delete_own": {
+      "name": "Eliminar Propio Grupo",
+      "description": "Eliminar grupos creados por uno mismo"
+    },
+    "parties_delete_any": {
+      "name": "Eliminar Cualquier Grupo",
+      "description": "Eliminar grupos de otros"
+    },
+    "siege_view_rosters": {
+      "name": "Ver Rosters de Siege",
+      "description": "Ver los rosters de siege"
+    },
+    "siege_edit_rosters": {
+      "name": "Editar Rosters de Siege",
+      "description": "Editar los rosters de siege"
+    },
+    "siege_create_event": {
+      "name": "Crear Evento Siege",
+      "description": "Crear nuevos eventos de siege"
+    },
+    "announcements_create": {
+      "name": "Crear Anuncio",
+      "description": "Crear nuevos anuncios"
+    },
+    "announcements_edit": {
+      "name": "Editar Anuncio",
+      "description": "Editar anuncios existentes"
+    },
+    "announcements_delete": {
+      "name": "Eliminar Anuncio",
+      "description": "Eliminar anuncios"
+    },
+    "recruitment_manage": {
+      "name": "Gestionar Reclutamiento",
+      "description": "Gestionar solicitudes y mensajes de reclutamiento"
+    },
+    "settings_edit": {
+      "name": "Editar Configuración del Clan",
+      "description": "Editar la configuración general del clan"
+    },
+    "settings_edit_roles": {
+      "name": "Gestionar Roles",
+      "description": "Cambiar roles de miembros"
+    },
+    "settings_view_permissions": {
+      "name": "Ver Permisos",
+      "description": "Ver la estructura de permisos del clan"
+    }
   }
 }

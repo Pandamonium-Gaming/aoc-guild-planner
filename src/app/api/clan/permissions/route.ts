@@ -1,0 +1,208 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { ClanRole } from '@/lib/permissions';
+
+// Get Supabase service role client for server-side operations
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    return null;
+  }
+  
+  return createClient(url, key);
+}
+
+export type PermissionOverrides = {
+  id: string;
+  clan_id: string;
+  role: ClanRole;
+  characters_create: boolean;
+  characters_read_all: boolean;
+  characters_edit_own: boolean;
+  characters_edit_any: boolean;
+  characters_delete_own: boolean;
+  characters_delete_any: boolean;
+  guild_bank_withdraw: boolean;
+  guild_bank_deposit: boolean;
+  guild_bank_view_history: boolean;
+  events_create: boolean;
+  events_read: boolean;
+  events_edit_own: boolean;
+  events_edit_any: boolean;
+  events_delete_own: boolean;
+  events_delete_any: boolean;
+  events_rsvp: boolean;
+  parties_create: boolean;
+  parties_read: boolean;
+  parties_edit_own: boolean;
+  parties_edit_any: boolean;
+  parties_delete_own: boolean;
+  parties_delete_any: boolean;
+  siege_view_rosters: boolean;
+  siege_edit_rosters: boolean;
+  siege_create_event: boolean;
+  announcements_create: boolean;
+  announcements_edit: boolean;
+  announcements_delete: boolean;
+  recruitment_manage: boolean;
+  settings_edit: boolean;
+  settings_edit_roles: boolean;
+  settings_view_permissions: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+// GET: Fetch permission overrides for a clan
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const clanId = searchParams.get('clan_id');
+
+  if (!clanId) {
+    return NextResponse.json({ error: 'Missing clan_id' }, { status: 400 });
+  }
+
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  try {
+    // Verify user is admin of the clan
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const { data: membership } = await supabaseAdmin
+      .from('clan_members')
+      .select('role')
+      .eq('clan_id', clanId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (!membership || membership.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Fetch permission overrides
+    const { data, error } = await supabaseAdmin
+      .from('clan_permission_overrides')
+      .select('*')
+      .eq('clan_id', clanId)
+      .order('role', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching permissions:', error);
+      return NextResponse.json({ error: 'Failed to fetch permissions' }, { status: 500 });
+    }
+
+    return NextResponse.json({ permissions: data || [] });
+  } catch (error) {
+    console.error('Error in GET /api/clan/permissions:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// POST: Save permission overrides for a clan
+export async function POST(request: NextRequest) {
+  const { clanId, rolePermissions } = await request.json();
+
+  if (!clanId || !rolePermissions) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  try {
+    // Verify user is admin of the clan
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const { data: membership } = await supabaseAdmin
+      .from('clan_members')
+      .select('role')
+      .eq('clan_id', clanId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (!membership || membership.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Save each role's permissions
+    const updates = Object.entries(rolePermissions).map(([role, permissions]) => {
+      const permsRecord = permissions as Record<string, boolean>;
+      return {
+        clan_id: clanId,
+        role,
+        ...permsRecord,
+        updated_at: new Date().toISOString(),
+      };
+    });
+
+    const { error: upsertError } = await supabaseAdmin
+      .from('clan_permission_overrides')
+      .upsert(updates, { onConflict: 'clan_id,role' });
+
+    if (upsertError) {
+      console.error('Error saving permissions:', upsertError);
+      return NextResponse.json({ error: 'Failed to save permissions' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in POST /api/clan/permissions:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -773,5 +773,140 @@
     "searchBuilds": "Search builds...",
     "filterByClass": "Filter by class",
     "filterByRole": "Filter by role"
+  },
+  "permissions": {
+    "title": "Role Permissions",
+    "manageRoles": "Manage Roles",
+    "rolePermissions": "Role Permissions",
+    "characters_create": {
+      "name": "Create Character",
+      "description": "Allow creating new characters"
+    },
+    "characters_read_all": {
+      "name": "View All Characters",
+      "description": "View characters from all members"
+    },
+    "characters_edit_own": {
+      "name": "Edit Own Character",
+      "description": "Edit your own characters"
+    },
+    "characters_edit_any": {
+      "name": "Edit Any Character",
+      "description": "Edit other members' characters"
+    },
+    "characters_delete_own": {
+      "name": "Delete Own Character",
+      "description": "Delete your own characters"
+    },
+    "characters_delete_any": {
+      "name": "Delete Any Character",
+      "description": "Delete other members' characters"
+    },
+    "guild_bank_withdraw": {
+      "name": "Withdraw from Guild Bank",
+      "description": "Withdraw items from the guild bank"
+    },
+    "guild_bank_deposit": {
+      "name": "Deposit to Guild Bank",
+      "description": "Deposit items to the guild bank"
+    },
+    "guild_bank_view_history": {
+      "name": "View Bank History",
+      "description": "View bank transaction history"
+    },
+    "events_create": {
+      "name": "Create Event",
+      "description": "Create new events"
+    },
+    "events_read": {
+      "name": "View Events",
+      "description": "View all events"
+    },
+    "events_edit_own": {
+      "name": "Edit Own Event",
+      "description": "Edit events you created"
+    },
+    "events_edit_any": {
+      "name": "Edit Any Event",
+      "description": "Edit other members' events"
+    },
+    "events_delete_own": {
+      "name": "Delete Own Event",
+      "description": "Delete events you created"
+    },
+    "events_delete_any": {
+      "name": "Delete Any Event",
+      "description": "Delete other members' events"
+    },
+    "events_rsvp": {
+      "name": "RSVP to Events",
+      "description": "Respond to event invitations"
+    },
+    "parties_create": {
+      "name": "Create Party",
+      "description": "Create new parties"
+    },
+    "parties_read": {
+      "name": "View Parties",
+      "description": "View all parties"
+    },
+    "parties_edit_own": {
+      "name": "Edit Own Party",
+      "description": "Edit parties you created"
+    },
+    "parties_edit_any": {
+      "name": "Edit Any Party",
+      "description": "Edit other members' parties"
+    },
+    "parties_delete_own": {
+      "name": "Delete Own Party",
+      "description": "Delete parties you created"
+    },
+    "parties_delete_any": {
+      "name": "Delete Any Party",
+      "description": "Delete other members' parties"
+    },
+    "siege_view_rosters": {
+      "name": "View Siege Rosters",
+      "description": "View siege rosters"
+    },
+    "siege_edit_rosters": {
+      "name": "Edit Siege Rosters",
+      "description": "Edit siege rosters"
+    },
+    "siege_create_event": {
+      "name": "Create Siege Event",
+      "description": "Create new siege events"
+    },
+    "announcements_create": {
+      "name": "Create Announcement",
+      "description": "Create new announcements"
+    },
+    "announcements_edit": {
+      "name": "Edit Announcement",
+      "description": "Edit existing announcements"
+    },
+    "announcements_delete": {
+      "name": "Delete Announcement",
+      "description": "Delete announcements"
+    },
+    "recruitment_manage": {
+      "name": "Manage Recruitment",
+      "description": "Manage recruitment applications and messages"
+    },
+    "settings_edit": {
+      "name": "Edit Guild Settings",
+      "description": "Edit guild general settings"
+    },
+    "settings_edit_roles": {
+      "name": "Manage Roles",
+      "description": "Change member roles"
+    },
+    "settings_view_permissions": {
+      "name": "View Permissions",
+      "description": "View the guild's permission structure"
+    }
+  }
+}
   }
 }

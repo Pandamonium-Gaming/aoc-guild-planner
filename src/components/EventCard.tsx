@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Calendar, MapPin, Users, Clock, Check, HelpCircle, X, ChevronDown, ChevronUp, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { 
   EventWithRsvps, 
   RsvpStatus, 
@@ -21,6 +22,7 @@ import {
 interface EventCardProps {
   event: EventWithRsvps;
   timezone: string;
+  clanId: string;
   onRsvp: (status: RsvpStatus, role?: EventRole | null) => void;
   onEdit?: () => void;
   onCancel?: () => void;
@@ -31,6 +33,7 @@ interface EventCardProps {
 export function EventCard({ 
   event, 
   timezone, 
+  clanId,
   onRsvp, 
   onEdit, 
   onCancel,
@@ -41,11 +44,15 @@ export function EventCard({
   const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const { hasPermission } = usePermissions(clanId);
   
   const eventType = EVENT_TYPES[event.event_type];
   const isPast = isEventPast(event.starts_at);
   const isNow = isEventNow(event.starts_at, event.ends_at);
   const userRsvp = event.user_rsvp;
+  
+  // Check if user can delete events
+  const canDeleteEvent = hasPermission('events_delete_any') || hasPermission('events_delete_own');
 
   const totalAttending = event.rsvp_counts.attending + event.rsvp_counts.maybe;
 
@@ -431,7 +438,7 @@ export function EventCard({
                   {t('event.cancelEvent')}
                 </button>
               )}
-              {onDelete && (
+              {onDelete && canDeleteEvent && (
                 <button
                   onClick={(e) => { 
                     e.stopPropagation(); 
