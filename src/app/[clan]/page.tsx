@@ -427,7 +427,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
         <div className="max-w-7xl mx-auto px-4 py-6 pb-4">
           {activeTab === 'characters' ? (
             <div className="space-y-4">
-              {canEdit && <AddCharacterButton onAdd={addCharacter} />}
+              {/* All members can add characters */}
+              <AddCharacterButton onAdd={addCharacter} />
               
               {/* Character Filters */}
               {characters.length > 0 && (
