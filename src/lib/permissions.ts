@@ -15,199 +15,211 @@ export interface Permission {
 // All available permissions
 export const PERMISSIONS = {
   // Characters
-  'characters:add': {
-    id: 'characters:add',
+  'characters_create': {
+    id: 'characters_create',
     category: 'characters' as PermissionCategory,
-    name: 'Add Character',
+    name: 'Create Character',
     description: 'Create a new character'
   },
-  'characters:edit_own': {
-    id: 'characters:edit_own',
+  'characters_read_all': {
+    id: 'characters_read_all',
+    category: 'characters' as PermissionCategory,
+    name: 'View All Characters',
+    description: 'View all characters in the guild'
+  },
+  'characters_edit_own': {
+    id: 'characters_edit_own',
     category: 'characters' as PermissionCategory,
     name: 'Edit Own Character',
-    description: 'Edit character details they created'
+    description: 'Edit your own characters'
   },
-  'characters:edit_any': {
-    id: 'characters:edit_any',
+  'characters_edit_any': {
+    id: 'characters_edit_any',
     category: 'characters' as PermissionCategory,
     name: 'Edit Any Character',
-    description: 'Edit any character in the guild'
+    description: 'Edit other members\' characters'
   },
-  'characters:delete_own': {
-    id: 'characters:delete_own',
+  'characters_delete_own': {
+    id: 'characters_delete_own',
     category: 'characters' as PermissionCategory,
     name: 'Delete Own Character',
-    description: 'Delete character they created'
+    description: 'Delete your own characters'
   },
-  'characters:delete_any': {
-    id: 'characters:delete_any',
+  'characters_delete_any': {
+    id: 'characters_delete_any',
     category: 'characters' as PermissionCategory,
     name: 'Delete Any Character',
-    description: 'Delete any character in the guild'
+    description: 'Delete other members\' characters'
   },
 
   // Guild Bank
-  'guild_bank:deposit': {
-    id: 'guild_bank:deposit',
+  'guild_bank_deposit': {
+    id: 'guild_bank_deposit',
     category: 'guild_bank' as PermissionCategory,
-    name: 'Deposit Items',
-    description: 'Deposit items into guild bank'
+    name: 'Deposit to Guild Bank',
+    description: 'Deposit items to the guild bank'
   },
-  'guild_bank:withdraw': {
-    id: 'guild_bank:withdraw',
+  'guild_bank_withdraw': {
+    id: 'guild_bank_withdraw',
     category: 'guild_bank' as PermissionCategory,
-    name: 'Withdraw Items',
-    description: 'Withdraw items from guild bank'
+    name: 'Withdraw from Guild Bank',
+    description: 'Withdraw items from the guild bank'
   },
-  'guild_bank:manage': {
-    id: 'guild_bank:manage',
+  'guild_bank_view_history': {
+    id: 'guild_bank_view_history',
     category: 'guild_bank' as PermissionCategory,
-    name: 'Manage Bank',
-    description: 'Manage guild bank contents and logs'
+    name: 'View Bank History',
+    description: 'View bank transaction history'
   },
 
   // Events
-  'events:create': {
-    id: 'events:create',
+  'events_create': {
+    id: 'events_create',
     category: 'events' as PermissionCategory,
     name: 'Create Event',
-    description: 'Create a new event'
+    description: 'Create new events'
   },
-  'events:edit_own': {
-    id: 'events:edit_own',
+  'events_read': {
+    id: 'events_read',
+    category: 'events' as PermissionCategory,
+    name: 'View Events',
+    description: 'View all events'
+  },
+  'events_edit_own': {
+    id: 'events_edit_own',
     category: 'events' as PermissionCategory,
     name: 'Edit Own Event',
-    description: 'Edit events they created'
+    description: 'Edit events you created'
   },
-  'events:edit_any': {
-    id: 'events:edit_any',
+  'events_edit_any': {
+    id: 'events_edit_any',
     category: 'events' as PermissionCategory,
     name: 'Edit Any Event',
-    description: 'Edit any event'
+    description: 'Edit other members\' events'
   },
-  'events:cancel_own': {
-    id: 'events:cancel_own',
+  'events_delete_own': {
+    id: 'events_delete_own',
     category: 'events' as PermissionCategory,
-    name: 'Cancel Own Event',
-    description: 'Cancel events they created'
+    name: 'Delete Own Event',
+    description: 'Delete events you created'
   },
-  'events:cancel_any': {
-    id: 'events:cancel_any',
-    category: 'events' as PermissionCategory,
-    name: 'Cancel Any Event',
-    description: 'Cancel any event'
-  },
-  'events:delete_any': {
-    id: 'events:delete_any',
+  'events_delete_any': {
+    id: 'events_delete_any',
     category: 'events' as PermissionCategory,
     name: 'Delete Any Event',
-    description: 'Delete any event'
+    description: 'Delete other members\' events'
+  },
+  'events_rsvp': {
+    id: 'events_rsvp',
+    category: 'events' as PermissionCategory,
+    name: 'RSVP to Events',
+    description: 'Respond to event invitations'
   },
 
   // Parties
-  'parties:create': {
-    id: 'parties:create',
+  'parties_create': {
+    id: 'parties_create',
     category: 'parties' as PermissionCategory,
     name: 'Create Party',
-    description: 'Create a new party'
+    description: 'Create new parties'
   },
-  'parties:edit_own': {
-    id: 'parties:edit_own',
+  'parties_read': {
+    id: 'parties_read',
+    category: 'parties' as PermissionCategory,
+    name: 'View Parties',
+    description: 'View all parties'
+  },
+  'parties_edit_own': {
+    id: 'parties_edit_own',
     category: 'parties' as PermissionCategory,
     name: 'Edit Own Party',
-    description: 'Edit parties they created'
+    description: 'Edit parties you created'
   },
-  'parties:edit_any': {
-    id: 'parties:edit_any',
+  'parties_edit_any': {
+    id: 'parties_edit_any',
     category: 'parties' as PermissionCategory,
     name: 'Edit Any Party',
-    description: 'Edit any party'
+    description: 'Edit other members\' parties'
   },
-  'parties:delete_own': {
-    id: 'parties:delete_own',
+  'parties_delete_own': {
+    id: 'parties_delete_own',
     category: 'parties' as PermissionCategory,
     name: 'Delete Own Party',
-    description: 'Delete parties they created'
+    description: 'Delete parties you created'
   },
-  'parties:delete_any': {
-    id: 'parties:delete_any',
+  'parties_delete_any': {
+    id: 'parties_delete_any',
     category: 'parties' as PermissionCategory,
     name: 'Delete Any Party',
-    description: 'Delete any party'
+    description: 'Delete other members\' parties'
   },
 
   // Siege
-  'siege:create': {
-    id: 'siege:create',
+  'siege_view_rosters': {
+    id: 'siege_view_rosters',
     category: 'siege' as PermissionCategory,
-    name: 'Create Siege',
-    description: 'Create a new siege event'
+    name: 'View Siege Rosters',
+    description: 'View siege rosters'
   },
-  'siege:edit_own': {
-    id: 'siege:edit_own',
+  'siege_edit_rosters': {
+    id: 'siege_edit_rosters',
     category: 'siege' as PermissionCategory,
-    name: 'Edit Own Siege',
-    description: 'Edit siege events they created'
+    name: 'Edit Siege Rosters',
+    description: 'Edit siege rosters'
   },
-  'siege:edit_any': {
-    id: 'siege:edit_any',
+  'siege_create_event': {
+    id: 'siege_create_event',
     category: 'siege' as PermissionCategory,
-    name: 'Edit Any Siege',
-    description: 'Edit any siege event'
+    name: 'Create Siege Event',
+    description: 'Create new siege events'
   },
 
   // Announcements
-  'announcements:create': {
-    id: 'announcements:create',
+  'announcements_create': {
+    id: 'announcements_create',
     category: 'announcements' as PermissionCategory,
     name: 'Create Announcement',
-    description: 'Create a new announcement'
+    description: 'Create new announcements'
   },
-  'announcements:edit_own': {
-    id: 'announcements:edit_own',
+  'announcements_edit': {
+    id: 'announcements_edit',
     category: 'announcements' as PermissionCategory,
-    name: 'Edit Own Announcement',
-    description: 'Edit announcements they created'
+    name: 'Edit Announcement',
+    description: 'Edit existing announcements'
   },
-  'announcements:edit_any': {
-    id: 'announcements:edit_any',
+  'announcements_delete': {
+    id: 'announcements_delete',
     category: 'announcements' as PermissionCategory,
-    name: 'Edit Any Announcement',
-    description: 'Edit any announcement'
-  },
-  'announcements:delete_any': {
-    id: 'announcements:delete_any',
-    category: 'announcements' as PermissionCategory,
-    name: 'Delete Any Announcement',
-    description: 'Delete any announcement'
+    name: 'Delete Announcement',
+    description: 'Delete announcements'
   },
 
   // Recruitment
-  'recruitment:manage': {
-    id: 'recruitment:manage',
+  'recruitment_manage': {
+    id: 'recruitment_manage',
     category: 'recruitment' as PermissionCategory,
     name: 'Manage Recruitment',
-    description: 'Review and manage recruitment applications'
+    description: 'Manage recruitment applications and messages'
   },
 
   // Settings
-  'settings:manage_permissions': {
-    id: 'settings:manage_permissions',
+  'settings_edit': {
+    id: 'settings_edit',
     category: 'settings' as PermissionCategory,
-    name: 'Manage Permissions',
-    description: 'Configure role permissions'
+    name: 'Edit Guild Settings',
+    description: 'Edit guild general settings'
   },
-  'settings:manage_roles': {
-    id: 'settings:manage_roles',
+  'settings_edit_roles': {
+    id: 'settings_edit_roles',
     category: 'settings' as PermissionCategory,
-    name: 'Manage Member Roles',
-    description: 'Change member roles and statuses'
+    name: 'Manage Roles',
+    description: 'Change member roles'
   },
-  'settings:manage_clan': {
-    id: 'settings:manage_clan',
+  'settings_view_permissions': {
+    id: 'settings_view_permissions',
     category: 'settings' as PermissionCategory,
-    name: 'Manage Guild',
-    description: 'Edit guild information and settings'
+    name: 'View Permissions',
+    description: 'View the guild\'s permission structure'
   },
 } as const;
 
@@ -233,62 +245,60 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<ClanRole, Set<string>> = {
   
   officer: new Set([
     // Characters
-    'characters:add',
-    'characters:edit_any',
-    'characters:delete_any',
+    'characters_create',
+    'characters_edit_any',
+    'characters_delete_any',
     // Guild Bank
-    'guild_bank:deposit',
-    'guild_bank:withdraw',
-    'guild_bank:manage',
+    'guild_bank_deposit',
+    'guild_bank_withdraw',
+    'guild_bank_manage',
     // Events
-    'events:create',
-    'events:edit_any',
-    'events:cancel_any',
-    'events:delete_any',
+    'events_create',
+    'events_edit_any',
+    'events_delete_any',
     // Parties
-    'parties:create',
-    'parties:edit_any',
-    'parties:delete_any',
+    'parties_create',
+    'parties_edit_any',
+    'parties_delete_any',
     // Siege
-    'siege:create',
-    'siege:edit_any',
+    'siege_create_event',
+    'siege_edit_rosters',
     // Announcements
-    'announcements:create',
-    'announcements:edit_any',
-    'announcements:delete_any',
+    'announcements_create',
+    'announcements_edit',
+    'announcements_delete',
     // Recruitment
-    'recruitment:manage',
+    'recruitment_manage',
     // Settings
-    'settings:manage_roles',
+    'settings_edit_roles',
   ]),
   
   member: new Set([
     // Characters
-    'characters:add',
-    'characters:edit_own',
-    'characters:delete_own',
+    'characters_create',
+    'characters_edit_own',
+    'characters_delete_own',
     // Guild Bank
-    'guild_bank:deposit',
-    'guild_bank:withdraw',
+    'guild_bank_deposit',
+    'guild_bank_withdraw',
     // Events
-    'events:create',
-    'events:edit_own',
-    'events:cancel_own',
+    'events_create',
+    'events_edit_own',
+    'events_delete_own',
     // Parties
-    'parties:create',
-    'parties:edit_own',
-    'parties:delete_own',
+    'parties_create',
+    'parties_edit_own',
+    'parties_delete_own',
     // Siege
-    'siege:create',
-    'siege:edit_own',
+    'siege_create_event',
+    'siege_edit_rosters',
     // Announcements
-    'announcements:create',
-    'announcements:edit_own',
+    'announcements_create',
   ]),
   
   trial: new Set([
     // Characters
-    'characters:add',
+    'characters_create',
     // Events
     // Can RSVP but not create
     // Guild Bank - read only
