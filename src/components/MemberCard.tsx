@@ -12,7 +12,7 @@ interface CharacterCardProps {
   character: CharacterWithProfessions;
   onUpdate: (id: string, name: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onSetProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
+  onSetProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null, level?: number, quality?: number) => Promise<void>;
   onEdit?: (character: CharacterWithProfessions) => void;
   readOnly?: boolean;
   mainCharacterName?: string; // Name of the main character this alt belongs to
@@ -76,6 +76,18 @@ export function CharacterCard({
   const getProfessionRank = (professionId: string): RankLevel | null => {
     const prof = character.professions.find((p) => p.profession === professionId);
     return prof ? prof.rank : null;
+  };
+
+  // Get profession level for a character
+  const getProfessionLevel = (professionId: string): number => {
+    const prof = character.professions.find((p) => p.profession === professionId);
+    return prof ? prof.artisan_level : 0;
+  };
+
+  // Get profession quality for a character
+  const getProfessionQuality = (professionId: string): number => {
+    const prof = character.professions.find((p) => p.profession === professionId);
+    return prof ? prof.quality_score : 0;
   };
 
   return (
@@ -246,7 +258,11 @@ export function CharacterCard({
                     key={profession.id}
                     profession={profession}
                     currentRank={getProfessionRank(profession.id)}
-                    onChange={(rank: RankLevel | null) => onSetProfessionRank(character.id, profession.id, rank)}
+                    currentLevel={getProfessionLevel(profession.id)}
+                    currentQuality={getProfessionQuality(profession.id)}
+                    onChange={(rank: RankLevel | null, level?: number, quality?: number) => 
+                      onSetProfessionRank(character.id, profession.id, rank, level, quality)
+                    }
                   />
                 ))}
               </div>

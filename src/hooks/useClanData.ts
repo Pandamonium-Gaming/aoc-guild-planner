@@ -24,7 +24,7 @@ interface UseClanDataReturn {
   addCharacter: (data: CharacterData) => Promise<void>;
   updateCharacter: (id: string, data: Partial<CharacterData>) => Promise<void>;
   deleteCharacter: (id: string) => Promise<void>;
-  setProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null) => Promise<void>;
+  setProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null, level?: number, quality?: number) => Promise<void>;
   refresh: () => Promise<void>;
   // Legacy aliases
   members: CharacterWithProfessions[];
@@ -213,7 +213,9 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
   const setProfessionRank = async (
     characterId: string,
     professionId: string,
-    rank: RankLevel | null
+    rank: RankLevel | null,
+    level: number = 1,
+    quality: number = 0
   ) => {
     // Optimistic update - update local state immediately
     setCharacters((prevCharacters) =>
@@ -236,6 +238,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
             updatedProfessions[existingIndex] = {
               ...updatedProfessions[existingIndex],
               rank,
+              artisan_level: level,
+              quality_score: quality,
             };
           } else {
             updatedProfessions.push({
@@ -243,6 +247,8 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
               member_id: characterId,
               profession: professionId,
               rank,
+              artisan_level: level,
+              quality_score: quality,
             });
           }
         }
@@ -266,7 +272,13 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
         const { error: upsertError } = await supabase
           .from('member_professions')
           .upsert(
-            { member_id: characterId, profession: professionId, rank },
+            { 
+              member_id: characterId, 
+              profession: professionId, 
+              rank,
+              artisan_level: level,
+              quality_score: quality
+            },
             { onConflict: 'member_id,profession' }
           )
           .select();

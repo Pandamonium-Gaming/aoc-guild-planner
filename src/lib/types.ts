@@ -69,7 +69,9 @@ export interface MemberProfession {
   id: string;
   member_id: string;
   profession: string;
-  rank: RankLevel;
+  rank: RankLevel; // Certification rank (manual promotion required)
+  artisan_level: number; // 0-50: Current skill level (can exceed rank requirements)
+  quality_score: number; // 0-100 quality/proficiency percentage
 }
 
 // Extended character with professions loaded
@@ -87,6 +89,56 @@ export interface ProfessionCoverage {
   masters: string[];
   journeymen: string[];
   apprentices: string[];
+}
+
+// Helper function to get rank from artisan level
+export function getRankFromLevel(level: number): RankLevel {
+  if (level >= 40) return 4; // Grandmaster
+  if (level >= 30) return 4; // Master
+  if (level >= 20) return 3; // Journeyman
+  if (level >= 10) return 2; // Apprentice
+  return 1; // Novice
+}
+
+// Helper function to get max level allowed for a rank
+export function getMaxLevelForRank(rank: RankLevel): number {
+  switch (rank) {
+    case 1: return 10; // Novice caps at 10
+    case 2: return 20; // Apprentice caps at 20
+    case 3: return 30; // Journeyman caps at 30
+    case 4: return 50; // Master/Grandmaster caps at 50
+    default: return 10;
+  }
+}
+
+// Helper function to check if at rank cap
+export function isAtRankCap(level: number, rank: RankLevel): boolean {
+  return level >= getMaxLevelForRank(rank);
+}
+
+// Helper function to get rank name including level range
+export function getRankWithLevelRange(level: number): string {
+  const rank = getRankFromLevel(level);
+  const rankName = RANK_NAMES[rank];
+  return `${rankName} (${level}/50)`;
+}
+
+// Rank color configuration
+export const RANK_COLORS: Record<RankLevel, { text: string; border: string; bg: string; glow: string }> = {
+  4: { 
+    text: 'text-orange-400', 
+    border: 'border-orange-500', 
+    bg: 'bg-orange-500/20',
+    glow: 'shadow-orange-500/50'
+  },
+  3: {
+}
+
+// Helper function to get rank name including level range
+export function getRankWithLevelRange(level: number): string {
+  const rank = getRankFromLevel(level);
+  const rankName = RANK_NAMES[rank];
+  return `${rankName} (${level}/50)`;
 }
 
 // Rank color configuration
