@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Profession, RankLevel, RANK_NAMES, RANK_COLORS, getMaxLevelForRank, isAtRankCap } from '@/lib/types';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ProfessionSelectorProps {
   profession: Profession;
@@ -19,7 +18,6 @@ export function ProfessionSelector({
   currentQuality = 0,
   onChange 
 }: ProfessionSelectorProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [level, setLevel] = useState(currentLevel);
   const [quality, setQuality] = useState(currentQuality);
   const ranks: RankLevel[] = [1, 2, 3, 4]; // 1=Apprentice, 2=Journeyman, 3=Master, 4=Grandmaster
@@ -33,7 +31,6 @@ export function ProfessionSelector({
     if (currentRank === rank) {
       // If clicking the current rank, remove it
       onChange(null);
-      setIsExpanded(false);
     } else {
       // Set new rank and default level for that rank
       // Map rank to minimum level: 1->10, 2->20, 3->30, 4->40
@@ -61,18 +58,14 @@ export function ProfessionSelector({
   return (
     <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-sm text-slate-300 truncate flex-1" title={profession.name}>
-          {profession.name}
+        <div className="text-sm text-slate-300 truncate flex-1 flex items-center gap-1" title={profession.name}>
+          <span>{profession.name}</span>
+          {currentRank && atCap && (
+            <span className="text-amber-400 text-xs" title="Level capped - certification required to progress">
+              🔒
+            </span>
+          )}
         </div>
-        {currentRank && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-0.5 text-slate-400 hover:text-slate-200 transition-colors"
-            title="Show details"
-          >
-            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
-        )}
       </div>
       <div className="flex gap-1">
         {ranks.map((rank) => {
@@ -102,8 +95,8 @@ export function ProfessionSelector({
         })}
       </div>
       
-      {/* Detailed metrics - shown when expanded */}
-      {currentRank && isExpanded && (
+      {/* Detailed metrics - always shown when a rank is selected */}
+      {currentRank && (
         <div className="mt-2 pt-2 border-t border-slate-700 space-y-2">
           {/* Artisan Level */}
           <div>
