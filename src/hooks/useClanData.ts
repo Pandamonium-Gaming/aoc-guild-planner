@@ -12,6 +12,7 @@ export interface CharacterData {
   secondary_archetype?: Archetype | null;
   level?: number;
   is_main?: boolean;
+  user_id?: string | null; // Allow setting user_id for ownership
 }
 
 interface UseClanDataReturn {
@@ -115,23 +116,24 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
   const addCharacter = async (data: CharacterData) => {
     if (!clan) return;
 
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+
     // If setting as main, first unmark any other main characters for this user
-    if (data.is_main) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from('members')
-          .update({ is_main: false })
-          .eq('clan_id', clan.id)
-          .eq('user_id', user.id)
-          .eq('is_main', true);
-      }
+    if (data.is_main && user) {
+      await supabase
+        .from('members')
+        .update({ is_main: false })
+        .eq('clan_id', clan.id)
+        .eq('user_id', user.id)
+        .eq('is_main', true);
     }
 
     const { error: insertError } = await supabase
       .from('members')
       .insert({ 
         clan_id: clan.id, 
+        user_id: user?.id || null, // Set user_id to link characters
         name: data.name,
         race: data.race || null,
         primary_archetype: data.primary_archetype || null,
@@ -152,23 +154,32 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
 
   // Update character
   const updateCharacter = async (id: string, data: Partial<CharacterData>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+
     // If setting as main, first unmark any other main characters for this user
-    if (data.is_main === true) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from('members')
-          .update({ is_main: false })
-          .eq('clan_id', clan?.id || '')
-          .eq('user_id', user.id)
-          .eq('is_main', true)
-          .neq('id', id); // Don't update the character we're about to update
+    if (data.is_main === true && user) {
+      await supabase
+        .from('members')
+        .update({ is_main: false })
+        .eq('clan_id', clan?.id || '')
+        .eq('user_id', user.id)
+        .eq('is_main', true)
+        .neq('id', id); // Don't update the character we're about to update
+    }
+
+    // Claim ownership if character doesn't have a user_id
+    // This allows users to take ownership of existing characters by editing them
+    const updateData = { ...data };
+    if (user) {
+      const character = characters.find(c => c.id === id);
+      if (character && !character.user_id) {
+        updateData.user_id = user.id;
       }
     }
 
     const { error: updateError } = await supabase
       .from('members')
-      .update(data)
+      .update(updateData)
       .eq('id', id)
       .select();
 
