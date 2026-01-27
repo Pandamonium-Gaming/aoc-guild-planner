@@ -150,8 +150,8 @@
     "maybe": "Quizás",
     "declined": "No asistiré",
     "cancelled": "Cancelado",
-    "cancelEvent": "Cancelar Evento",
-    "hours": "horas",
+    "cancelEvent": "Cancelar Evento",    "deleteEvent": "Eliminar",
+    "confirmDeleteEvent": "¿Estás seguro de que deseas eliminar permanentemente \"{{title}}\"? Esto no se puede deshacer.",    "hours": "horas",
     "minutes": "minutos"
   },
   "recruitment": {
@@ -249,20 +249,35 @@
   "announcements": {
     "title": "Anuncios",
     "createAnnouncement": "Crear Anuncio",
-    "editAnnouncement": "Editar Anuncio",
-    "noAnnouncements": "Sin anuncios",
+    "editAnnouncement": "Editar Anuncio",    "announcementTitle": "Título *",
+    "announcementContent": "Contenido *",
+    "announcementTitlePlaceholder": "Título del anuncio",
+    "announcementContentPlaceholder": "Escribe tu anuncio aquí...",
+    "pinAnnouncement": "Fijar anuncio",
+    "pinAnnouncementDesc": "Los anuncios fijados permanecen en la parte superior",
+    "sendDiscordNotification": "Enviar notificación de Discord",    "noAnnouncements": "Sin anuncios",
     "pinned": "Fijado"
   },
   "publicPage": {
-    "joinOurGuild": "Únete a Nuestro Clan",
+    "clanNotFound": "Clan No Encontrado",
+    "clanNotFoundDesc": "Este clan no existe o no es público.",
+    "goHome": "Ir a Inicio",
+    "ashesOfCreationGuild": "Guild de Ashes of Creation",
+    "memberLogin": "Inicio de Sesión de Miembros",
+    "joinOurGuild": "Únete a Nuestra Guild",
     "aboutUs": "Sobre Nosotros",
-    "guildStats": "Estadísticas del Clan",
+    "guildStats": "Estadísticas de la Guild",
     "members": "Miembros",
+    "professionCoverage": "Cobertura de Profesiones",
     "characters": "Personajes",
     "upcomingEvents": "Próximos Eventos",
     "applyToJoin": "Solicitar Unirse",
     "recruitmentClosed": "El reclutamiento está cerrado actualmente",
-    "guildNotPublic": "Este perfil de clan no es público"
+    "guildNotPublic": "Este perfil de guild no es público",
+    "weLookingFor": "Estamos Buscando",
+    "joinOurGuildTitle": "¡Únete a Nuestra Guild!",
+    "poweredBy": "Desarrollado por AoC Guild Profession Planner",
+    "createOwnPage": "Crea tu propia página de guild →"
   },
   "filters": {
     "title": "Filtros",

@@ -6,6 +6,7 @@ import { Users, Briefcase, Calendar, ChevronRight, ExternalLink, Home } from 'lu
 import { Clan, PARTY_ROLES } from '@/lib/types';
 import { ARCHETYPES } from '@/lib/characters';
 import { RecruitmentForm } from '@/components/RecruitmentForm';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PublicClanData {
   clan: Clan & {
@@ -21,6 +22,7 @@ interface PublicClanData {
 
 export default function PublicClanPage({ params }: { params: Promise<{ clan: string }> }) {
   const { clan: clanSlug } = use(params);
+  const { t } = useLanguage();
   const [data, setData] = useState<PublicClanData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRecruitmentForm, setShowRecruitmentForm] = useState(false);
@@ -68,14 +70,14 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">Clan Not Found</h1>
-          <p className="text-slate-400 mb-6">This clan doesn&apos;t exist or isn&apos;t public.</p>
+          <h1 className="text-2xl font-bold text-white mb-2">{t('publicPage.clanNotFound')}</h1>
+          <p className="text-slate-400 mb-6">{t('publicPage.clanNotFoundDesc')}</p>
           <Link 
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
             <Home size={18} />
-            Go Home
+            {t('publicPage.goHome')}
           </Link>
         </div>
       </div>
@@ -92,14 +94,14 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white font-display">{clan.name}</h1>
-              <p className="text-slate-400 mt-1">Ashes of Creation Guild</p>
+              <p className="text-slate-400 mt-1">{t('publicPage.ashesOfCreationGuild')}</p>
             </div>
             <Link
               href={`/${clanSlug}`}
               className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
             >
               <ExternalLink size={16} />
-              Member Login
+              {t('publicPage.memberLogin')}
             </Link>
           </div>
         </div>
@@ -110,7 +112,7 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
         {/* Description */}
         {clan.public_description && (
           <section className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
-            <h2 className="text-lg font-semibold text-white mb-3">About Us</h2>
+            <h2 className="text-lg font-semibold text-white mb-3">{t('publicPage.aboutUs')}</h2>
             <p className="text-slate-300 whitespace-pre-wrap">{clan.public_description}</p>
           </section>
         )}
@@ -120,23 +122,23 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4 text-center">
             <Users size={24} className="mx-auto mb-2 text-blue-400" />
             <div className="text-2xl font-bold text-white">{memberCount}</div>
-            <div className="text-sm text-slate-400">Members</div>
+            <div className="text-sm text-slate-400">{t('publicPage.members')}</div>
           </div>
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4 text-center">
             <Briefcase size={24} className="mx-auto mb-2 text-green-400" />
             <div className="text-2xl font-bold text-white">{professionCoverage}%</div>
-            <div className="text-sm text-slate-400">Profession Coverage</div>
+            <div className="text-sm text-slate-400">{t('publicPage.professionCoverage')}</div>
           </div>
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4 text-center">
             <Calendar size={24} className="mx-auto mb-2 text-purple-400" />
             <div className="text-2xl font-bold text-white">{upcomingEvents}</div>
-            <div className="text-sm text-slate-400">Upcoming Events</div>
+            <div className="text-sm text-slate-400">{t('publicPage.upcomingEvents')}</div>
           </div>
         </section>
 
         {/* Looking for */}
         <section className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">We&apos;re Looking For</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{t('publicPage.weLookingFor')}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {(['tank', 'cleric', 'bard', 'ranged_dps', 'melee_dps'] as const).map(role => (
               <div 
@@ -168,16 +170,16 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
           <section className="bg-gradient-to-r from-orange-500/20 to-rose-500/20 rounded-lg border border-orange-500/30 p-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-white">Join Our Guild!</h2>
+                <h2 className="text-xl font-bold text-white">{t('publicPage.joinOurGuildTitle')}</h2>
                 <p className="text-slate-300 mt-1">
-                  {clan.recruitment_message || 'We are currently recruiting new members.'}
+                  {clan.recruitment_message || t('publicPage.recruitmentClosed')}
                 </p>
               </div>
               <button
                 onClick={() => setShowRecruitmentForm(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap"
               >
-                Apply Now
+                {t('publicPage.applyToJoin')}
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -188,9 +190,9 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
       {/* Footer */}
       <footer className="border-t border-slate-800 mt-12 py-6">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-slate-500">
-          <p>Powered by AoC Guild Profession Planner</p>
+          <p>{t('publicPage.poweredBy')}</p>
           <Link href="/" className="text-orange-400 hover:text-orange-300">
-            Create your own guild page →
+            {t('publicPage.createOwnPage')}
           </Link>
         </div>
       </footer>

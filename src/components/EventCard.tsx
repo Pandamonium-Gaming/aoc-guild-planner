@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Calendar, MapPin, Users, Clock, Check, HelpCircle, X, ChevronDown, ChevronUp, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   EventWithRsvps, 
   RsvpStatus, 
@@ -39,6 +40,7 @@ export function EventCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
   const { showToast } = useToast();
+  const { t } = useLanguage();
   
   const eventType = EVENT_TYPES[event.event_type];
   const isPast = isEventPast(event.starts_at);
@@ -182,7 +184,15 @@ export function EventCard({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
                   const role = roleKey as EventRole;
-                  const needed = event[`${roleKey}_needed` as keyof EventWithRsvps] as number;
+                  // Map role keys to database field names (tanks_needed, clerics_needed, etc.)
+                  const fieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                    tank: 'tanks_needed',
+                    cleric: 'clerics_needed',
+                    bard: 'bards_needed',
+                    ranged_dps: 'ranged_dps_needed',
+                    melee_dps: 'melee_dps_needed'
+                  };
+                  const needed = event[fieldMap[role]] as number;
                   if (needed === 0) return null;
                   
                   const roleCounts = event.role_counts?.[role] || { attending: 0, maybe: 0 };
@@ -343,7 +353,7 @@ export function EventCard({
                   onClick={(e) => { e.stopPropagation(); onEdit(); }}
                   className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg cursor-pointer"
                 >
-                  Edit
+                  {t('common.edit')}
                 </button>
               )}
               {onCancel && !event.is_cancelled && (
@@ -351,22 +361,22 @@ export function EventCard({
                   onClick={(e) => { e.stopPropagation(); onCancel(); }}
                   className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg cursor-pointer"
                 >
-                  Cancel Event
+                  {t('clan.cancelEvent')}
                 </button>
               )}
               {onDelete && (
                 <button
                   onClick={(e) => { 
                     e.stopPropagation(); 
-                    if (confirm(`Are you sure you want to permanently delete "${event.title}"? This cannot be undone.`)) {
+                    if (confirm(t('clan.confirmDeleteEvent', { title: event.title }))) {
                       onDelete();
                     }
                   }}
                   className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg cursor-pointer flex items-center gap-1"
-                  title="Delete event permanently"
+                  title={t('clan.deleteEvent')}
                 >
                   <Trash2 size={14} />
-                  Delete
+                  {t('clan.deleteEvent')}
                 </button>
               )}
             </div>

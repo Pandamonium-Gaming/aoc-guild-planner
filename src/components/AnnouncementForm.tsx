@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Megaphone, Pin } from 'lucide-react';
 import { Announcement } from '@/lib/events';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AnnouncementFormProps {
   clanId: string;
@@ -21,6 +22,7 @@ export function AnnouncementForm({
   onCancel,
   isEditing = false,
 }: AnnouncementFormProps) {
+  const { t } = useLanguage();
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [isPinned, setIsPinned] = useState(initialData?.is_pinned || false);
@@ -65,7 +67,7 @@ export function AnnouncementForm({
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-amber-400" />
-            {isEditing ? 'Edit Announcement' : 'New Announcement'}
+            {isEditing ? t('announcements.editAnnouncement') : t('announcements.createAnnouncement')}
           </h2>
           <button
             onClick={onCancel}
@@ -80,7 +82,7 @@ export function AnnouncementForm({
           {/* Title */}
           <div>
             <label htmlFor="announcement-title" className="block text-sm font-medium text-slate-300 mb-2">
-              Title *
+              {t('announcements.announcementTitle')}
             </label>
             <input
               id="announcement-title"
@@ -88,7 +90,7 @@ export function AnnouncementForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              placeholder="Announcement title"
+              placeholder={t('announcements.announcementTitlePlaceholder')}
               autoFocus
             />
           </div>
@@ -96,7 +98,7 @@ export function AnnouncementForm({
           {/* Content */}
           <div>
             <label htmlFor="announcement-content" className="block text-sm font-medium text-slate-300 mb-2">
-              Content *
+              {t('announcements.announcementContent')}
             </label>
             <textarea
               id="announcement-content"
@@ -104,7 +106,7 @@ export function AnnouncementForm({
               onChange={(e) => setContent(e.target.value)}
               rows={4}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
-              placeholder="Write your announcement here..."
+              placeholder={t('announcements.announcementContentPlaceholder')}
             />
           </div>
 
@@ -118,8 +120,8 @@ export function AnnouncementForm({
             />
             <Pin size={16} className={isPinned ? 'text-amber-400' : 'text-slate-400'} />
             <div>
-              <span className="text-white text-sm font-medium">Pin announcement</span>
-              <p className="text-xs text-slate-500">Pinned announcements stay at the top</p>
+              <span className="text-white text-sm font-medium">{t('announcements.pinAnnouncement')}</span>
+              <p className="text-xs text-slate-500">{t('announcements.pinAnnouncementDesc')}</p>
             </div>
           </label>
 
@@ -133,7 +135,7 @@ export function AnnouncementForm({
               className="w-4 h-4 text-amber-500 bg-slate-800 border-slate-600 rounded focus:ring-2 focus:ring-amber-500"
             />
             <label htmlFor="sendDiscordNotificationAnn" className="text-sm text-slate-300 cursor-pointer">
-              Send Discord notification
+              {t('announcements.sendDiscordNotification')}
             </label>
           </div>
 
@@ -151,14 +153,14 @@ export function AnnouncementForm({
               onClick={onCancel}
               className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Post Announcement'}
+              {isSubmitting ? t('common.saving') : isEditing ? t('common.save') + ' ' + t('common.change') : t('announcements.createAnnouncement')}
             </button>
           </div>
         </form>
