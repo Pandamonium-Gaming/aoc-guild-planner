@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Calendar, Megaphone, Pin, Trash2, Edit2, Link } from 'lucide-react';
-import { EventWithRsvps, Announcement, RsvpStatus } from '@/lib/events';
+import { EventWithRsvps, Announcement, RsvpStatus, EventRole } from '@/lib/events';
 import { EventCard } from './EventCard';
 import { EventForm } from './EventForm';
 import { AnnouncementForm } from './AnnouncementForm';
@@ -19,7 +19,7 @@ interface EventsListProps {
   onCreateEvent: (event: Parameters<typeof EventForm>[0]['onSubmit'] extends (e: infer E) => Promise<void> ? E : never) => Promise<void>;
   onUpdateEvent: (id: string, updates: Partial<EventWithRsvps>) => Promise<void>;
   onCancelEvent: (id: string) => Promise<void>;
-  onRsvp: (eventId: string, status: RsvpStatus) => Promise<void>;
+  onRsvp: (eventId: string, status: RsvpStatus, role?: EventRole | null) => Promise<void>;
   onCreateAnnouncement: (announcement: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   onUpdateAnnouncement: (id: string, updates: Partial<Announcement>) => Promise<void>;
   onDeleteAnnouncement: (id: string) => Promise<void>;
@@ -239,7 +239,7 @@ export function EventsList({
               key={event.id}
               event={event}
               timezone={timezone}
-              onRsvp={(status) => onRsvp(event.id, status)}
+              onRsvp={(status, role) => onRsvp(event.id, status, role)}
               onEdit={canManage ? () => setEditingEvent(event) : undefined}
               onCancel={canManage ? () => onCancelEvent(event.id) : undefined}
               canManage={canManage}

@@ -6,7 +6,9 @@ import { useToast } from '@/contexts/ToastContext';
 import { 
   EventWithRsvps, 
   RsvpStatus, 
+  EventRole,
   EVENT_TYPES, 
+  EVENT_ROLES,
   RSVP_STATUSES,
   formatEventTime,
   formatTime,
@@ -18,7 +20,7 @@ import {
 interface EventCardProps {
   event: EventWithRsvps;
   timezone: string;
-  onRsvp: (status: RsvpStatus) => void;
+  onRsvp: (status: RsvpStatus, role?: EventRole | null) => void;
   onEdit?: () => void;
   onCancel?: () => void;
   canManage?: boolean;
@@ -33,6 +35,7 @@ export function EventCard({
   canManage = false 
 }: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
   const { showToast } = useToast();
   
   const eventType = EVENT_TYPES[event.event_type];
@@ -168,37 +171,164 @@ export function EventCard({
             </div>
           </div>
 
+          {/* Role Requirements & Roster */}
+          {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
+            event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-white">Role Composition</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
+                  const role = roleKey as EventRole;
+                  const needed = event[`${roleKey}_needed` as keyof EventWithRsvps] as number;
+                  if (needed === 0) return null;
+                  
+                  const roleCounts = event.role_counts?.[role] || { attending: 0, maybe: 0 };
+                  const attending = roleCounts.attending;
+                  const maybe = roleCounts.maybe;
+                  const total = attending + maybe;
+                  const isFull = total >= needed;
+                  
+                  // Get RSVPs for this role
+                  const roleRsvps = event.rsvps?.filter(rsvp => 
+                    rsvp.role === role && 
+                    (rsvp.status === 'attending' || rsvp.status === 'maybe')
+                  ) || [];
+                  
+                  return (
+                    <div 
+                      key={role}
+                      className="bg-slate-800/50 rounded-lg p-3 space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{roleConfig.icon}</span>
+                          <span className={`text-sm font-medium ${roleConfig.color}`}>
+                            {roleConfig.name}
+                          </span>
+                        </div>
+                        <span className={`text-sm font-semibold ${isFull ? 'text-green-400' : 'text-slate-400'}`}>
+                          {total}/{needed}
+                        </span>
+                      </div>
+                      
+                      {/* Progress bar */}
+                      <div className="w-full bg-slate-700 rounded-full h-1.5">
+                        <div 
+                          className="h-1.5 rounded-full transition-all"
+                          style={{ 
+                            width: `${Math.min(100, (total / needed) * 100)}%`,
+                            backgroundColor: roleConfig.color
+                          }}
+                        />
+                      </div>
+                      
+                      {/* List of signups */}
+                      {roleRsvps.length > 0 && (
+                        <div className="text-xs space-y-1">
+                          {roleRsvps.map((rsvp, idx) => (
+                            <div 
+                              key={idx}
+                              className="flex items-center gap-1.5 text-slate-300"
+                            >
+                              {rsvp.status === 'attending' ? (
+                                <Check size={12} className="text-green-400" />
+                              ) : (
+                                <HelpCircle size={12} className="text-yellow-400" />
+                              )}
+                              <span className="truncate">
+                                {rsvp.character?.name || rsvp.user?.display_name || 'Unknown'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* RSVP buttons */}
           {!event.is_cancelled && !isPast && (
-            <div className="flex flex-wrap gap-2">
-              {(['attending', 'maybe', 'declined'] as RsvpStatus[]).map((status) => {
-                const rsvpInfo = RSVP_STATUSES[status];
-                const isSelected = userRsvp?.status === status;
-                const isDisabled = status === 'attending' && isFull && !isSelected;
-                
-                return (
-                  <button
-                    key={status}
-                    onClick={(e) => { e.stopPropagation(); onRsvp(status); }}
-                    disabled={isDisabled}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
-                      isSelected
-                        ? 'ring-2 ring-offset-2 ring-offset-slate-900'
-                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                    } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={isSelected ? { 
-                      backgroundColor: rsvpInfo.color + '30',
-                      color: rsvpInfo.color
-                    } : undefined}
-                  >
-                    {status === 'attending' && <Check size={14} />}
-                    {status === 'maybe' && <HelpCircle size={14} />}
-                    {status === 'declined' && <X size={14} />}
-                    {rsvpInfo.name}
-                    {isDisabled && ' (Full)'}
-                  </button>
-                );
-              })}
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {(['attending', 'maybe', 'declined'] as RsvpStatus[]).map((status) => {
+                  const rsvpInfo = RSVP_STATUSES[status];
+                  const isSelected = userRsvp?.status === status;
+                  const isDisabled = status === 'attending' && isFull && !isSelected;
+                  
+                  return (
+                    <button
+                      key={status}
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        if (status === 'declined') {
+                          onRsvp(status, null);
+                        } else {
+                          onRsvp(status, selectedRole);
+                        }
+                      }}
+                      disabled={isDisabled}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                        isSelected
+                          ? 'ring-2 ring-offset-2 ring-offset-slate-900'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                      } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={isSelected ? { 
+                        backgroundColor: rsvpInfo.color + '30',
+                        color: rsvpInfo.color
+                      } : undefined}
+                    >
+                      {status === 'attending' && <Check size={14} />}
+                      {status === 'maybe' && <HelpCircle size={14} />}
+                      {status === 'declined' && <X size={14} />}
+                      {rsvpInfo.name}
+                      {isDisabled && ' (Full)'}
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {/* Role selector - show if any roles are needed */}
+              {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
+                event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5">Select your role (optional):</label>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
+                      const role = roleKey as EventRole;
+                      const needed = event[`${roleKey}_needed` as keyof EventWithRsvps] as number;
+                      if (needed === 0) return null;
+                      
+                      const isSelected = selectedRole === role;
+                      
+                      return (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRole(isSelected ? null : role);
+                          }}
+                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                            isSelected
+                              ? 'ring-2 ring-offset-2 ring-offset-slate-900'
+                              : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                          }`}
+                          style={isSelected ? { 
+                            backgroundColor: roleConfig.color + '30',
+                            color: roleConfig.color
+                          } : undefined}
+                        >
+                          <span>{roleConfig.icon}</span>
+                          <span>{roleConfig.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
