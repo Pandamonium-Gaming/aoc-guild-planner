@@ -138,11 +138,11 @@ export function ProfessionSelector({
             )}
           </div>
           
-          {/* Quality Score */}
+          {/* Max Quality Score */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs text-slate-400">
-                Quality
+              <label className="text-xs text-slate-400" title="Maximum quality achievable with all buffs">
+                Max quality
               </label>
               <span className="text-xs text-slate-300 font-medium">{quality}</span>
             </div>
@@ -153,7 +153,8 @@ export function ProfessionSelector({
               value={quality}
               onChange={(e) => handleQualityChange(parseInt(e.target.value) || 0)}
               className="w-full px-3 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm"
-              placeholder="Enter quality score"
+              placeholder="Enter max quality"
+              title="Max quality with food, clothes, town buffs, etc."
             />
           </div>
         </div>
