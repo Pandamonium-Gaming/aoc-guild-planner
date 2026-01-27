@@ -19,6 +19,7 @@ interface EventsListProps {
   onCreateEvent: (event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>, sendDiscordNotification: boolean) => Promise<void>;
   onUpdateEvent: (id: string, updates: Partial<EventWithRsvps>) => Promise<void>;
   onCancelEvent: (id: string) => Promise<void>;
+  onDeleteEvent: (id: string) => Promise<void>;
   onRsvp: (eventId: string, status: RsvpStatus, role?: EventRole | null) => Promise<void>;
   onCreateAnnouncement: (announcement: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>, sendDiscordNotification: boolean) => Promise<void>;
   onUpdateAnnouncement: (id: string, updates: Partial<Announcement>) => Promise<void>;
@@ -35,6 +36,7 @@ export function EventsList({
   onCreateEvent,
   onUpdateEvent,
   onCancelEvent,
+  onDeleteEvent,
   onRsvp,
   onCreateAnnouncement,
   onUpdateAnnouncement,
@@ -247,6 +249,7 @@ export function EventsList({
               onRsvp={(status, role) => onRsvp(event.id, status, role)}
               onEdit={canManage ? () => setEditingEvent(event) : undefined}
               onCancel={canManage ? () => onCancelEvent(event.id) : undefined}
+              onDelete={canManage ? () => onDeleteEvent(event.id) : undefined}
               canManage={canManage}
             />
           ))}

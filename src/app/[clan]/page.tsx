@@ -135,6 +135,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     createEvent,
     updateEvent,
     cancelEvent,
+    deleteEvent,
     setRsvp,
     createAnnouncement,
     updateAnnouncement,
@@ -516,6 +517,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               }}
               onUpdateEvent={updateEvent}
               onCancelEvent={cancelEvent}
+              onDeleteEvent={deleteEvent}
               onRsvp={setRsvp}
               onCreateAnnouncement={async (announcementData, sendDiscordNotification) => {
                 await createAnnouncement(announcementData, sendDiscordNotification);

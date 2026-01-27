@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, MapPin, Users, Clock, Check, HelpCircle, X, ChevronDown, ChevronUp, Link as LinkIcon } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Check, HelpCircle, X, ChevronDown, ChevronUp, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import { 
   EventWithRsvps, 
@@ -23,6 +23,7 @@ interface EventCardProps {
   onRsvp: (status: RsvpStatus, role?: EventRole | null) => void;
   onEdit?: () => void;
   onCancel?: () => void;
+  onDelete?: () => void;
   canManage?: boolean;
 }
 
@@ -32,6 +33,7 @@ export function EventCard({
   onRsvp, 
   onEdit, 
   onCancel,
+  onDelete,
   canManage = false 
 }: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -350,6 +352,21 @@ export function EventCard({
                   className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg cursor-pointer"
                 >
                   Cancel Event
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    if (confirm(`Are you sure you want to permanently delete "${event.title}"? This cannot be undone.`)) {
+                      onDelete();
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg cursor-pointer flex items-center gap-1"
+                  title="Delete event permanently"
+                >
+                  <Trash2 size={14} />
+                  Delete
                 </button>
               )}
             </div>
