@@ -223,27 +223,30 @@ export function EventForm({
               Role Requirements <span className="text-slate-500">(optional)</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => (
-                <div key={roleKey} className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-lg">{roleConfig.icon}</span>
-                    <span className={`text-xs ${roleConfig.color}`}>
-                      {roleConfig.name}
-                    </span>
+              {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
+                const fieldName = `${roleKey}_needed` as 'tanks_needed' | 'clerics_needed' | 'bards_needed' | 'ranged_dps_needed' | 'melee_dps_needed';
+                return (
+                  <div key={roleKey} className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg">{roleConfig.icon}</span>
+                      <span className={`text-xs ${roleConfig.color}`}>
+                        {roleConfig.name}
+                      </span>
+                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      max="40"
+                      value={formData[fieldName]}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        [fieldName]: e.target.value 
+                      })}
+                      className="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
                   </div>
-                  <input
-                    type="number"
-                    min="0"
-                    max="40"
-                    value={formData[`${roleKey}_needed` as keyof EventFormData]}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      [`${roleKey}_needed`]: e.target.value 
-                    })}
-                    className="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
