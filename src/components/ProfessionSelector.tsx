@@ -27,7 +27,7 @@ export function ProfessionSelector({
   // Max level is determined by current certification rank
   const maxLevel = currentRank ? getMaxLevelForRank(currentRank) : 10;
   const atCap = currentRank ? isAtRankCap(level, currentRank) : false;
-  const canCertify = atCap && currentRank < 4; // Can't go beyond Grandmaster
+  const canCertify = atCap && currentRank !== null && currentRank < 4; // Can't go beyond Grandmaster
 
   const handleRankClick = (rank: RankLevel) => {
     if (currentRank === rank) {
