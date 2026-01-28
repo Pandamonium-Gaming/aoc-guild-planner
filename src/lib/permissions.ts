@@ -346,8 +346,8 @@ export const ROLE_CONFIG: Record<ClanRole, { label: string; color: string; borde
   },
   officer: {
     label: 'Officer',
-    color: 'text-orange-400', // epic
-    borderColor: 'border-orange-400',
+    color: 'text-purple-400', // epic (was orange, now purple)
+    borderColor: 'border-purple-400',
     description: 'Can manage members and events',
   },
   member: {
@@ -364,7 +364,7 @@ export const ROLE_CONFIG: Record<ClanRole, { label: string; color: string; borde
   },
   pending: {
     label: 'Pending',
-    color: 'text-slate-400', // common
+    color: 'text-slate-400', // common (white/gray)
     borderColor: 'border-slate-400',
     description: 'Application awaiting approval',
   }

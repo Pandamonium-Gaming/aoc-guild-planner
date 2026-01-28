@@ -271,26 +271,36 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
       {/* Role Selection */}
       <div className="flex gap-2 flex-wrap">
         {/* Show only manageable roles, with colored dot on left, invert selected style */}
-        {manageableRoles.map((role) => {
-          const roleConfig = ROLE_CONFIG[role];
-          const bgColor = roleConfig.color.replace('text-', 'bg-');
-          return (
-            <button
-              key={role}
-              onClick={() => setSelectedRole(role)}
-              disabled={!canEditRole}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 border transition-all ${
-                selectedRole === role
-                  ? `${bgColor} text-white ${roleConfig.borderColor}` // Inverted: colored bg, white text, colored border
-                  : `bg-slate-900 text-slate-300 ${roleConfig.borderColor}` // Neutral bg, colored border, colored dot
-              } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-              style={selectedRole === role ? { boxShadow: '0 0 0 2px rgba(0,0,0,0.2)' } : undefined}
-            >
-              <span className={roleConfig.color}>{String.fromCharCode(9679)}</span>
-              <span className={selectedRole === role ? 'text-white' : roleConfig.color}>{roleConfig.label}</span>
-            </button>
-          );
-        })}
+        {(() => {
+          // Map role to rarity bgColor
+          const rarityBg: Record<string, string> = {
+            admin: 'bg-amber-500/20', // legendary
+            officer: 'bg-purple-500/20', // epic/heroic
+            member: 'bg-blue-500/20', // rare
+            trial: 'bg-green-500/20', // uncommon
+            pending: 'bg-slate-500/20', // common
+          };
+          return manageableRoles.map((role) => {
+            const roleConfig = ROLE_CONFIG[role];
+            const selectedBg = rarityBg[role] || 'bg-slate-900';
+            return (
+              <button
+                key={role}
+                onClick={() => setSelectedRole(role)}
+                disabled={!canEditRole}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 border transition-all ${
+                  selectedRole === role
+                    ? `${selectedBg} text-white ${roleConfig.borderColor}`
+                    : `bg-slate-900 text-slate-300 ${roleConfig.borderColor}`
+                } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                style={selectedRole === role ? { boxShadow: '0 0 0 2px rgba(0,0,0,0.2)' } : undefined}
+              >
+                <span className={roleConfig.color}>{String.fromCharCode(9679)}</span>
+                <span className={selectedRole === role ? 'text-white' : roleConfig.color}>{roleConfig.label}</span>
+              </button>
+            );
+          });
+        })()}
         {/* Show Admin and Pending as immutable, as disabled buttons */}
         <button disabled className="px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 bg-amber-400/20 text-amber-400 cursor-not-allowed opacity-50">
           <span className={ROLE_CONFIG.admin.color}>{String.fromCharCode(9679)}</span>
