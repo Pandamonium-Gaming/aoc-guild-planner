@@ -774,13 +774,17 @@ function ManageTab({
                 <div className="flex items-center gap-2">
                   <select
                     value={member.role || 'member'}
-                    onChange={(e) => onUpdateRole(member.id, e.target.value as 'admin' | 'officer' | 'member')}
+                    onChange={(e) => onUpdateRole(member.id, e.target.value as ClanRole)}
                     className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-white text-sm cursor-pointer"
                     title={t('members.changeRole')}
                   >
-                    <option value="member">{t('clan.member')}</option>
-                    <option value="officer">{t('clan.officer')}</option>
-                    <option value="admin">{t('clan.admin')}</option>
+                    {Object.entries(ROLE_CONFIG)
+                      .filter(([role]) => role !== 'pending')
+                      .map(([role, config]) => (
+                        <option key={role} value={role}>
+                          {t(`clan.${role}`) || config.label}
+                        </option>
+                      ))}
                   </select>
                   {onRemove && (
                     <button
