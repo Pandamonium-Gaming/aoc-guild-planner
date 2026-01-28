@@ -223,6 +223,7 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
     );
   }
 
+  // Only render permissioned UI after loading is complete
   return (
     <div className="space-y-4">
       {/* Header */}
