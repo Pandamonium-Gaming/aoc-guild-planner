@@ -340,27 +340,27 @@ export function canManageRole(userRole: ClanRole, targetRole: ClanRole): boolean
 export const ROLE_CONFIG: Record<ClanRole, { label: string; color: string; description: string }> = {
   admin: {
     label: 'Admin',
-    color: 'text-red-400',
-    description: 'Full control over the guild',
+    color: 'text-amber-400', // legendary
+    description: 'Full permissions to manage clan',
   },
   officer: {
     label: 'Officer',
-    color: 'text-purple-400',
-    description: 'Can manage events, members, and announcements',
+    color: 'text-orange-400', // epic
+    description: 'Can manage members and events',
   },
   member: {
     label: 'Member',
-    color: 'text-blue-400',
+    color: 'text-blue-400', // rare
     description: 'Can create events and manage own content',
   },
   trial: {
     label: 'Trial',
-    color: 'text-yellow-400',
+    color: 'text-green-400', // uncommon
     description: 'Limited access while being evaluated',
   },
   pending: {
     label: 'Pending',
-    color: 'text-slate-400',
+    color: 'text-slate-400', // common
     description: 'Application awaiting approval',
-  },
+  }
 };

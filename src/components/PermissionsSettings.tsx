@@ -274,6 +274,8 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
         {(['officer', 'member', 'trial'] as ClanRole[]).map((role) => {
           if (!manageableRoles.includes(role)) return null;
           const roleConfig = ROLE_CONFIG[role];
+          // Map Tailwind text color to bg color (e.g., text-blue-400 -> bg-blue-400)
+          const bgColor = roleConfig.color.replace('text-', 'bg-');
           return (
             <button
               key={role}
@@ -281,12 +283,10 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
               disabled={!canEditRole}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 selectedRole === role
-                  ? `ring-2 ring-offset-2 ring-offset-slate-900 ${roleConfig.color}`
+                  ? `${bgColor} text-white` // Inverted: colored bg, white text
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
               } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-              style={selectedRole === role ? {
-                backgroundColor: roleConfig.color.replace('text-', '').slice(0, -2) + '30',
-              } : undefined}
+              style={selectedRole === role ? undefined : undefined}
             >
               {roleConfig.label}
             </button>

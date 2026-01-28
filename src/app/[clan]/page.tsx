@@ -742,11 +742,50 @@ function ManageTab({
           {t('members.title')} ({members.length})
         </h2>
         <div className="space-y-2">
-          {members.map((member) => (
-            <div
-              key={member.id}
-              className="bg-slate-900/80 border border-slate-700 rounded-lg p-4 flex items-center justify-between"
-            >
+          {(() => {
+            // Sort members by role (using role hierarchy) then display name
+            const getRoleRank = (role: string | null) => {
+              const hierarchy = {
+                admin: 4,
+                officer: 3,
+                member: 2,
+                trial: 1,
+                pending: 0,
+              };
+              return role && hierarchy.hasOwnProperty(role) ? hierarchy[role as keyof typeof hierarchy] : -1;
+            };
+            return members
+              .slice()
+              .sort((a, b) => {
+                const roleDiff = getRoleRank(b.role) - getRoleRank(a.role);
+                if (roleDiff !== 0) return roleDiff;
+                const nameA = (a.user?.display_name || a.user?.discord_username || '').toLowerCase();
+                const nameB = (b.user?.display_name || b.user?.discord_username || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+              })
+              .map((member) => (
+                <div
+                  key={member.id}
+                  className={
+                    [
+                      "bg-slate-900/80",
+                      "backdrop-blur-sm",
+                      "rounded-lg",
+                      "border",
+                      member.role === 'admin' ? 'border-orange-400' :
+                      member.role === 'officer' ? 'border-purple-400' :
+                      member.role === 'trial' ? 'border-yellow-400' :
+                      'border-slate-700',
+                      "transition-all",
+                      "duration-300",
+                      "hover:border-slate-600",
+                      "p-4",
+                      "flex",
+                      "items-center",
+                      "justify-between"
+                    ].join(' ')
+                  }
+                >
               <div className="flex items-center gap-3">
                 {member.user?.discord_avatar ? (
                   <img
@@ -816,7 +855,8 @@ function ManageTab({
                 </div>
               )}
             </div>
-          ))}
+              ));
+            })()}
         </div>
       </div>
     </div>
