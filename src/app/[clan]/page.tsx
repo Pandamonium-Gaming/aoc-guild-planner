@@ -17,7 +17,7 @@ import { useClanMembership } from '@/hooks/useClanMembership';
 import { useEvents } from '@/hooks/useEvents';
 import { CharactersTab } from './tabs/CharactersTab';
 import { PartiesTab } from './tabs/PartiesTab';
-import { CharacterForm } from '@/components/CharacterForm';
+import { CharacterEditModal } from './CharacterEditModal';
 import { EventsList } from '@/components/EventsList';
 import { CharacterFiltersBar, CharacterFilters, DEFAULT_FILTERS, filterCharacters } from '@/components/CharacterFilters';
 import { ClanSettings } from '@/components/ClanSettings';
@@ -488,24 +488,14 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
         <InlineFooter variant="matching" />
       </div>
 
-      {editingCharacter && (
-        <CharacterForm
-          initialData={{
-            name: editingCharacter.name,
-            race: editingCharacter.race,
-            primary_archetype: editingCharacter.primary_archetype,
-            secondary_archetype: editingCharacter.secondary_archetype,
-            level: editingCharacter.level,
-            is_main: editingCharacter.is_main,
-          }}
-          onSubmit={async (data) => {
-            await updateCharacter(editingCharacter.id, data);
-            setEditingCharacter(null);
-          }}
-          onCancel={() => setEditingCharacter(null)}
-          isEditing
-        />
-      )}
+      <CharacterEditModal
+        editingCharacter={editingCharacter}
+        onSubmit={async (id, data) => {
+          await updateCharacter(id, data);
+          setEditingCharacter(null);
+        }}
+        onCancel={() => setEditingCharacter(null)}
+      />
     </div>
   );
 }
