@@ -15,7 +15,6 @@ interface BottomNavProps {
 
 export function BottomNav({ activeTab, onTabChange, canManage }: BottomNavProps) {
   const { t } = useLanguage();
-  
   const NAV_ITEMS: { tab: Tab; icon: React.ElementType; labelKey: string; requiresManage?: boolean }[] = [
     { tab: 'characters', icon: Users, labelKey: 'nav.characters' },
     { tab: 'matrix', icon: Grid3X3, labelKey: 'nav.matrix' },
@@ -24,9 +23,7 @@ export function BottomNav({ activeTab, onTabChange, canManage }: BottomNavProps)
     { tab: 'more', icon: MoreHorizontal, labelKey: 'nav.more' },
     { tab: 'manage', icon: Settings, labelKey: 'nav.manage', requiresManage: true },
   ];
-
   const visibleItems = NAV_ITEMS.filter(item => !item.requiresManage || canManage);
-
   return (
     <nav 
       className="z-50"
@@ -38,50 +35,45 @@ export function BottomNav({ activeTab, onTabChange, canManage }: BottomNavProps)
       }}
     >
       <div className="flex items-stretch" style={{ height: '64px' }}>
-        {loading
-          ? Array.from({ length: NAV_ITEMS.length }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-16 mx-2" />
-            ))
-          : visibleItems.map(({ tab, icon: Icon, labelKey }) => {
-              const isActive = activeTab === tab;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => onTabChange(tab)}
-                  className="relative flex-1 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200"
-                  style={{
-                    color: isActive ? '#fb923c' : '#94a3b8',
-                    background: isActive ? 'rgba(251, 146, 60, 0.1)' : 'transparent',
-                  }}
-                >
-                  {/* Active indicator bar - positioned at top of this button */}
-                  {isActive && (
-                    <span 
-                      className="absolute top-0 w-10 h-0.5 rounded-full bg-orange-400"
-                      style={{ left: '50%', transform: 'translateX(-50%)' }}
-                    />
-                  )}
-                  
-                  <Icon 
-                    size={24} 
-                    strokeWidth={isActive ? 2.5 : 1.8}
-                    style={{
-                      filter: isActive ? 'drop-shadow(0 0 4px rgba(251, 146, 60, 0.4))' : 'none',
-                    }}
-                  />
-                  <span 
-                    className="font-medium"
-                    style={{ 
-                      fontSize: '10px',
-                      letterSpacing: '0.02em',
-                      opacity: isActive ? 1 : 0.8,
-                    }}
-                  >
-                    {t(labelKey)}
-                  </span>
-                </button>
-              );
-            })}
+        {visibleItems.map(({ tab, icon: Icon, labelKey }) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => onTabChange(tab)}
+              className="relative flex-1 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200"
+              style={{
+                color: isActive ? '#fb923c' : '#94a3b8',
+                background: isActive ? 'rgba(251, 146, 60, 0.1)' : 'transparent',
+              }}
+            >
+              {/* Active indicator bar - positioned at top of this button */}
+              {isActive && (
+                <span 
+                  className="absolute top-0 w-10 h-0.5 rounded-full bg-orange-400"
+                  style={{ left: '50%', transform: 'translateX(-50%)' }}
+                />
+              )}
+              <Icon 
+                size={24} 
+                strokeWidth={isActive ? 2.5 : 1.8}
+                style={{
+                  filter: isActive ? 'drop-shadow(0 0 4px rgba(251, 146, 60, 0.4))' : 'none',
+                }}
+              />
+              <span 
+                className="font-medium"
+                style={{ 
+                  fontSize: '10px',
+                  letterSpacing: '0.02em',
+                  opacity: isActive ? 1 : 0.8,
+                }}
+              >
+                {t(labelKey)}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );

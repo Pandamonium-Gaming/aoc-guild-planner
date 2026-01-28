@@ -1,8 +1,7 @@
+
+"use client";
 import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from './ui/Skeleton';
-  const { loading, hasPermission } = usePermissions(clanId);
-  const effectiveCanManage = typeof canManage === 'boolean' ? canManage : hasPermission('parties_manage');
-"use client";
 
 import { useState } from 'react';
 import { PartyWithRoster, CharacterWithProfessions, PartyRole, Party } from '@/lib/types';
@@ -37,8 +36,10 @@ export function PartiesList({
   onRemoveFromRoster,
   onToggleConfirmed,
 }: PartiesListProps) {
+
   const [showForm, setShowForm] = useState(false);
   const [editingParty, setEditingParty] = useState<PartyWithRoster | null>(null);
+  const { loading, isLeadership, isAdmin } = usePermissions(clanId);
 
   const handleCreate = async (data: Omit<Party, 'id' | 'created_at' | 'updated_at'>) => {
     await onCreateParty(data);
@@ -62,7 +63,7 @@ export function PartiesList({
         {canManage && (
           loading ? (
             <Skeleton className="h-10 w-32" />
-          ) : effectiveCanManage ? (
+          ) : (isLeadership() || isAdmin()) ? (
             <button
               onClick={() => setShowForm(true)}
               className="flex items-center gap-2 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"

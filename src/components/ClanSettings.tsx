@@ -1,6 +1,6 @@
+"use client";
 import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from './ui/Skeleton';
-"use client";
 
 import { useState } from 'react';
 import { Webhook, Bell, BellOff, Check, AlertCircle, Loader2 } from 'lucide-react';

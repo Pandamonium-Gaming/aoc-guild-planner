@@ -1,8 +1,7 @@
+
+"use client";
 import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from './ui/Skeleton';
-  const { loading, hasPermission } = usePermissions(party.clan_id);
-  const effectiveCanManage = typeof canManage === 'boolean' ? canManage : hasPermission('parties_manage');
-"use client";
 
 import { useState } from 'react';
 import { PartyWithRoster, PartyRole, PARTY_ROLES, CharacterWithProfessions } from '@/lib/types';
@@ -51,6 +50,8 @@ export function PartyCard({
   onDelete,
   onEdit,
 }: PartyCardProps) {
+  // Use permissions for this party's clan
+  const { loading, hasPermission, isLeadership, isAdmin } = usePermissions(party.clan_id);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAssign, setShowAssign] = useState(false);
   const [selectedRole, setSelectedRole] = useState<PartyRole>('ranged_dps');
@@ -77,6 +78,9 @@ export function PartyCard({
       setAssigning(false);
     }
   };
+
+  // Determine if the user can manage this party (could be more complex in future)
+  const effectiveCanManage = isLeadership() || isAdmin();
 
   return (
     <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 overflow-hidden">
@@ -179,38 +183,36 @@ export function PartyCard({
                         </div>
                         
                         {canManage && (
-                                                  {loading ? (
-                                                    <Skeleton className="h-8 w-16" />
-                                                  ) : effectiveCanManage && (
-                                    {loading ? (
-                                      <Skeleton className="h-8 w-32" />
-                                    ) : effectiveCanManage && (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleConfirmed(r.character_id, !r.is_confirmed);
-                              }}
-                              className={`p-1 rounded transition-colors cursor-pointer ${
-                                r.is_confirmed 
-                                  ? 'text-green-400 hover:bg-green-500/20' 
-                                  : 'text-slate-400 hover:bg-slate-700'
-                              }`}
-                              title={r.is_confirmed ? 'Unconfirm' : 'Confirm'}
-                            >
-                              <Check size={14} />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onRemove(r.character_id);
-                              }}
-                              className="p-1 text-slate-400 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors cursor-pointer"
-                              title="Remove"
-                            >
-                              <X size={14} />
-                            </button>
-                          </div>
+                          loading ? (
+                            <Skeleton className="h-8 w-16" />
+                          ) : effectiveCanManage && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onToggleConfirmed(r.character_id, !r.is_confirmed);
+                                }}
+                                className={`p-1 rounded transition-colors cursor-pointer ${
+                                  r.is_confirmed 
+                                    ? 'text-green-400 hover:bg-green-500/20' 
+                                    : 'text-slate-400 hover:bg-slate-700'
+                                }`}
+                                title={r.is_confirmed ? 'Unconfirm' : 'Confirm'}
+                              >
+                                <Check size={14} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRemove(r.character_id);
+                                }}
+                                className="p-1 text-slate-400 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors cursor-pointer"
+                                title="Remove"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          )
                         )}
                       </div>
                     );

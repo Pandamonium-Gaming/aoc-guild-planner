@@ -1,6 +1,6 @@
+"use client";
 import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from './ui/Skeleton';
-"use client";
 
 import { useState, useEffect } from 'react';
 import { Globe, UserPlus, Save, Loader2, Check, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
