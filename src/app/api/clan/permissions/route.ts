@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Check if user is admin
+    // Check if user is a member of the clan (any role)
     const { data: membership } = await supabaseAdmin
       .from('clan_members')
       .select('role')
@@ -117,8 +117,8 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (!membership || membership.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - user is not an admin' }, { status: 403 });
+    if (!membership) {
+      return NextResponse.json({ error: 'Forbidden - user is not a member of this clan' }, { status: 403 });
     }
 
     // Fetch permission overrides - may not exist if table hasn't been created yet
