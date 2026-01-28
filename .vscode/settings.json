@@ -3,6 +3,7 @@
         "npx tsc": true,
         "Tee-Object": true,
         "Test-Path": true,
-        "Get-Item": true
+        "Get-Item": true,
+        "npx next": true
     }
 }

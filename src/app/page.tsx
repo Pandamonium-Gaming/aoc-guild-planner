@@ -9,6 +9,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { InlineFooter } from '@/components/Footer';
 import { getUserClans } from '@/lib/auth';
 
+import { LandingHero } from '@/components/LandingHero';
+import { LandingClanForm } from '@/components/LandingClanForm';
+import { LandingFeatureHighlights } from '@/components/LandingFeatureHighlights';
+
 interface UserClan {
   id: string;
   slug: string;
@@ -126,48 +130,8 @@ export default function Home() {
       {/* Main scrollable content */}
       <main className="flex-1 overflow-y-auto">
         <div className="flex flex-col items-center justify-center p-8 min-h-full">
-          {/* Hero section */}
-      <div className="text-center max-w-2xl mx-auto">
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <Pickaxe className="w-8 h-8 text-amber-400" />
-          <Hammer className="w-10 h-10 text-orange-400" />
-          <Sword className="w-8 h-8 text-rose-400" />
-        </div>
-
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-400 via-amber-300 to-orange-400 bg-clip-text text-transparent">
-          {t('home.title')}
-        </h1>
-
-        <p className="text-slate-400 text-lg mb-8">
-          {t('home.subtitle')}
-        </p>
-
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-          <div className="relative">
-            <input
-              type="text"
-              value={clanName}
-              onChange={(e) => setClanName(e.target.value)}
-              placeholder={t('home.enterClanPlaceholder')}
-              className="w-full px-6 py-4 bg-slate-900/80 backdrop-blur-sm border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
-              autoFocus
-            />
-            <button
-              type="submit"
-              disabled={!clanName.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {t('common.enter')}
-            </button>
-          </div>
-          <p className="text-slate-500 text-sm mt-3">
-            {user 
-              ? t('home.loggedInHint')
-              : t('home.notLoggedInHint')
-            }
-          </p>
-        </form>
-      </div>
+          <LandingHero />
+          <LandingClanForm clanName={clanName} setClanName={setClanName} user={user} />
 
       {/* User's clans section */}
       {user && (
@@ -209,24 +173,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Feature highlights */}
-      <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <FeatureCard
-          icon={<Pickaxe className="w-6 h-6 text-amber-400" />}
-          title={t('home.feature1Title')}
-          description={t('home.feature1Desc')}
-        />
-        <FeatureCard
-          icon={<Hammer className="w-6 h-6 text-cyan-400" />}
-          title={t('home.feature2Title')}
-          description={t('home.feature2Desc')}
-        />
-        <FeatureCard
-          icon={<Sword className="w-6 h-6 text-rose-400" />}
-          title={t('home.feature3Title')}
-          description={t('home.feature3Desc')}
-        />
-      </div>
+      <LandingFeatureHighlights />
 
 
         </div>
