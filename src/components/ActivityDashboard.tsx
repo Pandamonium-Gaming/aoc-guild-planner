@@ -53,7 +53,8 @@ export function ActivityDashboard({
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return t('activity.never');
     const date = new Date(dateStr);
-    return date.toLocaleDateString(Intl.DateTimeFormat().resolvedOptions().timeZone, {
+    return date.toLocaleDateString('en-GB', {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       month: 'short',
       day: 'numeric',
       year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined,

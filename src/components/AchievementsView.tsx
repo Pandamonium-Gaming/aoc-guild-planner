@@ -125,7 +125,7 @@ export function AchievementsView({
                   {/* Unlocked date */}
                   {achievement.is_unlocked && achievement.unlocked_at && (
                     <div className="text-xs text-slate-500 mt-2">
-                      {t('achievements.unlockedAt')} {new Date(achievement.unlocked_at).toLocaleDateString(Intl.DateTimeFormat().resolvedOptions().timeZone)}
+                      {t('achievements.unlockedAt')} {new Date(achievement.unlocked_at).toLocaleDateString('en-GB', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
                     </div>
                   )}
                 </div>
