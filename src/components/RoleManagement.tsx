@@ -35,12 +35,13 @@ export function RoleManagement({ clanId, members, userRole, onRoleChange }: Role
 
   // Get available roles to promote/demote to
   const getAvailableRoles = (currentRole: ClanRole): ClanRole[] => {
-    // Show all roles below the current user's role, except 'admin' and 'pending'.
+    // Allow assigning any role except 'pending'.
+    // Only allow assigning roles with hierarchy less than or equal to the current user's role.
     return (Object.keys(ROLE_CONFIG) as ClanRole[])
       .filter(role => {
-        if (role === 'admin' || role === 'pending') return false;
-        // Only allow assigning roles strictly below the current user's role
-        return hierarchy[userRole] > hierarchy[role];
+        if (role === 'pending') return false;
+        // Only allow assigning roles with hierarchy less than or equal to the current user's role
+        return hierarchy[userRole] >= hierarchy[role];
       })
       .sort((a, b) => hierarchy[b] - hierarchy[a]);
   };

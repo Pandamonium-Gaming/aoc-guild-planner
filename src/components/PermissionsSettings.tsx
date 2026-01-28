@@ -270,44 +270,37 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
 
       {/* Role Selection */}
       <div className="flex gap-2 flex-wrap">
-        {manageableRoles.length > 0 && (
-          <>
-            {manageableRoles.map((role) => {
-              const roleConfig = ROLE_CONFIG[role];
-              return (
-              <button
-                key={role}
-                onClick={() => setSelectedRole(role)}
-                disabled={!canEditRole}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  selectedRole === role
-                    ? `ring-2 ring-offset-2 ring-offset-slate-900 ${roleConfig.color}`
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                style={selectedRole === role ? {
-                  backgroundColor: roleConfig.color.replace('text-', '').slice(0, -2) + '30',
-                } : undefined}
-              >
-                {roleConfig.label}
-              </button>
-            );
-            })}
-          </>
-        )}
-        {userRole === 'admin' && (
-          <>
-            {/* Show admin role but disabled */}
-            <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 cursor-not-allowed opacity-50">
-              {ROLE_CONFIG.admin.label}
-              <span className="text-xs ml-1">(immutable)</span>
-            </div>
-            {/* Show pending role but disabled */}
-            <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-400 cursor-not-allowed opacity-50">
-              {ROLE_CONFIG.pending.label}
-              <span className="text-xs ml-1">(immutable)</span>
-            </div>
-          </>
-        )}
+        {/* Always show roles in a consistent order, with immutable roles at the end */}
+        {(['officer', 'member', 'trial'] as ClanRole[]).map((role) => {
+          if (!manageableRoles.includes(role)) return null;
+          const roleConfig = ROLE_CONFIG[role];
+          return (
+            <button
+              key={role}
+              onClick={() => setSelectedRole(role)}
+              disabled={!canEditRole}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                selectedRole === role
+                  ? `ring-2 ring-offset-2 ring-offset-slate-900 ${roleConfig.color}`
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+              } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+              style={selectedRole === role ? {
+                backgroundColor: roleConfig.color.replace('text-', '').slice(0, -2) + '30',
+              } : undefined}
+            >
+              {roleConfig.label}
+            </button>
+          );
+        })}
+        {/* Show Admin and Pending as immutable, only once each */}
+        <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 cursor-not-allowed opacity-50">
+          {ROLE_CONFIG.admin.label}
+          <span className="text-xs ml-1">(immutable)</span>
+        </div>
+        <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-400 cursor-not-allowed opacity-50">
+          {ROLE_CONFIG.pending.label}
+          <span className="text-xs ml-1">(immutable)</span>
+        </div>
       </div>
 
       {/* Permissions Grid */}
