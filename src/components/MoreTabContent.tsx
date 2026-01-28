@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CharacterWithProfessions } from '@/lib/types';
 import { PartiesList } from './PartiesList';
 import { AchievementsView } from './AchievementsView';
+import { AchievementAdminPanel } from './AchievementAdminPanel';
 import { AllianceView } from './AllianceView';
 import { BuildLibrary } from './BuildLibrary';
 import { SiegeTabContent } from './SiegeTabContent';
@@ -42,6 +43,7 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
     unlockedCount,
     totalPoints,
     loading: achievementsLoading,
+    refresh: refreshAchievements,
   } = useAchievements(clanId);
 
   const {
@@ -117,11 +119,20 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
         achievementsLoading ? (
           <div className="text-center py-8 text-slate-400">{t('common.loading')}</div>
         ) : (
-          <AchievementsView
-            achievements={achievements}
-            unlockedCount={unlockedCount}
-            totalPoints={totalPoints}
-          />
+          <div className="space-y-4">
+            {isOfficer && (
+              <AchievementAdminPanel
+                achievements={achievements}
+                clanId={clanId}
+                onRefresh={refreshAchievements}
+              />
+            )}
+            <AchievementsView
+              achievements={achievements}
+              unlockedCount={unlockedCount}
+              totalPoints={totalPoints}
+            />
+          </div>
         )
       )}
 

@@ -48,13 +48,25 @@ export function useAchievements(clanId: string | null): UseAchievementsReturn {
       // Fetch clan achievements
       const { data: clanAchievements, error: achieveError } = await supabase
         .from('clan_achievements')
-        .select(`
-          *,
-          achievement_definitions (*)
-        `)
-        .eq('clan_id', clanId);
+        .select('*')
+        .eq('clan_id', clanId)
+        .order('created_at');
 
-      if (achieveError) throw achieveError;
+      if (achieveError) {
+        console.error('Error fetching clan achievements:', achieveError);
+        throw achieveError;
+      }
+
+      console.log('Fetched achievements:', {
+        count: clanAchievements?.length,
+        clanId,
+        data: clanAchievements?.map(a => ({
+          id: a.id,
+          achievement_id: a.achievement_id,
+          is_unlocked: a.is_unlocked,
+          current_value: a.current_value
+        }))
+      });
 
       // Merge with definitions for complete list
       const achievementMap = new Map(
