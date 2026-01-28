@@ -250,13 +250,14 @@ export async function getUserClans(userId: string): Promise<Array<{
   name: string;
   role: string;
   isCreator: boolean;
+  guild_icon_url?: string;
 }>> {
   const { data, error } = await supabase
     .from('clan_members')
     .select(`
       role,
       is_creator,
-      clans(id, slug, name)
+      clans(id, slug, name, guild_icon_url)
     `)
     .eq('user_id', userId)
     .neq('role', 'pending');
@@ -268,7 +269,7 @@ export async function getUserClans(userId: string): Promise<Array<{
     .filter(m => m.clans !== null)
     .map(m => {
       // Supabase returns single object for one-to-many join
-      const clanData = m.clans as unknown as { id: string; slug: string; name: string } | null;
+      const clanData = m.clans as unknown as { id: string; slug: string; name: string; guild_icon_url?: string } | null;
       if (!clanData) return null;
       return {
         id: clanData.id,
@@ -276,6 +277,7 @@ export async function getUserClans(userId: string): Promise<Array<{
         name: clanData.name,
         role: m.role as string,
         isCreator: m.is_creator as boolean,
+        guild_icon_url: clanData.guild_icon_url,
       };
     })
     .filter((c): c is NonNullable<typeof c> => c !== null);

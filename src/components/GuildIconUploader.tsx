@@ -56,9 +56,15 @@ export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconU
       {iconUrl && (
         <img src={iconUrl} alt="Guild Icon" className="w-16 h-16 rounded-full border border-slate-700" />
       )}
-      <label className={`inline-block px-4 py-2 rounded bg-blue-600 text-white font-semibold cursor-pointer hover:bg-blue-700 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        style={{ position: 'relative' }}>
-        {uploading ? 'Uploading...' : 'Choose File'}
+      <label
+        className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 border border-dashed border-slate-600 hover:border-orange-500/50 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        style={{ position: 'relative' }}
+      >
+        {uploading ? (
+          <span className="font-medium">Uploading...</span>
+        ) : (
+          <span className="font-medium">Choose File</span>
+        )}
         <input
           type="file"
           accept="image/*"

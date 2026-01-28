@@ -19,6 +19,7 @@ interface UserClan {
   name: string;
   role: string;
   isCreator: boolean;
+  guild_icon_url?: string;
 }
 
 export default function Home() {
@@ -155,7 +156,15 @@ export default function Home() {
                   className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
+                    {clan.guild_icon_url ? (
+                      <img
+                        src={clan.guild_icon_url}
+                        alt="Guild Icon"
+                        className="w-8 h-8 rounded-full border border-slate-700 bg-slate-800"
+                      />
+                    ) : (
+                      <Users className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
+                    )}
                     <span className="text-white font-medium group-hover:text-orange-300 transition-colors">
                       {clan.name}
                     </span>
