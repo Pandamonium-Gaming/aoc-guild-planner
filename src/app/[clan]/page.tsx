@@ -1,4 +1,6 @@
-'use client';
+
+"use client";
+import { AchievementsTab } from './tabs/AchievementsTab';
 
 import { useState, use, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -433,6 +435,11 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               clanId={clanId!}
               characters={characters}
               userId={user.id}
+            />
+          ) : activeTab === 'achievements' ? (
+            <AchievementsTab
+              clanId={clanId!}
+              isOfficer={canManageMembers}
             />
           ) : activeTab === 'matrix' ? (
             <ClanMatrix members={characters} />
