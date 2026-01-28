@@ -17,14 +17,15 @@ async function calculateAchievementProgress(
   clanId: string
 ): Promise<AchievementProgress[]> {
   try {
-    // Define all achievement calculations
+    // Define all achievement calculations indexed by requirement_type
     const calculations: Record<string, () => Promise<number>> = {
       // Milestone achievements - based on member count
-      '': async () => {
+      'member_count': async () => {
         const { count } = await supabaseAdmin
           .from('clan_members')
           .select('id', { count: 'exact', head: true })
           .eq('clan_id', clanId);
+        console.log(`Calculated member_count: ${count}`);
         return count || 0;
       },
 
@@ -35,6 +36,7 @@ async function calculateAchievementProgress(
           .select('id')
           .eq('clan_id', clanId)
           .eq('result', 'win');
+        console.log(`Calculated siege_wins: ${sieges?.length || 0}`);
         return sieges?.length || 0;
       },
 
@@ -45,6 +47,7 @@ async function calculateAchievementProgress(
           .select('id', { count: 'exact', head: true })
           .eq('clan_id', clanId)
           .eq('transaction_type', 'deposit');
+        console.log(`Calculated bank_deposits: ${count}`);
         return count || 0;
       },
 
@@ -54,6 +57,7 @@ async function calculateAchievementProgress(
           .select('id', { count: 'exact', head: true })
           .eq('clan_id', clanId)
           .eq('status', 'completed');
+        console.log(`Calculated caravan_complete: ${count}`);
         return count || 0;
       },
 
@@ -80,6 +84,7 @@ async function calculateAchievementProgress(
             }
           }
         }
+        console.log(`Calculated grandmaster_count: ${grandmasters.size}`);
         return grandmasters.size;
       },
 
@@ -89,6 +94,7 @@ async function calculateAchievementProgress(
           .from('events')
           .select('id', { count: 'exact', head: true })
           .eq('clan_id', clanId);
+        console.log(`Calculated events_hosted: ${count}`);
         return count || 0;
       },
 
@@ -103,19 +109,9 @@ async function calculateAchievementProgress(
           .gte('created_at', oneWeekAgo.toISOString());
 
         const uniqueUsers = new Set(activities?.map(a => a.user_id) || []);
+        console.log(`Calculated weekly_active: ${uniqueUsers.size}`);
         return uniqueUsers.size;
       },
-    };
-
-    // Map requirement types to calculations
-    const requirementTypeToCalculation: Record<string, string> = {
-      'member_count': 'member_count',
-      'siege_wins': 'siege_wins',
-      'bank_deposits': 'bank_deposits',
-      'caravan_complete': 'caravan_complete',
-      'grandmaster_count': 'grandmaster_count',
-      'events_hosted': 'events_hosted',
-      'weekly_active': 'weekly_active',
     };
 
     // Fetch all definitions
@@ -128,22 +124,25 @@ async function calculateAchievementProgress(
     const progress: AchievementProgress[] = [];
 
     for (const def of definitions) {
-      const calcKey = requirementTypeToCalculation[def.requirement_type];
-      const calculation = calculations[calcKey];
+      const calculation = calculations[def.requirement_type];
 
       if (!calculation) {
-        console.warn(`No calculation for requirement type: ${def.requirement_type}`);
+        console.warn(`No calculation found for requirement_type: ${def.requirement_type}`);
         continue;
       }
 
-      const currentValue = await calculation();
-      const isUnlocked = currentValue >= def.requirement_value;
+      try {
+        const currentValue = await calculation();
+        const isUnlocked = currentValue >= def.requirement_value;
 
-      progress.push({
-        achievement_id: def.id,
-        current_value: currentValue,
-        is_unlocked: isUnlocked,
-      });
+        progress.push({
+          achievement_id: def.id,
+          current_value: currentValue,
+          is_unlocked: isUnlocked,
+        });
+      } catch (err) {
+        console.error(`Error calculating ${def.requirement_type}:`, err);
+      }
     }
 
     return progress;
