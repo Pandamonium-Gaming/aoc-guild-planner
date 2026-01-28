@@ -19,6 +19,7 @@ import { RecruitmentSettings } from '@/components/RecruitmentSettings';
 import { PermissionsSettings } from '@/components/PermissionsSettings';
 import { BottomNav } from '@/components/BottomNav';
 import { InlineFooter } from '@/components/Footer';
+import { ROLE_CONFIG, ClanRole } from '@/lib/permissions';
 import { ClanMatrix } from '@/components/ClanMatrix';
 import { SiegeTabContent } from '@/components/SiegeTabContent';
 import { EconomyTabContent } from '@/components/EconomyTabContent';
