@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { Plus, X, Check } from 'lucide-react';
+import { ROLE_CONFIG, ClanRole } from '@/lib/permissions';
 
 interface AddMemberFormProps {
-  onAdd: (name: string) => Promise<void>;
+  onAdd: (name: string, role: ClanRole) => Promise<void>;
 }
 
-export function AddMemberForm({ onAdd }: AddMemberFormProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,6 +62,21 @@ export function AddMemberForm({ onAdd }: AddMemberFormProps) {
           autoFocus
           disabled={isSubmitting}
         />
+        <select
+          value={role}
+          onChange={e => setRole(e.target.value as ClanRole)}
+          className="bg-slate-800 border border-slate-600 rounded px-2 py-2 text-white focus:outline-none"
+          disabled={isSubmitting}
+          aria-label="Role"
+        >
+          {(Object.keys(ROLE_CONFIG) as ClanRole[])
+            .filter(r => r !== 'admin' && r !== 'pending')
+            .map(r => (
+              <option key={r} value={r}>
+                {ROLE_CONFIG[r].label}
+              </option>
+            ))}
+        </select>
         <button
           type="submit"
           disabled={!name.trim() || isSubmitting}
@@ -77,8 +92,10 @@ export function AddMemberForm({ onAdd }: AddMemberFormProps) {
             setName('');
             setIsAdding(false);
           }}
-          className="p-2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"          aria-label="Cancel"
-          title="Cancel"        >
+          className="p-2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+          aria-label="Cancel"
+          title="Cancel"
+        >
           <X size={20} />
         </button>
       </div>
