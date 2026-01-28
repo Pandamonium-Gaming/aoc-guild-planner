@@ -269,6 +269,7 @@ export function CharacterCard({
                     onChange={(rank: RankLevel | null, level?: number, quality?: number) => 
                       onSetProfessionRank(character.id, profession.id, rank, level, quality)
                     }
+                    readOnly={readOnly}
                   />
                 ))}
               </div>
@@ -276,6 +277,11 @@ export function CharacterCard({
           ))}
         </div>
       )}
+      {/* Debug info for editability */}
+      <div className="text-xs text-slate-500 mt-2">
+        <div>user_id: {character.user_id}</div>
+        <div>readOnly: {String(readOnly)}</div>
+      </div>
     </div>
   );
 }
