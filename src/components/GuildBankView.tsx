@@ -44,7 +44,7 @@ export function GuildBankView({
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
 
   // Filter inventory
-                        {tx.user?.display_name || t('bank.system')} • {txDate.toLocaleDateString('en-GB', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
+  const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.resource.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || item.resource.category === categoryFilter;
     return matchesSearch && matchesCategory;
