@@ -2,7 +2,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export type Tab = 'characters' | 'events' | 'parties' | 'matrix' | 'manage' | 'siege' | 'economy' | 'more' | 'achievements' | 'alliances';
+export type Tab = 'characters' | 'events' | 'parties' | 'matrix' | 'manage' | 'siege' | 'economy' | 'more' | 'achievements' | 'alliances' | 'builds';
 
 interface ClanTabNavProps {
   canManage: boolean;

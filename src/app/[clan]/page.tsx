@@ -1,6 +1,7 @@
 
 "use client";
 import { AchievementsTab } from './tabs/AchievementsTab';
+import { BuildsTab } from './tabs/BuildsTab';
 import { AlliancesTab } from './tabs/AlliancesTab';
 
 import { useState, use, useEffect } from 'react';
@@ -446,6 +447,10 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
             <AlliancesTab
               clanId={clanId!}
               isOfficer={canManageMembers}
+            />
+          ) : activeTab === 'builds' ? (
+            <BuildsTab
+              clanId={clanId!}
             />
           ) : activeTab === 'matrix' ? (
             <ClanMatrix members={characters} />
