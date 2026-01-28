@@ -10,9 +10,7 @@ interface AddMemberFormProps {
 }
 
 export function AddMemberForm({ onAdd }: AddMemberFormProps) {
-  const [isAdding, setIsAdding] = useState(false);
-  const [name, setName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // ...existing code...
 
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
@@ -68,21 +66,6 @@ export function AddMemberForm({ onAdd }: AddMemberFormProps) {
           autoFocus
           disabled={isSubmitting}
         />
-        <select
-          value={role}
-          onChange={e => setRole(e.target.value as ClanRole)}
-          className="bg-slate-800 border border-slate-600 rounded px-2 py-2 text-white focus:outline-none"
-          disabled={isSubmitting}
-          aria-label="Role"
-        >
-          {(Object.keys(ROLE_CONFIG) as ClanRole[])
-            .filter(r => r !== 'admin' && r !== 'pending')
-            .map(r => (
-              <option key={r} value={r}>
-                {ROLE_CONFIG[r].label}
-              </option>
-            ))}
-        </select>
         <button
           type="submit"
           disabled={!name.trim() || isSubmitting}
