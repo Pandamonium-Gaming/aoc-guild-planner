@@ -82,6 +82,7 @@
     "admin": "admin",
     "officer": "officer",
     "member": "member",
+    "trial": "trial",
     "loginRequired": "Login Required",
     "signInToAccess": "Sign in with Discord to access {{name}}",
     "connectionError": "Connection Error",

@@ -82,6 +82,7 @@
     "admin": "admin",
     "officer": "oficial",
     "member": "miembro",
+    "trial": "a prueba",
     "loginRequired": "Inicio de Sesión Requerido",
     "signInToAccess": "Inicia sesión con Discord para acceder a {{name}}",
     "connectionError": "Error de Conexión",

@@ -92,30 +92,27 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
     { id: 'alliances', icon: Handshake, label: t('alliance.title') },
   ] as const;
 
-  // Only show subtab navigation if the current route is 'more'
-  const isMoreRoute = pathname?.includes('more');
+
 
   return (
     <div className="space-y-4">
       {/* Sub-navigation */}
-      {isMoreRoute && (
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {SUB_TABS.map(({ id, icon: Icon, label }) => (
-            <button
-              key={id}
-              onClick={() => handleSubTabChange(id as MoreSubTab)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                subTab === id
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {SUB_TABS.map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => handleSubTabChange(id as MoreSubTab)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              subTab === id
+                ? 'bg-purple-500 text-white'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* Content */}
       {subTab === 'parties' && (
