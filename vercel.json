@@ -1,0 +1,8 @@
+{
+  "cron": [
+    {
+      "path": "/api/sync/achievements",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
