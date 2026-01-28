@@ -1,4 +1,8 @@
-'use client';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
+  const { loading, hasPermission } = usePermissions(party.clan_id);
+  const effectiveCanManage = typeof canManage === 'boolean' ? canManage : hasPermission('parties_manage');
+"use client";
 
 import { useState } from 'react';
 import { PartyWithRoster, PartyRole, PARTY_ROLES, CharacterWithProfessions } from '@/lib/types';
@@ -175,6 +179,12 @@ export function PartyCard({
                         </div>
                         
                         {canManage && (
+                                                  {loading ? (
+                                                    <Skeleton className="h-8 w-16" />
+                                                  ) : effectiveCanManage && (
+                                    {loading ? (
+                                      <Skeleton className="h-8 w-32" />
+                                    ) : effectiveCanManage && (
                           <div className="flex items-center gap-1">
                             <button
                               onClick={(e) => {
@@ -221,7 +231,9 @@ export function PartyCard({
           })}
 
           {/* Actions */}
-          {canManage && (
+          {loading ? (
+            <Skeleton className="h-8 w-32" />
+          ) : effectiveCanManage ? (
             <div className="flex items-center justify-between pt-4 border-t border-slate-800">
               {/* Assign character */}
               {showAssign ? (
@@ -291,7 +303,7 @@ export function PartyCard({
                 </button>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>

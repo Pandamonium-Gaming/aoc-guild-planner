@@ -1,4 +1,6 @@
-'use client';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { Globe, UserPlus, Save, Loader2, Check, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
@@ -11,6 +13,7 @@ interface RecruitmentSettingsProps {
 }
 
 export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsProps) {
+  const { loading } = usePermissions(clanId);
   const [isPublic, setIsPublic] = useState(false);
   const [recruitmentOpen, setRecruitmentOpen] = useState(false);
   const [recruitmentMessage, setRecruitmentMessage] = useState('');
@@ -18,7 +21,7 @@ export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsPro
   const [applications, setApplications] = useState<RecruitmentApplication[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch current settings and applications
@@ -28,19 +31,15 @@ export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsPro
     async function fetchData() {
       if (!isMounted) return;
       setError(null);
-      
       try {
         console.log('[RecruitmentSettings] Fetching clan settings for:', clanId);
-        
         // Fetch clan settings
         const { data: clanData, error: clanError } = await supabase
           .from('clans')
           .select('is_public, recruitment_open, recruitment_message, public_description')
           .eq('id', clanId)
           .single();
-
         if (!isMounted) return;
-
         if (clanError) {
           console.error('[RecruitmentSettings] Error fetching clan:', clanError);
         }
@@ -78,7 +77,7 @@ export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsPro
         }
       } finally {
         if (isMounted) {
-          setLoading(false);
+          setLocalLoading(false);
         }
       }
     }
@@ -86,7 +85,7 @@ export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsPro
     if (clanId) {
       fetchData();
     } else {
-      setLoading(false);
+      setLocalLoading(false);
     }
 
     return () => {
@@ -285,20 +284,24 @@ export function RecruitmentSettings({ clanId, clanSlug }: RecruitmentSettingsPro
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : saved ? (
-              <Check size={16} />
-            ) : (
-              <Save size={16} />
-            )}
-            {saved ? 'Saved!' : 'Save Settings'}
-          </button>
+          {loading ? (
+            <Skeleton className="h-10 w-32" />
+          ) : (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {saving ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : saved ? (
+                <Check size={16} />
+              ) : (
+                <Save size={16} />
+              )}
+              {saved ? 'Saved!' : 'Save Settings'}
+            </button>
+          )}
         </div>
       </div>
 

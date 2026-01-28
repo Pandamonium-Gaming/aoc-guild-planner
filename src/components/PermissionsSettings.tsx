@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { SkeletonCard } from './ui/Skeleton';
 import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -216,9 +217,19 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
   const selectedRolePerms = customPermissions[selectedRole];
 
   if (isLoading) {
+    // Show skeletons for the main permissioned UI
     return (
-      <div className="bg-slate-800/50 rounded-lg p-8 text-center text-slate-400">
-        <p>Loading permissions...</p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-6 w-40 bg-slate-700/50 rounded mb-2 animate-pulse" />
+            <div className="h-4 w-64 bg-slate-700/50 rounded animate-pulse" />
+          </div>
+          <div className="h-8 w-32 bg-slate-700/50 rounded animate-pulse" />
+        </div>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }

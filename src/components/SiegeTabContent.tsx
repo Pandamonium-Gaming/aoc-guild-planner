@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Shield, Crosshair, Trophy, Gem, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
 import { useSiegeEvents, RosterSignupData } from '@/hooks/useSiegeEvents';
 import { useLootSystem } from '@/hooks/useLootSystem';
 import { useNodeCitizenships } from '@/hooks/useNodeCitizenships';
@@ -75,6 +76,7 @@ export function SiegeTabContent({ clanId, characters, userId }: SiegeTabContentP
   };
 
   // Permission checks
+  const { loading } = usePermissions(clanId);
   const canCreateSiege = hasPermission('siege_create_event');
   const canEditRosters = hasPermission('siege_edit_rosters');
   const canDistributeLoot = hasPermission('siege_edit_rosters');
@@ -102,7 +104,9 @@ export function SiegeTabContent({ clanId, characters, userId }: SiegeTabContentP
       {/* Content */}
       {subTab === 'roster' && (
         <div className="space-y-4">
-          {canCreateSiege && (
+          {loading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : canCreateSiege && (
             <button
               onClick={() => setShowEventForm(true)}
               className="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"

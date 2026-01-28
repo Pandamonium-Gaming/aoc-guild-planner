@@ -1,4 +1,6 @@
-'use client';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
+"use client";
 
 import { useState } from 'react';
 import { Webhook, Bell, BellOff, Check, AlertCircle, Loader2 } from 'lucide-react';
@@ -23,6 +25,7 @@ export function ClanSettings({
   announcementRoleId = '',
   onUpdate,
 }: ClanSettingsProps) {
+  const { loading } = usePermissions(clanId);
   const [webhookUrl, setWebhookUrl] = useState(currentWebhookUrl);
   const [eventsEnabled, setEventsEnabled] = useState(notifyOnEvents);
   const [announcementsEnabled, setAnnouncementsEnabled] = useState(notifyOnAnnouncements);
@@ -231,25 +234,29 @@ export function ClanSettings({
 
       {/* Save button */}
       <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={saving || !!(webhookUrl && !isValidWebhookUrl(webhookUrl))}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
-        >
-          {saving ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              {t('discord.saving')}
-            </>
-          ) : saved ? (
-            <>
-              <Check size={16} />
-              {t('discord.saved')}
-            </>
-          ) : (
-            t('discord.saveSettings')
-          )}
-        </button>
+        {loading ? (
+          <Skeleton className="h-10 w-32" />
+        ) : (
+          <button
+            onClick={handleSave}
+            disabled={saving || !!(webhookUrl && !isValidWebhookUrl(webhookUrl))}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            {saving ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                {t('discord.saving')}
+              </>
+            ) : saved ? (
+              <>
+                <Check size={16} />
+                {t('discord.saved')}
+              </>
+            ) : (
+              t('discord.saveSettings')
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

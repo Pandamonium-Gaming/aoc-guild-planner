@@ -9,6 +9,7 @@ import { AnnouncementForm } from './AnnouncementForm';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/contexts/ToastContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
 
 interface EventsListProps {
   events: EventWithRsvps[];
@@ -52,6 +53,7 @@ export function EventsList({
   const { hasPermission } = usePermissions(clanId);
   
   // Check permissions
+  const { loading } = usePermissions(clanId);
   const canCreateEvent = hasPermission('events_create');
   const canCreateAnnouncement = hasPermission('announcements_create');
 
@@ -216,7 +218,12 @@ export function EventsList({
             </span>
           )}
         </h3>
-        {(canCreateEvent || canCreateAnnouncement) && (
+        {loading ? (
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-40" />
+            <Skeleton className="h-10 w-40" />
+          </div>
+        ) : (canCreateEvent || canCreateAnnouncement) && (
           <div className="flex gap-2">
             {canCreateAnnouncement && (
               <button

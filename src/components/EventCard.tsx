@@ -5,6 +5,7 @@ import { Calendar, MapPin, Users, Clock, Check, HelpCircle, X, ChevronDown, Chev
 import { useToast } from '@/contexts/ToastContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Skeleton } from './ui/Skeleton';
 import { 
   EventWithRsvps, 
   RsvpStatus, 
@@ -54,6 +55,7 @@ export function EventCard({
   const userRsvp = event.user_rsvp;
   
   // Check if user can edit or delete events
+  const { loading } = usePermissions(clanId);
   const canEditEvent = hasPermission('events_edit_any') || (hasPermission('events_edit_own') && event.created_by === userId);
   const canDeleteEvent = hasPermission('events_delete_any') || (hasPermission('events_delete_own') && event.created_by === userId);
 
@@ -423,7 +425,12 @@ export function EventCard({
           )}
 
           {/* Event actions based on permissions */}
-          {(canEditEvent || canDeleteEvent || (onCancel && !event.is_cancelled)) && (
+          {loading ? (
+            <div className="flex gap-2 pt-2 border-t border-slate-800">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+          ) : (canEditEvent || canDeleteEvent || (onCancel && !event.is_cancelled)) && (
             <div className="flex gap-2 pt-2 border-t border-slate-800">
               {canEditEvent && onEdit && (
                 <button
