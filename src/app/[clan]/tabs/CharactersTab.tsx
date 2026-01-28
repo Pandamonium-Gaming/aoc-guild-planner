@@ -40,6 +40,9 @@ export function CharactersTab({
           <CharacterCard
             key={character.id}
             character={character}
+            onUpdate={async () => {}}
+            onDelete={async () => {}}
+            onSetProfessionRank={async () => {}}
             onEdit={() => setEditingCharacter(character)}
           />
         ))

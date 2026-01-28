@@ -523,6 +523,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
                 onUpdateRole={canManageRoles ? updateRole : undefined}
                 onRemove={canManageRoles ? removeMember : undefined}
                 currentUserId={user.id}
+                currentUserRole={membership?.role || 'member'}
                 t={t}
               />
 
@@ -630,6 +631,7 @@ function ManageTab({
   onUpdateRole,
   onRemove,
   currentUserId,
+  currentUserRole,
   t,
 }: {
   members: Array<{
@@ -645,6 +647,7 @@ function ManageTab({
   onUpdateRole?: (id: string, role: ClanRole) => Promise<void>;
   onRemove?: (id: string) => Promise<void>;
   currentUserId: string;
+  currentUserRole: ClanRole;
   t: (key: string) => string;
 }) {
   return (
@@ -748,6 +751,14 @@ function ManageTab({
                   }
                 >
               <div className="flex items-center gap-3">
+                {/* Colored dot for role */}
+                {(() => {
+                  const validRole = (role: string | null): role is ClanRole =>
+                    role !== null && Object.prototype.hasOwnProperty.call(ROLE_CONFIG, role);
+                  const roleKey: ClanRole = validRole(member.role) ? member.role : 'member';
+                  const config = ROLE_CONFIG[roleKey];
+                  return <span className={config.color}>{String.fromCharCode(9679)}</span>;
+                })()}
                 {member.user?.discord_avatar ? (
                   <img
                     src={member.user.discord_avatar}
@@ -761,14 +772,7 @@ function ManageTab({
                   <span className="text-white">
                     {member.user?.display_name || member.user?.discord_username || 'Unknown'}
                   </span>
-                  <span className={`ml-2 text-sm ${
-                    member.role === 'admin' ? 'text-orange-400' :
-                    member.role === 'officer' ? 'text-purple-400' :
-                    'text-slate-400'
-                  }`}>
-                    {member.role}
-                    {member.is_creator && ' (creator)'}
-                  </span>
+                  <span className={`ml-2 text-sm ${ROLE_CONFIG[member.role as ClanRole]?.color || 'text-slate-400'}`}> {member.role}{member.is_creator && ' (creator)'}</span>
                 </div>
               </div>
               {onUpdateRole && member.user_id !== currentUserId && (
@@ -781,6 +785,12 @@ function ManageTab({
                   >
                     {Object.entries(ROLE_CONFIG)
                       .filter(([role]) => role !== 'pending')
+                      .filter(([role]) => {
+                        // Only allow managing roles below your own
+                        if (currentUserRole === 'admin') return true;
+                        if (currentUserRole === 'officer') return ['member', 'trial'].includes(role);
+                        return false;
+                      })
                       .map(([role, config]) => (
                         <option
                           key={role}
@@ -791,20 +801,6 @@ function ManageTab({
                         </option>
                       ))}
                   </select>
-                  {/* Show colored dot and label for selected role next to dropdown */}
-                  {(() => {
-                    const validRole = (role: string | null): role is ClanRole =>
-                      role !== null && Object.prototype.hasOwnProperty.call(ROLE_CONFIG, role);
-                    const roleKey: ClanRole = validRole(member.role) ? member.role : 'member';
-                    const config = ROLE_CONFIG[roleKey];
-                    return (
-                      <span className="ml-2 flex items-center gap-1 text-xs max-w-xs truncate" title={config.description}>
-                        <span className={config.color}>{String.fromCharCode(9679)}</span>
-                        <span>{t(`clan.${roleKey}`) || config.label}</span>
-                        <span className="text-slate-400">- {config.description}</span>
-                      </span>
-                    );
-                  })()}
                   {onRemove && (
                     <button
                       onClick={() => onRemove(member.id)}

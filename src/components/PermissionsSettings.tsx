@@ -270,37 +270,37 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
 
       {/* Role Selection */}
       <div className="flex gap-2 flex-wrap">
-        {/* Always show roles in a consistent order, with immutable roles at the end */}
-        {(['officer', 'member', 'trial'] as ClanRole[]).map((role) => {
-          if (!manageableRoles.includes(role)) return null;
+        {/* Show only manageable roles, with colored dot on left, invert selected style */}
+        {manageableRoles.map((role) => {
           const roleConfig = ROLE_CONFIG[role];
-          // Map Tailwind text color to bg color (e.g., text-blue-400 -> bg-blue-400)
           const bgColor = roleConfig.color.replace('text-', 'bg-');
           return (
             <button
               key={role}
               onClick={() => setSelectedRole(role)}
               disabled={!canEditRole}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
                 selectedRole === role
                   ? `${bgColor} text-white` // Inverted: colored bg, white text
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
               } ${!canEditRole ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-              style={selectedRole === role ? undefined : undefined}
             >
+              <span className={roleConfig.color}>{String.fromCharCode(9679)}</span>
               {roleConfig.label}
             </button>
           );
         })}
-        {/* Show Admin and Pending as immutable, only once each */}
-        <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 cursor-not-allowed opacity-50">
+        {/* Show Admin and Pending as immutable, as disabled buttons */}
+        <button disabled className="px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 bg-amber-400/20 text-amber-400 cursor-not-allowed opacity-50">
+          <span className={ROLE_CONFIG.admin.color}>{String.fromCharCode(9679)}</span>
           {ROLE_CONFIG.admin.label}
           <span className="text-xs ml-1">(immutable)</span>
-        </div>
-        <div className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-400 cursor-not-allowed opacity-50">
+        </button>
+        <button disabled className="px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 bg-slate-700 text-slate-400 cursor-not-allowed opacity-50">
+          <span className={ROLE_CONFIG.pending.color}>{String.fromCharCode(9679)}</span>
           {ROLE_CONFIG.pending.label}
           <span className="text-xs ml-1">(immutable)</span>
-        </div>
+        </button>
       </div>
 
       {/* Permissions Grid */}
