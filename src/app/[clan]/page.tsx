@@ -10,6 +10,7 @@ import { useClanData } from '@/hooks/useClanData';
 import { useClanMembership } from '@/hooks/useClanMembership';
 import { useEvents } from '@/hooks/useEvents';
 import { CharactersTab } from './tabs/CharactersTab';
+import { PartiesTab } from './tabs/PartiesTab';
 import { CharacterForm } from '@/components/CharacterForm';
 import { EventsList } from '@/components/EventsList';
 import { CharacterFiltersBar, CharacterFilters, DEFAULT_FILTERS, filterCharacters } from '@/components/CharacterFilters';
@@ -419,6 +420,13 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               }}
               onUpdateAnnouncement={updateAnnouncement}
               onDeleteAnnouncement={deleteAnnouncement}
+            />
+          ) : activeTab === 'parties' ? (
+            <PartiesTab
+              clanId={clanId!}
+              characters={characters}
+              userId={user.id}
+              canManage={canManageMembers}
             />
           ) : activeTab === 'matrix' ? (
             <ClanMatrix members={characters} />
