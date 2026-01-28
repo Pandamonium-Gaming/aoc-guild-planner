@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
     try {
       result = await supabaseAdmin
         .from('clan_permission_overrides')
-        .upsert(updates, { onConflict: ['clan_id', 'role'] });
+        .upsert(updates, { onConflict: 'clan_id,role' });
     } catch (upsertException) {
       console.error('Exception during upsert:', upsertException);
       throw upsertException;
