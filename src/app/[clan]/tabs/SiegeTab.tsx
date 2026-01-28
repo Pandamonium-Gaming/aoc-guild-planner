@@ -1,7 +1,7 @@
 import { SiegeTabContent } from '@/components/SiegeTabContent';
 import { CharacterWithProfessions } from '@/lib/types';
 
-interface SiegeTabProps {
+export interface SiegeTabProps {
   clanId: string;
   characters: CharacterWithProfessions[];
   userId: string;

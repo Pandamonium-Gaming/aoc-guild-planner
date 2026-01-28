@@ -9,6 +9,7 @@ import { CharacterWithProfessions } from "@/lib/types";
 import { useState } from "react";
 
 interface CharactersTabProps {
+  clanId: string;
   characters: CharacterWithProfessions[];
   addCharacter: (data: any) => Promise<void>;
   setEditingCharacter: (character: CharacterWithProfessions) => void;
@@ -17,6 +18,7 @@ interface CharactersTabProps {
 }
 
 export function CharactersTab({
+  clanId,
   characters,
   addCharacter,
   setEditingCharacter,
@@ -24,7 +26,7 @@ export function CharactersTab({
   setCharacterFilters,
 }: CharactersTabProps) {
   const { user } = useAuthContext();
-  const clanMembership = useClanMembership(null, user?.id || null);
+  const clanMembership = useClanMembership(clanId, user?.id || null);
   console.log('[DEBUG] clanMembership:', clanMembership);
   const userRole = clanMembership.membership?.role || 'pending';
   console.log('[DEBUG] userRole from membership:', userRole);

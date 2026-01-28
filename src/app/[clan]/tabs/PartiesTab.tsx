@@ -2,7 +2,7 @@ import { useParties } from '@/hooks/useParties';
 import { PartiesList } from '@/components/PartiesList';
 import { CharacterWithProfessions } from '@/lib/types';
 
-interface PartiesTabProps {
+export interface PartiesTabProps {
   clanId: string;
   characters: CharacterWithProfessions[];
   userId: string;

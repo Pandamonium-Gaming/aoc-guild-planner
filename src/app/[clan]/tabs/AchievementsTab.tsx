@@ -2,7 +2,7 @@ import { useAchievements } from '@/hooks/useAchievements';
 import { AchievementsView } from '@/components/AchievementsView';
 import { AchievementAdminPanel } from '@/components/AchievementAdminPanel';
 
-interface AchievementsTabProps {
+export interface AchievementsTabProps {
   clanId: string;
   isOfficer: boolean;
 }

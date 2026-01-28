@@ -3,7 +3,7 @@
 import { useBuilds } from '@/hooks/useBuilds';
 import { BuildLibrary } from '@/components/BuildLibrary';
 
-interface BuildsTabProps {
+export interface BuildsTabProps {
   clanId: string;
 }
 

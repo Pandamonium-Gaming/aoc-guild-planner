@@ -361,14 +361,15 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
       {/* Main content - scrollable area */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 py-6 pb-4">
-          {activeTab === 'characters' ? (
-            <CharactersTab
-              characters={characters}
-              addCharacter={addCharacter}
-              setEditingCharacter={setEditingCharacter}
-              characterFilters={characterFilters}
-              setCharacterFilters={setCharacterFilters}
-            />
+            {activeTab === 'characters' ? (
+              <CharactersTab
+                clanId={clanId!}
+                characters={characters}
+                addCharacter={addCharacter}
+                setEditingCharacter={setEditingCharacter}
+                characterFilters={characterFilters}
+                setCharacterFilters={setCharacterFilters}
+              />
           ) : activeTab === 'events' ? (
             <EventsList
               events={events}

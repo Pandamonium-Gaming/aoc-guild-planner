@@ -3,7 +3,7 @@
 import { useAlliances } from '@/hooks/useAlliances';
 import { AllianceView } from '@/components/AllianceView';
 
-interface AlliancesTabProps {
+export interface AlliancesTabProps {
   clanId: string;
   isOfficer: boolean;
 }

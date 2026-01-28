@@ -2,7 +2,7 @@
 
 import { EconomyTabContent } from '@/components/EconomyTabContent';
 
-interface EconomyTabProps {
+export interface EconomyTabProps {
   clanId: string;
   isOfficer: boolean;
 }
