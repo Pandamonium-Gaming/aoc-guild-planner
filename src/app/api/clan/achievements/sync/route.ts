@@ -42,10 +42,22 @@ async function calculateAchievementProgress(
 
       // Economy achievements
       'bank_deposits': async () => {
-        const { count } = await supabaseAdmin
-          .from('guild_bank_transactions')
-          .select('id', { count: 'exact', head: true })
+        // First get the bank for this clan
+        const { data: bank } = await supabaseAdmin
+          .from('guild_banks')
+          .select('id')
           .eq('clan_id', clanId)
+          .single();
+
+        if (!bank) {
+          console.log(`No bank found for clan ${clanId}`);
+          return 0;
+        }
+
+        const { count } = await supabaseAdmin
+          .from('bank_transactions')
+          .select('id', { count: 'exact', head: true })
+          .eq('bank_id', bank.id)
           .eq('transaction_type', 'deposit');
         console.log(`Calculated bank_deposits: ${count}`);
         return count || 0;
