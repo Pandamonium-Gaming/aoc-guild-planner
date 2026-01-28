@@ -9,8 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClanData } from '@/hooks/useClanData';
 import { useClanMembership } from '@/hooks/useClanMembership';
 import { useEvents } from '@/hooks/useEvents';
-import { CharacterCard } from '@/components/MemberCard';
-import { AddCharacterButton } from '@/components/AddCharacterButton';
+import { CharactersTab } from './tabs/CharactersTab';
 import { CharacterForm } from '@/components/CharacterForm';
 import { EventsList } from '@/components/EventsList';
 import { CharacterFiltersBar, CharacterFilters, DEFAULT_FILTERS, filterCharacters } from '@/components/CharacterFilters';
@@ -464,51 +463,13 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 py-6 pb-4">
           {activeTab === 'characters' ? (
-            <div className="space-y-4">
-              {/* All members can add characters */}
-              <AddCharacterButton onAdd={addCharacter} />
-              
-              {/* Character Filters */}
-              {characters.length > 0 && (
-                <CharacterFiltersBar
-                  filters={characterFilters}
-                  onChange={setCharacterFilters}
-                  characterCount={characters.length}
-                  filteredCount={filterCharacters(characters, characterFilters).length}
-                />
-              )}
-              
-              {characters.length === 0 ? (
-                <div className="text-center py-12 text-slate-500">
-                  <Swords className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>{t('clan.noCharacters')}</p>
-                </div>
-              ) : filterCharacters(characters, characterFilters).length === 0 ? (
-                <div className="text-center py-12 text-slate-500">
-                  <Swords className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>{t('clan.noCharactersMatch')}</p>
-                </div>
-              ) : (
-                filterCharacters(characters, characterFilters).map((character) => {
-                  // Users can edit their own characters, or officers+ can edit all
-                  const canEditCharacter = character.user_id === user.id || canEdit;
-                  
-                  return (
-                    <CharacterCard
-                      key={character.id}
-                      character={character}
-                      onUpdate={canEditCharacter ? async (id, name) => updateCharacter(id, { name }) : async () => {}}
-                      onDelete={canEditCharacter ? deleteCharacter : async () => {}}
-                      onSetProfessionRank={setProfessionRank}
-                      onEdit={canEditCharacter ? setEditingCharacter : undefined}
-                      readOnly={!canEditCharacter}
-                      mainCharacterName={getMainCharacterName(character)}
-                      altCharacters={getAltCharacters(character)}
-                    />
-                  );
-                })
-              )}
-            </div>
+            <CharactersTab
+              characters={characters}
+              addCharacter={addCharacter}
+              setEditingCharacter={setEditingCharacter}
+              characterFilters={characterFilters}
+              setCharacterFilters={setCharacterFilters}
+            />
           ) : activeTab === 'events' ? (
             <EventsList
               events={events}
