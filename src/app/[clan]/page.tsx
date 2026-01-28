@@ -681,7 +681,7 @@ function ManageTab({
   pendingMembers: typeof members;
   onAccept: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
-  onUpdateRole?: (id: string, role: 'admin' | 'officer' | 'member') => Promise<void>;
+  onUpdateRole?: (id: string, role: ClanRole) => Promise<void>;
   onRemove?: (id: string) => Promise<void>;
   currentUserId: string;
   t: (key: string) => string;
