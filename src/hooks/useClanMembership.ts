@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserRole, applyToClan, getClanMembership } from '@/lib/auth';
+import { getClanById } from '@/lib/auth';
 import { ClanRole } from '@/lib/permissions';
 
 interface ClanMember {
@@ -135,7 +136,21 @@ export function useClanMembership(clanId: string | null, userId: string | null):
 
   const acceptMember = async (membershipId: string) => {
     if (!userId) throw new Error('Not authenticated');
-    
+
+    // Get the member info (to get user_id and discord_username)
+    const { data: memberData, error: memberFetchError } = await supabase
+      .from('clan_members')
+      .select('user_id, clan_id, users!clan_members_user_id_fkey(discord_username)')
+      .eq('id', membershipId)
+      .maybeSingle();
+    if (memberFetchError || !memberData) throw memberFetchError || new Error('Member not found');
+
+    const discordUsername = Array.isArray(memberData.users)
+      ? memberData.users[0]?.discord_username
+      : memberData.users?.discord_username;
+    const clanIdForWebhook = memberData.clan_id;
+
+    // Update the member's role
     const { error } = await supabase
       .from('clan_members')
       .update({
@@ -145,8 +160,31 @@ export function useClanMembership(clanId: string | null, userId: string | null):
       })
       .eq('id', membershipId)
       .select();
-
     if (error) throw error;
+
+    // Fetch the clan's webhook URLs
+    let webhookUrl = null;
+    try {
+      const clan = await getClanById(clanIdForWebhook);
+      webhookUrl = clan?.discord_welcome_webhook_url || clan?.discord_webhook_url;
+    } catch (e) {
+      // ignore, just don't send if not found
+    }
+
+    // Send welcome message if webhook is set
+    if (webhookUrl && discordUsername) {
+      fetch('/api/discord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          webhookUrl,
+          payload: {
+            content: `🎉 Welcome <@${discordUsername}> to the guild!`,
+          },
+        }),
+      });
+    }
+
     await refresh();
   };
 

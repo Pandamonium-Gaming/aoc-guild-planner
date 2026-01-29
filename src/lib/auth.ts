@@ -1,3 +1,13 @@
+// Get clan by ID (for webhook lookup)
+export async function getClanById(id: string) {
+  const { data, error } = await supabase
+    .from('clans')
+    .select('id, slug, name, guild_icon_url, discord_webhook_url, discord_welcome_webhook_url')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
 // Update the guild icon URL for a clan
 export async function updateClanIconUrl(clanId: string, url: string) {
   const { error } = await supabase
