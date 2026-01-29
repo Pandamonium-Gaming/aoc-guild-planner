@@ -28,5 +28,6 @@
   "027_event_role_requirements.sql",
   "028_update_role_system.sql",
   "029_clan_permission_overrides.sql",
-  "030_crafting_achievements.sql"
+  "030_crafting_achievements.sql",
+  "031_add_discord_welcome_webhook_url.sql"
 ]

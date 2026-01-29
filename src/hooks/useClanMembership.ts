@@ -138,6 +138,7 @@ export function useClanMembership(clanId: string | null, userId: string | null):
     if (!userId) throw new Error('Not authenticated');
 
     // Get the member info (to get user_id and discord_username)
+
     const { data: memberData, error: memberFetchError } = await supabase
       .from('clan_members')
       .select('user_id, clan_id, users!clan_members_user_id_fkey(discord_username)')
@@ -145,9 +146,11 @@ export function useClanMembership(clanId: string | null, userId: string | null):
       .maybeSingle();
     if (memberFetchError || !memberData) throw memberFetchError || new Error('Member not found');
 
-    const discordUsername = Array.isArray(memberData.users)
-      ? memberData.users[0]?.discord_username
-      : memberData.users?.discord_username;
+    type UserWithDiscord = { discord_username?: string };
+    const users = memberData.users as UserWithDiscord[] | UserWithDiscord | undefined;
+    const discordUsername = Array.isArray(users)
+      ? users[0]?.discord_username
+      : users?.discord_username;
     const clanIdForWebhook = memberData.clan_id;
 
     // Update the member's role
