@@ -139,7 +139,7 @@ export function useClanMembership(clanId: string | null, userId: string | null):
     const { error } = await supabase
       .from('clan_members')
       .update({
-        role: 'member',
+        role: 'trial',
         approved_at: new Date().toISOString(),
         approved_by: userId,
       })
