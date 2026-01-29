@@ -12,6 +12,9 @@ interface CharactersTabProps {
   clanId: string;
   characters: CharacterWithProfessions[];
   addCharacter: (data: any) => Promise<void>;
+  updateMember: (id: string, name: string) => Promise<void>;
+  deleteMember: (id: string) => Promise<void>;
+  setProfessionRank: (characterId: string, professionId: string, rank: any, level?: number, quality?: number) => Promise<void>;
   setEditingCharacter: (character: CharacterWithProfessions) => void;
   characterFilters: any;
   setCharacterFilters: (filters: any) => void;
@@ -21,6 +24,9 @@ export function CharactersTab({
   clanId,
   characters,
   addCharacter,
+  updateMember,
+  deleteMember,
+  setProfessionRank,
   setEditingCharacter,
   characterFilters,
   setCharacterFilters,
@@ -62,9 +68,9 @@ export function CharactersTab({
             <CharacterCard
               key={character.id}
               character={character}
-              onUpdate={async () => {}}
-              onDelete={async () => {}}
-              onSetProfessionRank={async () => {}}
+              onUpdate={updateMember}
+              onDelete={deleteMember}
+              onSetProfessionRank={setProfessionRank}
               onEdit={canEdit ? () => setEditingCharacter(character) : undefined}
               readOnly={!canEdit}
             />

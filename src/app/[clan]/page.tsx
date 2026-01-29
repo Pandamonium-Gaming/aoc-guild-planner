@@ -127,6 +127,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     addCharacter,
     updateCharacter,
     deleteCharacter,
+    updateMember,
+    deleteMember,
     setProfessionRank,
   } = useClanData(clanSlug);
 
@@ -378,6 +380,9 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
                 clanId={clanId!}
                 characters={characters}
                 addCharacter={addCharacter}
+                updateMember={updateMember}
+                deleteMember={deleteMember}
+                setProfessionRank={setProfessionRank}
                 setEditingCharacter={setEditingCharacter}
                 characterFilters={characterFilters}
                 setCharacterFilters={setCharacterFilters}
