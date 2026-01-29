@@ -174,8 +174,33 @@ export function useClanMembership(clanId: string | null, userId: string | null):
       // ignore, just don't send if not found
     }
 
-    // Send welcome message if webhook is set
+
+    // Enhanced onboarding message with checklist embed
     if (webhookUrl && discordUsername) {
+      const checklist = [
+        ':white_check_mark: Set your main character in the planner',
+        ':white_check_mark: Fill out your professions and skills',
+        ':white_check_mark: Join upcoming events and RSVP',
+        ':white_check_mark: Read the guild rules and code of conduct',
+        ':white_check_mark: Introduce yourself in Discord',
+      ];
+      const embed = {
+        title: '🎉 Welcome to the Guild!',
+        description: `Welcome <@${discordUsername}>! We’re excited to have you join us. Here’s how to get started:`,
+        color: 0x22c55e, // green
+        fields: [
+          {
+            name: 'Onboarding Checklist',
+            value: checklist.join('\n'),
+          },
+          {
+            name: 'Need Help?',
+            value: 'Ask in this channel or contact an officer for assistance.',
+          },
+        ],
+        footer: { text: 'AoC Guild Profession Planner' },
+        timestamp: new Date().toISOString(),
+      };
       fetch('/api/discord', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -183,6 +208,7 @@ export function useClanMembership(clanId: string | null, userId: string | null):
           webhookUrl,
           payload: {
             content: `🎉 Welcome <@${discordUsername}> to the guild!`,
+            embeds: [embed],
           },
         }),
       });
