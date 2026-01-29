@@ -13,9 +13,11 @@ interface GuildIconUploaderProps {
   onUploaded?: (url: string) => void;
 }
 
+
 export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [iconUrl, setIconUrl] = useState(currentUrl || '');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { user, session } = useAuthContext();
@@ -25,11 +27,24 @@ export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconU
     setIconUrl(currentUrl || '');
   }, [currentUrl]);
 
+  // Clean up previewUrl when component unmounts or iconUrl changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewUrl]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     setSuccess(null);
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Show local preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
+
     if (!user || !session) {
       setError('You must be logged in to upload a guild icon.');
       return;
@@ -50,6 +65,7 @@ export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconU
       setIconUrl(data.publicUrl);
       setSuccess('Icon uploaded successfully!');
       if (onUploaded) onUploaded(data.publicUrl);
+      setPreviewUrl(null); // clear preview after upload
     }
     setUploading(false);
     // Reset file input
@@ -58,8 +74,13 @@ export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconU
 
   return (
     <div className="flex flex-col items-start gap-2">
-      {iconUrl && (
-        <img src={iconUrl} alt="Guild Icon" className="w-16 h-16 rounded-full border border-slate-700" />
+      {(previewUrl || iconUrl) && (
+        <img
+          src={previewUrl || iconUrl}
+          alt="Guild Icon Preview"
+          className="w-16 h-16 rounded-full border border-slate-700"
+          style={{ objectFit: 'cover' }}
+        />
       )}
       <label
         className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 border border-dashed border-slate-600 hover:border-orange-500/50 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
