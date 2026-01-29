@@ -74,31 +74,33 @@ export function GuildIconUploader({ clanId, currentUrl, onUploaded }: GuildIconU
 
   return (
     <div className="flex flex-col items-start gap-2">
-      {(previewUrl || iconUrl) && (
-        <img
-          src={previewUrl || iconUrl}
-          alt="Guild Icon Preview"
-          className="w-16 h-16 rounded-full border border-slate-700"
-          style={{ objectFit: 'cover' }}
-        />
-      )}
-      <label
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 border border-dashed border-slate-600 hover:border-orange-500/50 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        style={{ position: 'relative' }}
-      >
-        {uploading ? (
-          <span className="font-medium">Uploading...</span>
-        ) : (
-          <span className="font-medium">Choose File</span>
+      <div className="flex flex-row items-center gap-6 w-full">
+        {(previewUrl || iconUrl) && (
+          <img
+            src={previewUrl || iconUrl}
+            alt="Guild Icon Preview"
+            className="w-16 h-16 rounded-full border border-slate-700"
+            style={{ objectFit: 'cover' }}
+          />
         )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          disabled={uploading}
-          style={{ display: 'none' }}
-        />
-      </label>
+        <label
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 border border-dashed border-slate-600 hover:border-orange-500/50 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{ position: 'relative' }}
+        >
+          {uploading ? (
+            <span className="font-medium">Uploading...</span>
+          ) : (
+            <span className="font-medium">Choose File</span>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={uploading}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
       {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
       {success && <div className="text-green-500 text-sm mt-1">{success}</div>}
     </div>
