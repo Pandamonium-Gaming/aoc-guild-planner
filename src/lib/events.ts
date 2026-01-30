@@ -107,11 +107,16 @@ export interface Event {
   ends_at: string | null;
   location: string | null;
   max_attendees: number | null;
-  tanks_needed: number;
-  clerics_needed: number;
-  bards_needed: number;
-  ranged_dps_needed: number;
-  melee_dps_needed: number;
+  tanks_min: number; // Minimum required (not a cap)
+  clerics_min: number; // Minimum required (not a cap)
+  bards_min: number; // Minimum required (not a cap)
+  ranged_dps_min: number; // Minimum required (not a cap)
+  melee_dps_min: number; // Minimum required (not a cap)
+  tanks_max: number | null; // Maximum allowed (null = unlimited)
+  clerics_max: number | null; // Maximum allowed (null = unlimited)
+  bards_max: number | null; // Maximum allowed (null = unlimited)
+  ranged_dps_max: number | null; // Maximum allowed (null = unlimited)
+  melee_dps_max: number | null; // Maximum allowed (null = unlimited)
   is_cancelled: boolean;
   created_at: string;
   updated_at: string;

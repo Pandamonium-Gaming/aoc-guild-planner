@@ -164,11 +164,29 @@ export async function notifyNewEvent(
 
   // Build role requirements string if any roles are needed
   const roleRequirements = [];
-  if (event.tanks_needed > 0) roleRequirements.push(`🛡️ ${event.tanks_needed} Tank${event.tanks_needed > 1 ? 's' : ''}`);
-  if (event.clerics_needed > 0) roleRequirements.push(`✨ ${event.clerics_needed} Cleric${event.clerics_needed > 1 ? 's' : ''}`);
-  if (event.bards_needed > 0) roleRequirements.push(`🎵 ${event.bards_needed} Bard${event.bards_needed > 1 ? 's' : ''}`);
-  if (event.ranged_dps_needed > 0) roleRequirements.push(`🏹 ${event.ranged_dps_needed} Ranged DPS`);
-  if (event.melee_dps_needed > 0) roleRequirements.push(`⚔️ ${event.melee_dps_needed} Melee DPS`);
+  
+  const formatRoleRequirement = (min: number, max: number | null, icon: string, name: string) => {
+    if (min > 0 && max !== null) {
+      return `${icon} ${min}-${max} ${name}`;
+    } else if (min > 0) {
+      return `${icon} ${min}+ ${name}`;
+    } else if (max !== null) {
+      return `${icon} Max ${max} ${name}`;
+    }
+    return null;
+  };
+  
+  const tankReq = formatRoleRequirement(event.tanks_min, event.tanks_max, '🛡️', event.tanks_min > 1 || (event.tanks_max && event.tanks_max > 1) ? 'Tanks' : 'Tank');
+  const clericReq = formatRoleRequirement(event.clerics_min, event.clerics_max, '✨', event.clerics_min > 1 || (event.clerics_max && event.clerics_max > 1) ? 'Clerics' : 'Cleric');
+  const bardReq = formatRoleRequirement(event.bards_min, event.bards_max, '🎵', event.bards_min > 1 || (event.bards_max && event.bards_max > 1) ? 'Bards' : 'Bard');
+  const rangedReq = formatRoleRequirement(event.ranged_dps_min, event.ranged_dps_max, '🏹', 'Ranged DPS');
+  const meleeReq = formatRoleRequirement(event.melee_dps_min, event.melee_dps_max, '⚔️', 'Melee DPS');
+  
+  if (tankReq) roleRequirements.push(tankReq);
+  if (clericReq) roleRequirements.push(clericReq);
+  if (bardReq) roleRequirements.push(bardReq);
+  if (rangedReq) roleRequirements.push(rangedReq);
+  if (meleeReq) roleRequirements.push(meleeReq);
 
   if (roleRequirements.length > 0) {
     fields.push({

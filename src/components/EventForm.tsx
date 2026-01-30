@@ -12,11 +12,16 @@ interface EventFormData {
   ends_at: string;
   location: string;
   max_attendees: string;
-  tanks_needed: string;
-  clerics_needed: string;
-  bards_needed: string;
-  ranged_dps_needed: string;
-  melee_dps_needed: string;
+  tanks_min: string;
+  clerics_min: string;
+  bards_min: string;
+  ranged_dps_min: string;
+  melee_dps_min: string;
+  tanks_max: string;
+  clerics_max: string;
+  bards_max: string;
+  ranged_dps_max: string;
+  melee_dps_max: string;
   sendDiscordNotification: boolean;
 }
 
@@ -45,11 +50,16 @@ export function EventForm({
     ends_at: initialData?.ends_at ? utcToLocal(initialData.ends_at) : '',
     location: initialData?.location || '',
     max_attendees: initialData?.max_attendees?.toString() || '',
-    tanks_needed: initialData?.tanks_needed?.toString() || '0',
-    clerics_needed: initialData?.clerics_needed?.toString() || '0',
-    bards_needed: initialData?.bards_needed?.toString() || '0',
-    ranged_dps_needed: initialData?.ranged_dps_needed?.toString() || '0',
-    melee_dps_needed: initialData?.melee_dps_needed?.toString() || '0',
+    tanks_min: initialData?.tanks_min?.toString() || '0',
+    clerics_min: initialData?.clerics_min?.toString() || '0',
+    bards_min: initialData?.bards_min?.toString() || '0',
+    ranged_dps_min: initialData?.ranged_dps_min?.toString() || '0',
+    melee_dps_min: initialData?.melee_dps_min?.toString() || '0',
+    tanks_max: initialData?.tanks_max?.toString() || '',
+    clerics_max: initialData?.clerics_max?.toString() || '',
+    bards_max: initialData?.bards_max?.toString() || '',
+    ranged_dps_max: initialData?.ranged_dps_max?.toString() || '',
+    melee_dps_max: initialData?.melee_dps_max?.toString() || '',
     sendDiscordNotification: true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,16 +83,16 @@ export function EventForm({
 
     try {
       console.log('Parsing role values:',{
-        tanks_needed_raw: formData.tanks_needed,
-        tanks_needed_parsed: parseInt(formData.tanks_needed),
-        clerics_needed_raw: formData.clerics_needed,
-        clerics_needed_parsed: parseInt(formData.clerics_needed),
-        bards_needed_raw: formData.bards_needed,
-        bards_needed_parsed: parseInt(formData.bards_needed),
-        ranged_dps_needed_raw: formData.ranged_dps_needed,
-        ranged_dps_needed_parsed: parseInt(formData.ranged_dps_needed),
-        melee_dps_needed_raw: formData.melee_dps_needed,
-        melee_dps_needed_parsed: parseInt(formData.melee_dps_needed),
+        tanks_min_raw: formData.tanks_min,
+        tanks_min_parsed: parseInt(formData.tanks_min),
+        clerics_min_raw: formData.clerics_min,
+        clerics_min_parsed: parseInt(formData.clerics_min),
+        bards_min_raw: formData.bards_min,
+        bards_min_parsed: parseInt(formData.bards_min),
+        ranged_dps_min_raw: formData.ranged_dps_min,
+        ranged_dps_min_parsed: parseInt(formData.ranged_dps_min),
+        melee_dps_min_raw: formData.melee_dps_min,
+        melee_dps_min_parsed: parseInt(formData.melee_dps_min),
       });
       const eventData = {
         clan_id: clanId,
@@ -94,11 +104,16 @@ export function EventForm({
         ends_at: formData.ends_at ? new Date(formData.ends_at).toISOString() : null,
         location: formData.location.trim() || null,
         max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
-        tanks_needed: parseInt(formData.tanks_needed) || 0,
-        clerics_needed: parseInt(formData.clerics_needed) || 0,
-        bards_needed: parseInt(formData.bards_needed) || 0,
-        ranged_dps_needed: parseInt(formData.ranged_dps_needed) || 0,
-        melee_dps_needed: parseInt(formData.melee_dps_needed) || 0,
+        tanks_min: parseInt(formData.tanks_min) || 0,
+        clerics_min: parseInt(formData.clerics_min) || 0,
+        bards_min: parseInt(formData.bards_min) || 0,
+        ranged_dps_min: parseInt(formData.ranged_dps_min) || 0,
+        melee_dps_min: parseInt(formData.melee_dps_min) || 0,
+        tanks_max: formData.tanks_max ? parseInt(formData.tanks_max) : null,
+        clerics_max: formData.clerics_max ? parseInt(formData.clerics_max) : null,
+        bards_max: formData.bards_max ? parseInt(formData.bards_max) : null,
+        ranged_dps_max: formData.ranged_dps_max ? parseInt(formData.ranged_dps_max) : null,
+        melee_dps_max: formData.melee_dps_max ? parseInt(formData.melee_dps_max) : null,
       };
       console.log('EventForm submitting eventData:', eventData, 'sendDiscordNotification:', formData.sendDiscordNotification);
       await onSubmit(eventData, formData.sendDiscordNotification);
@@ -237,38 +252,68 @@ export function EventForm({
           {/* Role Requirements */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Role Requirements <span className="text-slate-500">(optional)</span>
+              Role Requirements <span className="text-slate-500">(min / max per role)</span>
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div className="space-y-3">
               {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
-                const fieldMap = {
-                  tank: 'tanks_needed',
-                  cleric: 'clerics_needed',
-                  bard: 'bards_needed',
-                  ranged_dps: 'ranged_dps_needed',
-                  melee_dps: 'melee_dps_needed'
+                const minFieldMap = {
+                  tank: 'tanks_min',
+                  cleric: 'clerics_min',
+                  bard: 'bards_min',
+                  ranged_dps: 'ranged_dps_min',
+                  melee_dps: 'melee_dps_min'
                 } as const;
-                const fieldName = fieldMap[roleKey as EventRole];
+                const maxFieldMap = {
+                  tank: 'tanks_max',
+                  cleric: 'clerics_max',
+                  bard: 'bards_max',
+                  ranged_dps: 'ranged_dps_max',
+                  melee_dps: 'melee_dps_max'
+                } as const;
+                const minFieldName = minFieldMap[roleKey as EventRole];
+                const maxFieldName = maxFieldMap[roleKey as EventRole];
                 return (
-                  <div key={roleKey} className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5">
+                  <div key={roleKey} className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 w-32">
                       <span className="text-lg">{roleConfig.icon}</span>
-                      <span className={`text-xs ${roleConfig.color}`}>
+                      <span className={`text-sm ${roleConfig.color}`}>
                         {roleConfig.name}
                       </span>
                     </div>
-                    <input
-                      type="number"
-                      min="0"
-                      max="40"
-                      value={formData[fieldName]}
-                      aria-label={roleConfig.name}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        [fieldName]: e.target.value 
-                      })}
-                      className="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="flex-1">
+                        <label className="block text-xs text-slate-400 mb-1">Min</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="40"
+                          value={formData[minFieldName]}
+                          aria-label={`${roleConfig.name} minimum`}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            [minFieldName]: e.target.value 
+                          })}
+                          className="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                      <span className="text-slate-500 pt-5">/</span>
+                      <div className="flex-1">
+                        <label className="block text-xs text-slate-400 mb-1">Max</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="40"
+                          value={formData[maxFieldName]}
+                          aria-label={`${roleConfig.name} maximum`}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            [maxFieldName]: e.target.value 
+                          })}
+                          placeholder="∞"
+                          className="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-white text-center placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                    </div>
                   </div>
                 );
               })}

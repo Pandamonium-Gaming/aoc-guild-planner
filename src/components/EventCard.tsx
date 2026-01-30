@@ -189,29 +189,38 @@ export function EventCard({
           </div>
 
           {/* Role Requirements & Roster */}
-          {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
-            event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+          {(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
+            event.ranged_dps_min > 0 || event.melee_dps_min > 0) && (
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-white">Role Composition</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
                   const role = roleKey as EventRole;
-                  // Map role keys to database field names (tanks_needed, clerics_needed, etc.)
-                  const fieldMap: Record<EventRole, keyof EventWithRsvps> = {
-                    tank: 'tanks_needed',
-                    cleric: 'clerics_needed',
-                    bard: 'bards_needed',
-                    ranged_dps: 'ranged_dps_needed',
-                    melee_dps: 'melee_dps_needed'
+                  // Map role keys to database field names (tanks_min, clerics_min, etc.)
+                  const minFieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                    tank: 'tanks_min',
+                    cleric: 'clerics_min',
+                    bard: 'bards_min',
+                    ranged_dps: 'ranged_dps_min',
+                    melee_dps: 'melee_dps_min'
                   };
-                  const needed = event[fieldMap[role]] as number;
-                  if (needed === 0) return null;
+                  const maxFieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                    tank: 'tanks_max',
+                    cleric: 'clerics_max',
+                    bard: 'bards_max',
+                    ranged_dps: 'ranged_dps_max',
+                    melee_dps: 'melee_dps_max'
+                  };
+                  const minimum = event[minFieldMap[role]] as number;
+                  const maximum = event[maxFieldMap[role]] as number | null;
+                  if (minimum === 0 && !maximum) return null;
                   
                   const roleCounts = event.role_counts?.[role] || { attending: 0, maybe: 0 };
                   const attending = roleCounts.attending;
                   const maybe = roleCounts.maybe;
                   const total = attending + maybe;
-                  const isFull = total >= needed;
+                  const isMinimumMet = minimum > 0 && total >= minimum;
+                  const isAtMax = maximum !== null && total >= maximum;
                   
                   // Get RSVPs for this role
                   const roleRsvps = event.rsvps?.filter(rsvp => 
@@ -219,10 +228,25 @@ export function EventCard({
                     (rsvp.status === 'attending' || rsvp.status === 'maybe')
                   ) || [];
                   
+                  // Format the count display
+                  let countDisplay;
+                  if (minimum > 0 && maximum !== null) {
+                    countDisplay = `${total}/${minimum}/${maximum}`;
+                  } else if (minimum > 0) {
+                    countDisplay = `${total}/${minimum}+`;
+                  } else if (maximum !== null) {
+                    countDisplay = `${total}/${maximum}`;
+                  } else {
+                    countDisplay = `${total}`;
+                  }
+                  
                   return (
                     <div 
                       key={role}
-                      className="bg-slate-800/50 rounded-lg p-3 space-y-2"
+                      className={`bg-slate-800/50 rounded-lg p-3 space-y-2 border transition-all ${
+                        isAtMax ? 'border-red-500/50' :
+                        isMinimumMet ? 'border-green-500/50' : 'border-slate-700'
+                      }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -231,9 +255,20 @@ export function EventCard({
                             {roleConfig.name}
                           </span>
                         </div>
-                        <span className={`text-sm font-semibold ${isFull ? 'text-green-400' : 'text-slate-400'}`}>
-                          {total}/{needed}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-sm font-semibold ${
+                            isAtMax ? 'text-red-400' :
+                            isMinimumMet ? 'text-green-400' : 'text-slate-400'
+                          }`}>
+                            {countDisplay}
+                          </span>
+                          {isAtMax && (
+                            <span className="text-xs text-red-400" title="Role is full">🔒</span>
+                          )}
+                          {isMinimumMet && !isAtMax && (
+                            <Check size={14} className="text-green-400" />
+                          )}
+                        </div>
                       </div>
                       
                       {/* Progress bar */}
@@ -241,8 +276,8 @@ export function EventCard({
                         <div 
                           className="h-1.5 rounded-full transition-all"
                           style={{ 
-                            width: `${Math.min(100, (total / needed) * 100)}%`,
-                            backgroundColor: roleConfig.color
+                            width: `${Math.min(100, (total / (maximum || minimum || 1)) * 100)}%`,
+                            backgroundColor: isAtMax ? '#ef4444' : roleConfig.color
                           }}
                         />
                       </div>
@@ -278,8 +313,8 @@ export function EventCard({
           {!event.is_cancelled && !isPast && (
             <div className="space-y-3">
               {/* Role selector - show if any roles are needed */}
-              {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
-                event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+              {(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
+                event.ranged_dps_min > 0 || event.melee_dps_min > 0) && (
                 <div>
                   <label className="block text-xs text-slate-400 mb-2">
                     RSVP with role <span className="text-red-400">*</span>
@@ -287,15 +322,29 @@ export function EventCard({
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(EVENT_ROLES).map(([roleKey, roleConfig]) => {
                       const role = roleKey as EventRole;
-                      const fieldMap: Record<EventRole, keyof EventWithRsvps> = {
-                        tank: 'tanks_needed',
-                        cleric: 'clerics_needed',
-                        bard: 'bards_needed',
-                        ranged_dps: 'ranged_dps_needed',
-                        melee_dps: 'melee_dps_needed'
+                      const minFieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                        tank: 'tanks_min',
+                        cleric: 'clerics_min',
+                        bard: 'bards_min',
+                        ranged_dps: 'ranged_dps_min',
+                        melee_dps: 'melee_dps_min'
                       };
-                      const needed = event[fieldMap[role]] as number;
-                      if (needed === 0) return null;
+                      const maxFieldMap: Record<EventRole, keyof EventWithRsvps> = {
+                        tank: 'tanks_max',
+                        cleric: 'clerics_max',
+                        bard: 'bards_max',
+                        ranged_dps: 'ranged_dps_max',
+                        melee_dps: 'melee_dps_max'
+                      };
+                      const minimum = event[minFieldMap[role]] as number;
+                      const maximum = event[maxFieldMap[role]] as number | null;
+                      if (minimum === 0 && !maximum) return null;
+                      
+                      // Check if this role is full
+                      const roleCounts = event.role_counts?.[role] || { attending: 0, maybe: 0 };
+                      const total = roleCounts.attending + roleCounts.maybe;
+                      const isRoleFull = maximum !== null && total >= maximum;
+                      const userInThisRole = userRsvp?.role === role && (userRsvp.status === 'attending' || userRsvp.status === 'maybe');
                       
                       const isSelected = selectedRole === role;
                       
@@ -305,20 +354,25 @@ export function EventCard({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedRole(isSelected ? null : role);
+                            if (!isRoleFull || userInThisRole) {
+                              setSelectedRole(isSelected ? null : role);
+                            }
                           }}
-                          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                          disabled={isRoleFull && !userInThisRole}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            isRoleFull && !userInThisRole ? 'opacity-50 cursor-not-allowed bg-slate-900 text-slate-500' :
                             isSelected
-                              ? 'ring-2 ring-offset-2 ring-offset-slate-900'
-                              : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                              ? 'ring-2 ring-offset-2 ring-offset-slate-900 cursor-pointer'
+                              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer'
                           }`}
-                          style={isSelected ? { 
+                          style={isSelected && !isRoleFull ? { 
                             backgroundColor: roleConfig.color + '30',
                             color: roleConfig.color
                           } : undefined}
                         >
                           <span>{roleConfig.icon}</span>
                           <span>{roleConfig.name}</span>
+                          {isRoleFull && !userInThisRole && <span className="text-xs ml-1">(Full)</span>}
                           {isSelected && <Check size={14} className="ml-1" />}
                         </button>
                       );
@@ -330,15 +384,15 @@ export function EventCard({
               {/* General RSVP options */}
               <div>
                 <label className="block text-xs text-slate-400 mb-2">
-                  {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
-                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0)
+                  {(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
+                    event.ranged_dps_min > 0 || event.melee_dps_min > 0)
                     ? 'Or respond:'
                     : 'RSVP:'}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {/* Only show attending without role if no roles are needed */}
-                  {!(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
-                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && (
+                  {!(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
+                    event.ranged_dps_min > 0 || event.melee_dps_min > 0) && (
                     <button
                       onClick={(e) => { 
                         e.stopPropagation(); 
@@ -361,26 +415,24 @@ export function EventCard({
                   )}
                   
                   {/* Show attending with role button if roles are needed and a role is selected */}
-                  {(event.tanks_needed > 0 || event.clerics_needed > 0 || event.bards_needed > 0 || 
-                    event.ranged_dps_needed > 0 || event.melee_dps_needed > 0) && selectedRole && (
+                  {(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
+                    event.ranged_dps_min > 0 || event.melee_dps_min > 0) && selectedRole && (
                     <button
                       onClick={(e) => { 
                         e.stopPropagation(); 
                         onRsvp('attending', selectedRole);
                       }}
-                      disabled={isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole)}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                         userRsvp?.status === 'attending' && userRsvp?.role === selectedRole
                           ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-green-400'
                           : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                      } ${isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      }`}
                       style={userRsvp?.status === 'attending' && userRsvp?.role === selectedRole ? { 
                         backgroundColor: '#22c55e30'
                       } : undefined}
                     >
                       <Check size={14} />
                       Attending
-                      {isFull && !(userRsvp?.status === 'attending' && userRsvp?.role === selectedRole) && ' (Full)'}
                     </button>
                   )}
                   
