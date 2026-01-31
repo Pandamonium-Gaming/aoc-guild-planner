@@ -274,12 +274,6 @@ export function EventCard({
                     return null;
                   }
                   
-                  // Special handling for combined DPS
-                  if (role === 'tank' && event.allow_combined_dps && (event.ranged_dps_min > 0 || event.melee_dps_min > 0 || event.ranged_dps_max || event.melee_dps_max)) {
-                    // This will be handled as a separate card below
-                    return null;
-                  }
-                  
                   // Map role keys to database field names
                   const minFieldMap: Record<EventRole, keyof EventWithRsvps> = {
                     tank: 'tanks_min',
