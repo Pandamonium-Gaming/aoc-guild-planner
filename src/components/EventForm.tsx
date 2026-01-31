@@ -25,6 +25,7 @@ interface EventFormData {
   allow_combined_dps: boolean;
   combined_dps_max: string;
   is_public: boolean;
+  allow_allied_signups: boolean;
   sendDiscordNotification: boolean;
 }
 
@@ -66,6 +67,7 @@ export function EventForm({
     allow_combined_dps: (initialData as any)?.allow_combined_dps || false,
     combined_dps_max: (initialData as any)?.combined_dps_max?.toString() || '',
     is_public: (initialData as any)?.is_public || false,
+    allow_allied_signups: (initialData as any)?.allow_allied_signups !== false, // Default true
     sendDiscordNotification: true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,6 +125,7 @@ export function EventForm({
         allow_combined_dps: formData.allow_combined_dps,
         combined_dps_max: formData.allow_combined_dps && formData.combined_dps_max ? parseInt(formData.combined_dps_max) : null,
         is_public: formData.is_public,
+        allow_allied_signups: formData.allow_allied_signups,
       };
       console.log('EventForm submitting eventData:', eventData, 'sendDiscordNotification:', formData.sendDiscordNotification);
       await onSubmit(eventData, formData.sendDiscordNotification);
@@ -392,6 +395,23 @@ export function EventForm({
                   />
                   <label htmlFor="isPublic" className="text-sm text-slate-300 cursor-pointer flex-1">
                     Make this event public (allow unauthenticated guests to sign up)
+                  </label>
+                </div>
+
+                {/* Allied Member Signup Option */}
+                <div className="flex items-center gap-2 p-3 bg-slate-800/50 rounded-lg mt-2">
+                  <input
+                    type="checkbox"
+                    id="allowAlliedSignups"
+                    checked={formData.allow_allied_signups}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      allow_allied_signups: e.target.checked
+                    })}
+                    className="w-4 h-4 text-blue-500 bg-slate-800 border-slate-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label htmlFor="allowAlliedSignups" className="text-sm text-slate-300 cursor-pointer flex-1">
+                    Allow allied member signups
                   </label>
                 </div>
               </div>

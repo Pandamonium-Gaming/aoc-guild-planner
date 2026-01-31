@@ -37,5 +37,6 @@
   "036_allow_allied_clan_event_participation.sql",
   "037_add_combined_dps_option.sql",
   "038_guest_event_rsvps.sql",
-  "039_add_check_clans_allied_function.sql"
+  "039_add_check_clans_allied_function.sql",
+  "040_add_public_events.sql"
 ]
