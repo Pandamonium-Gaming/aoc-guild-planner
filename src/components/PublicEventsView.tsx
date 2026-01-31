@@ -48,6 +48,7 @@ export function PublicEventsView() {
       // Compute rsvp_counts for each event
       const eventsWithCounts = (data || []).map(event => ({
         ...event,
+        rsvps: event.event_rsvps, // Map event_rsvps to rsvps for EventCard
         rsvp_counts: {
           attending: (event.event_rsvps || []).filter((r: any) => r.status === 'attending').length,
           maybe: (event.event_rsvps || []).filter((r: any) => r.status === 'maybe').length,
