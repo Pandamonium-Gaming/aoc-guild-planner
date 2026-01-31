@@ -134,7 +134,7 @@ export function EventsList({
                     title="Copy link"
                     aria-label="Copy link"
                   >
-                    <Link size={14} />
+                    <ExternalLink size={14} />
                   </button>
                   {canManage && (
                     <>
@@ -186,7 +186,7 @@ export function EventsList({
                     title="Copy link"
                     aria-label="Copy link"
                   >
-                    <Link size={14} />
+                    <ExternalLink size={14} />
                   </button>
                   {canManage && (
                     <>
