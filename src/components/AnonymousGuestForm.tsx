@@ -30,12 +30,8 @@ export function AnonymousGuestForm({ eventId, onSuccess }: AnonymousGuestFormPro
       return;
     }
 
-    if (!formData.guestEmail.trim()) {
-      error('Please enter your email address');
-      return;
-    }
-
-    if (!formData.guestEmail.includes('@')) {
+    // Email is optional
+    if (formData.guestEmail.trim() && !formData.guestEmail.includes('@')) {
       error('Please enter a valid email address');
       return;
     }
@@ -121,7 +117,7 @@ export function AnonymousGuestForm({ eventId, onSuccess }: AnonymousGuestFormPro
         {/* Email */}
         <div>
           <label htmlFor="guestEmail" className="block text-xs text-slate-200 font-medium mb-1">
-            Email <span className="text-red-400" aria-label="required">*</span>
+            Email <span className="text-slate-400 text-xs">(optional)</span>
           </label>
           <input
             type="email"

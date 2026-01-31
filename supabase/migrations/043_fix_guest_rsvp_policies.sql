@@ -26,5 +26,12 @@ ADD CONSTRAINT guest_rsvp_unique_anonymous UNIQUE NULLS NOT DISTINCT (event_id, 
 -- Disable RLS since we validate at the application layer
 ALTER TABLE guest_event_rsvps DISABLE ROW LEVEL SECURITY;
 
+-- =====================================================
+-- MAKE GUEST_EMAIL NULLABLE
+-- =====================================================
+
+-- Email is optional for public guests
+ALTER TABLE guest_event_rsvps ALTER COLUMN guest_email DROP NOT NULL;
+
 -- Record this migration as applied
 INSERT INTO migration_history (filename) VALUES ('043_fix_guest_rsvp_policies.sql');
