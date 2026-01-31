@@ -45,9 +45,27 @@ export function EventCard({
 }: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedRole, setSelectedRole] = useState<EventRole | null>(null);
+  const [isRsvpLoading, setIsRsvpLoading] = useState(false);
   const { showToast } = useToast();
   const { t } = useLanguage();
   const { hasPermission } = usePermissions(clanId);
+
+  // Wrapper for RSVP calls with error handling and loading state
+  const handleRsvpClick = async (status: RsvpStatus, role?: EventRole | null) => {
+    try {
+      setIsRsvpLoading(true);
+      await onRsvp(status, role);
+      // Show success toast
+      const statusText = status === 'attending' ? 'attending' : status === 'maybe' ? 'maybe' : 'declined';
+      showToast('success', `Successfully marked as ${statusText}`);
+    } catch (err) {
+      console.error('RSVP error:', err);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to RSVP for event';
+      showToast('error', errorMsg);
+    } finally {
+      setIsRsvpLoading(false);
+    }
+  };
   
   const eventType = EVENT_TYPES[event.event_type];
   const isPast = isEventPast(event.starts_at);
@@ -396,20 +414,20 @@ export function EventCard({
                     <button
                       onClick={(e) => { 
                         e.stopPropagation(); 
-                        onRsvp('attending', null);
+                        handleRsvpClick('attending', null);
                       }}
-                      disabled={isFull && userRsvp?.status !== 'attending'}
+                      disabled={(isFull && userRsvp?.status !== 'attending') || isRsvpLoading}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                         userRsvp?.status === 'attending' && !userRsvp?.role
                           ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-green-400'
                           : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                      } ${isFull && userRsvp?.status !== 'attending' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      } ${(isFull && userRsvp?.status !== 'attending') || isRsvpLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       style={userRsvp?.status === 'attending' && !userRsvp?.role ? { 
                         backgroundColor: '#22c55e30'
                       } : undefined}
                     >
                       <Check size={14} />
-                      Attending
+                      {isRsvpLoading ? 'Updating...' : 'Attending'}
                       {isFull && userRsvp?.status !== 'attending' && ' (Full)'}
                     </button>
                   )}
@@ -420,56 +438,59 @@ export function EventCard({
                     <button
                       onClick={(e) => { 
                         e.stopPropagation(); 
-                        onRsvp('attending', selectedRole);
+                        handleRsvpClick('attending', selectedRole);
                       }}
+                      disabled={isRsvpLoading}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                         userRsvp?.status === 'attending' && userRsvp?.role === selectedRole
                           ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-green-400'
                           : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                      }`}
+                      } ${isRsvpLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       style={userRsvp?.status === 'attending' && userRsvp?.role === selectedRole ? { 
                         backgroundColor: '#22c55e30'
                       } : undefined}
                     >
                       <Check size={14} />
-                      Attending
+                      {isRsvpLoading ? 'Updating...' : 'Attending'}
                     </button>
                   )}
                   
                   <button
                     onClick={(e) => { 
                       e.stopPropagation(); 
-                      onRsvp('maybe', selectedRole);
+                      handleRsvpClick('maybe', selectedRole);
                     }}
+                    disabled={isRsvpLoading}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       userRsvp?.status === 'maybe'
                         ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-yellow-400'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                    }`}
+                    } ${isRsvpLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     style={userRsvp?.status === 'maybe' ? { 
                       backgroundColor: '#eab30830'
                     } : undefined}
                   >
                     <HelpCircle size={14} />
-                    Maybe
+                    {isRsvpLoading ? 'Updating...' : 'Maybe'}
                   </button>
                   
                   <button
                     onClick={(e) => { 
                       e.stopPropagation(); 
-                      onRsvp('declined', null);
+                      handleRsvpClick('declined', null);
                     }}
+                    disabled={isRsvpLoading}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       userRsvp?.status === 'declined'
                         ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-red-400'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                    }`}
+                    } ${isRsvpLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     style={userRsvp?.status === 'declined' ? { 
                       backgroundColor: '#ef444430'
                     } : undefined}
                   >
                     <X size={14} />
-                    Decline
+                    {isRsvpLoading ? 'Updating...' : 'Decline'}
                   </button>
                 </div>
               </div>
