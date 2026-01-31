@@ -58,6 +58,21 @@ export function EventCard({
   const userCharacters = characters.filter(c => c.user_id === userId);
   const mainCharacter = userCharacters.find(c => c.is_main);
 
+  // Helper function to format attendee name (show char + discord name)
+  const formatAttendeeName = (rsvp: EventWithRsvps['rsvps'][0]): string => {
+    const charName = rsvp.character?.name;
+    const userName = rsvp.user?.display_name;
+    
+    if (charName && userName) {
+      return `${charName} (${userName})`;
+    } else if (charName) {
+      return charName;
+    } else if (userName) {
+      return userName;
+    }
+    return 'Unknown';
+  };
+
   // Wrapper for RSVP calls with error handling and loading state
   const handleRsvpClick = async (status: RsvpStatus, role?: EventRole | null) => {
     try {
@@ -324,7 +339,7 @@ export function EventCard({
                                 <HelpCircle size={12} className="text-yellow-400" />
                               )}
                               <span className="truncate">
-                                {rsvp.character?.name || rsvp.user?.display_name || 'Unknown'}
+                                {formatAttendeeName(rsvp)}
                               </span>
                             </div>
                           ))}
