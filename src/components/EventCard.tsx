@@ -369,8 +369,6 @@ export function EventCard({
                 </div>
               )}
               
-          {!event.is_cancelled && !isPast && (
-            <div className="space-y-3">
               {/* Role selector - show if any roles are needed */}
               {(event.tanks_min > 0 || event.clerics_min > 0 || event.bards_min > 0 || 
                 event.ranged_dps_min > 0 || event.melee_dps_min > 0) && (
