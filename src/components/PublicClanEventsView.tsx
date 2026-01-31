@@ -62,24 +62,34 @@ export function PublicClanEventsView({ clanId, clanName }: PublicClanEventsViewP
           },
           role_counts: {
             tank: {
-              attending: rsvps.filter((r: any) => r.role === 'tank' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: any) => r.role === 'tank' && r.status === 'maybe').length,
+              attending: (rsvps.filter((r: any) => r.role === 'tank' && r.status === 'attending').length +
+                guestRsvps.filter((g: any) => g.role === 'tank' && g.status === 'attending').length),
+              maybe: (rsvps.filter((r: any) => r.role === 'tank' && r.status === 'maybe').length +
+                guestRsvps.filter((g: any) => g.role === 'tank' && g.status === 'maybe').length),
             },
             cleric: {
-              attending: rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'maybe').length,
+              attending: (rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'attending').length +
+                guestRsvps.filter((g: any) => g.role === 'cleric' && g.status === 'attending').length),
+              maybe: (rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'maybe').length +
+                guestRsvps.filter((g: any) => g.role === 'cleric' && g.status === 'maybe').length),
             },
             bard: {
-              attending: rsvps.filter((r: any) => r.role === 'bard' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: any) => r.role === 'bard' && r.status === 'maybe').length,
+              attending: (rsvps.filter((r: any) => r.role === 'bard' && r.status === 'attending').length +
+                guestRsvps.filter((g: any) => g.role === 'bard' && g.status === 'attending').length),
+              maybe: (rsvps.filter((r: any) => r.role === 'bard' && r.status === 'maybe').length +
+                guestRsvps.filter((g: any) => g.role === 'bard' && g.status === 'maybe').length),
             },
             ranged_dps: {
-              attending: rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'maybe').length,
+              attending: (rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'attending').length +
+                guestRsvps.filter((g: any) => g.role === 'ranged_dps' && g.status === 'attending').length),
+              maybe: (rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'maybe').length +
+                guestRsvps.filter((g: any) => g.role === 'ranged_dps' && g.status === 'maybe').length),
             },
             melee_dps: {
-              attending: rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'attending').length,
-              maybe: rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'maybe').length,
+              attending: (rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'attending').length +
+                guestRsvps.filter((g: any) => g.role === 'melee_dps' && g.status === 'attending').length),
+              maybe: (rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'maybe').length +
+                guestRsvps.filter((g: any) => g.role === 'melee_dps' && g.status === 'maybe').length),
             },
           }
         };

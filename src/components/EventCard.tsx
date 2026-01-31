@@ -416,13 +416,13 @@ export function EventCard({
                               <span className="font-medium text-blue-400">
                                 {roleGuestRsvps.filter(g => g.status === 'attending').length}
                               </span>
-                              <span className="mx-1">guest confirmed</span>
+                              <span className="text-slate-400 mx-1">guest confirmed</span>
                               {roleGuestRsvps.filter(g => g.status === 'maybe').length > 0 && (
                                 <>
                                   <span className="font-medium text-blue-300">
                                     {roleGuestRsvps.filter(g => g.status === 'maybe').length}
                                   </span>
-                                  <span className="mx-1">guest tentative</span>
+                                  <span className="text-slate-400 mx-1">guest tentative</span>
                                 </>
                               )}
                             </div>
@@ -570,13 +570,13 @@ export function EventCard({
                                 <span className="font-medium text-blue-400">
                                   {combinedGuestRsvps.filter(g => g.status === 'attending').length}
                                 </span>
-                                <span className="mx-1">guest confirmed</span>
+                                <span className="text-slate-400 mx-1">guest confirmed</span>
                                 {combinedGuestRsvps.filter(g => g.status === 'maybe').length > 0 && (
                                   <>
                                     <span className="font-medium text-blue-300">
                                       {combinedGuestRsvps.filter(g => g.status === 'maybe').length}
                                     </span>
-                                    <span className="mx-1">guest tentative</span>
+                                    <span className="text-slate-400 mx-1">guest tentative</span>
                                   </>
                                 )}
                               </div>
