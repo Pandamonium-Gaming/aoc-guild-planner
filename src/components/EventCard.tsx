@@ -373,7 +373,14 @@ export function EventCard({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!isRoleFull || userInThisRole) {
-                              setSelectedRole(isSelected ? null : role);
+                              if (isSelected) {
+                                // Deselect the role
+                                setSelectedRole(null);
+                              } else {
+                                // Select the role and automatically RSVP as attending
+                                setSelectedRole(role);
+                                handleRsvpClick('attending', role);
+                              }
                             }
                           }}
                           disabled={isRoleFull && !userInThisRole}
