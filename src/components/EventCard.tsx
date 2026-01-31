@@ -8,6 +8,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { CharacterWithProfessions } from '@/lib/types';
 import { Skeleton } from './ui/Skeleton';
 import { GuestSignupForm } from './GuestSignupForm';
+import { AnonymousGuestForm } from './AnonymousGuestForm';
 import { 
   EventWithRsvps, 
   RsvpStatus, 
@@ -399,14 +400,26 @@ export function EventCard({
           {/* RSVP buttons */}
           {!event.is_cancelled && !isPast && (
             <div className="space-y-3">
-              {/* Guest signup form - show this at the top for ally members */}
-              <GuestSignupForm 
-                eventId={event.id}
-                alliedClanId={clanId}
-                onSuccess={() => {
-                  // Could refresh the event here
-                }}
-              />
+              {/* For public events with anonymous users, show anonymous signup */}
+              {event.is_public && !userId && (
+                <AnonymousGuestForm 
+                  eventId={event.id}
+                  onSuccess={() => {
+                    // Could refresh the event here
+                  }}
+                />
+              )}
+
+              {/* For authenticated users in allied clans, show guest signup */}
+              {!event.is_public && userId && (
+                <GuestSignupForm 
+                  eventId={event.id}
+                  alliedClanId={clanId}
+                  onSuccess={() => {
+                    // Could refresh the event here
+                  }}
+                />
+              )}
 
               {/* Admin mode toggle - only show for admins */}
               {isAdmin && (

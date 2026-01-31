@@ -393,6 +393,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               announcements={announcements}
               timezone={profile?.timezone || 'UTC'}
               clanId={clanId!}
+              clanSlug={clanSlug}
               userId={user.id}
               characters={characters}
               canManage={canManageMembers}

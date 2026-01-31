@@ -9,8 +9,8 @@ BEGIN
     INNER JOIN alliance_members am2 ON am1.alliance_id = am2.alliance_id
     WHERE am1.clan_id = clan_a
     AND am2.clan_id = clan_b
-    AND am1.status = 'approved'
-    AND am2.status = 'approved'
+    AND am1.status = 'active'
+    AND am2.status = 'active'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

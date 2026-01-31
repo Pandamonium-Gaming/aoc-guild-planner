@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Calendar, Megaphone, Pin, Trash2, Edit2, Link } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Calendar, Megaphone, Pin, Trash2, Edit2, ExternalLink } from 'lucide-react';
 import { EventWithRsvps, Announcement, RsvpStatus, EventRole, Event } from '@/lib/events';
 import { CharacterWithProfessions } from '@/lib/types';
 import { EventCard } from './EventCard';
@@ -17,6 +18,7 @@ interface EventsListProps {
   announcements: Announcement[];
   timezone: string;
   clanId: string;
+  clanSlug?: string;
   userId: string;
   characters: CharacterWithProfessions[];
   canManage: boolean;
@@ -35,6 +37,7 @@ export function EventsList({
   announcements,
   timezone, // Keep the timezone prop for backward compatibility
   clanId,
+  clanSlug,
   userId,
   characters,
   canManage,
@@ -224,6 +227,16 @@ export function EventsList({
           )}
         </h3>
         <div className="flex gap-2">
+          {clanSlug && (
+            <Link
+              href={`/${clanSlug}/public-events`}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border bg-slate-700/50 hover:bg-slate-600 text-slate-300 border-slate-600 cursor-pointer"
+              title="View public events"
+            >
+              <ExternalLink size={16} />
+              <span className="hidden sm:inline">Public Events</span>
+            </Link>
+          )}
           <button
             onClick={() => setShowAnnouncementForm(true)}
             className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
