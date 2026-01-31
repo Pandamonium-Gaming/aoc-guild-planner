@@ -60,8 +60,16 @@ export function EventCard({
 
   // Helper function to format attendee name (show char + discord name)
   const formatAttendeeName = (rsvp: EventWithRsvps['rsvps'][0]): string => {
-    const charName = rsvp.character?.name;
+    let charName = rsvp.character?.name;
     const userName = rsvp.user?.display_name;
+    
+    // If no character linked but user exists, find their main character
+    if (!charName && rsvp.user_id) {
+      const userMainChar = characters.find(c => c.user_id === rsvp.user_id && c.is_main);
+      if (userMainChar) {
+        charName = userMainChar.name;
+      }
+    }
     
     if (charName && userName) {
       return `${charName} (${userName})`;
