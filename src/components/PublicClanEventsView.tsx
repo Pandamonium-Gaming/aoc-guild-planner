@@ -33,7 +33,11 @@ export function PublicClanEventsView({ clanId, clanName }: PublicClanEventsViewP
         .select(
           `
           *,
-          event_rsvps(*),
+          event_rsvps(
+            *,
+            character:members(id, name),
+            user:users(id, display_name)
+          ),
           guest_event_rsvps(*)
         `
         )

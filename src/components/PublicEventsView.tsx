@@ -35,7 +35,11 @@ export function PublicEventsView() {
         .select(
           `
           *,
-          event_rsvps(*),
+          event_rsvps(
+            *,
+            character:members(id, name),
+            user:users(id, display_name)
+          ),
           guest_event_rsvps(*),
           clan:clan_id(id, name, slug)
         `
