@@ -359,7 +359,7 @@ export function EventCard({
                         />
                       </div>
                       
-                      {/* List of signups - hide guest names on public view */}
+                      {/* List of signups - hide names on public view, show counts instead */}
                       {!isPublicView && (roleRsvps.length > 0 || roleGuestRsvps.length > 0) && (
                         <div className="text-xs space-y-1">
                           {roleRsvps.map((rsvp, idx) => (
@@ -392,10 +392,26 @@ export function EventCard({
                         </div>
                       )}
                       
-                      {/* On public view, show guest count only */}
-                      {isPublicView && roleGuestRsvps.length > 0 && (
-                        <div className="text-xs text-slate-400 italic">
-                          {roleGuestRsvps.length} guest{roleGuestRsvps.length !== 1 ? 's' : ''}
+                      {/* On public view, show counts without names */}
+                      {isPublicView && (roleRsvps.length > 0 || roleGuestRsvps.length > 0) && (
+                        <div className="text-xs space-y-1">
+                          {roleRsvps.length > 0 && (
+                            <div className="text-slate-300">
+                              <span className="font-medium text-green-400">{roleRsvps.filter(r => r.status === 'attending').length}</span>
+                              <span className="text-slate-400 mx-1">confirmed</span>
+                              {roleRsvps.filter(r => r.status === 'maybe').length > 0 && (
+                                <>
+                                  <span className="font-medium text-yellow-400">{roleRsvps.filter(r => r.status === 'maybe').length}</span>
+                                  <span className="text-slate-400">tentative</span>
+                                </>
+                              )}
+                            </div>
+                          )}
+                          {roleGuestRsvps.length > 0 && (
+                            <div className="text-slate-400 italic">
+                              {roleGuestRsvps.length} guest{roleGuestRsvps.length !== 1 ? 's' : ''}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
