@@ -47,16 +47,43 @@ export function PublicClanEventsView({ clanId, clanName }: PublicClanEventsViewP
 
       if (error) throw error;
 
-      // Compute rsvp_counts for each event
-      const eventsWithCounts = (data || []).map(event => ({
-        ...event,
-        rsvps: event.event_rsvps, // Map event_rsvps to rsvps for EventCard
-        rsvp_counts: {
-          attending: (event.event_rsvps || []).filter((r: any) => r.status === 'attending').length,
-          maybe: (event.event_rsvps || []).filter((r: any) => r.status === 'maybe').length,
-          declined: (event.event_rsvps || []).filter((r: any) => r.status === 'declined').length,
-        }
-      }));
+      // Compute rsvp_counts and role_counts for each event
+      const eventsWithCounts = (data || []).map(event => {
+        const rsvps = event.event_rsvps || [];
+        const guestRsvps = event.guest_event_rsvps || [];
+        return {
+          ...event,
+          rsvps,
+          guest_rsvps: guestRsvps,
+          rsvp_counts: {
+            attending: rsvps.filter((r: any) => r.status === 'attending').length,
+            maybe: rsvps.filter((r: any) => r.status === 'maybe').length,
+            declined: rsvps.filter((r: any) => r.status === 'declined').length,
+          },
+          role_counts: {
+            tank: {
+              attending: rsvps.filter((r: any) => r.role === 'tank' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: any) => r.role === 'tank' && r.status === 'maybe').length,
+            },
+            cleric: {
+              attending: rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: any) => r.role === 'cleric' && r.status === 'maybe').length,
+            },
+            bard: {
+              attending: rsvps.filter((r: any) => r.role === 'bard' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: any) => r.role === 'bard' && r.status === 'maybe').length,
+            },
+            ranged_dps: {
+              attending: rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: any) => r.role === 'ranged_dps' && r.status === 'maybe').length,
+            },
+            melee_dps: {
+              attending: rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'attending').length,
+              maybe: rsvps.filter((r: any) => r.role === 'melee_dps' && r.status === 'maybe').length,
+            },
+          }
+        };
+      });
 
       setEvents(eventsWithCounts);
     } catch (err) {
