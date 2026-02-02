@@ -148,18 +148,11 @@ export default function Home() {
       {/* Main scrollable content */}
       <main className="flex-1 overflow-y-auto">
         <div className="flex flex-col items-center justify-center p-8 min-h-full">
-          {/* Show game selector if user is logged in but hasn't selected a game */}
-          {user && !selectedGame ? (
-            <GameSelector />
-          ) : (
-            <>
-              <LandingHero />
-              <LandingClanForm clanName={clanName} setClanName={setClanName} user={user} />
-            </>
-          )}
+          <LandingHero />
+          <LandingClanForm clanName={clanName} setClanName={setClanName} user={user} />
 
-      {/* User's clans section - only show after game selection or when not logged in */}
-      {user && selectedGame && (
+      {/* User's clans section - show for logged in users */}
+      {user && (
         <div className="mt-12 w-full max-w-2xl mx-auto">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 justify-center">
             <Shield className="w-5 h-5 text-orange-400" />
@@ -174,7 +167,7 @@ export default function Home() {
               {userClans.map((group) => (
                 <Link
                   key={group.id}
-                  href={`/${group.slug}/${selectedGame || 'aoc'}`}
+                  href={`/${group.slug}`}
                   className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
