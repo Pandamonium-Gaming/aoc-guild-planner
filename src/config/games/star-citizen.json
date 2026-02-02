@@ -58,32 +58,38 @@
     {
       "id": "lowlife",
       "name": "Lowlife",
-      "description": "Entry level"
+      "description": "Entry level",
+      "hierarchy": 1
     },
     {
       "id": "pirate",
       "name": "Pirate",
-      "description": "Pirate rank"
+      "description": "Pirate rank",
+      "hierarchy": 2
     },
     {
       "id": "enforcer",
       "name": "Enforcer",
-      "description": "Enforcer rank"
+      "description": "Enforcer rank",
+      "hierarchy": 3
     },
     {
       "id": "captain",
       "name": "Captain",
-      "description": "Captain rank"
+      "description": "Captain rank",
+      "hierarchy": 4
     },
     {
       "id": "vice-admiral",
       "name": "Vice Admiral",
-      "description": "Vice Admiral rank"
+      "description": "Vice Admiral rank",
+      "hierarchy": 5
     },
     {
       "id": "admiral",
       "name": "Admiral",
-      "description": "Admiral rank"
+      "description": "Admiral rank",
+      "hierarchy": 6
     }
   ]
 }

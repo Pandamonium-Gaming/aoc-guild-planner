@@ -1,11 +1,13 @@
 import { Clock, Users } from 'lucide-react';
 import { ROLE_CONFIG, ClanRole } from '@/lib/permissions';
+import { getGameConfig } from '@/config';
 
 interface ManageTabProps {
   members: Array<{
     id: string;
     user_id: string;
     role: string | null;
+    guild_rank: string | null;
     is_creator: boolean;
     user: { display_name: string | null; discord_username: string | null; discord_avatar: string | null } | null;
   }>;
@@ -13,15 +15,18 @@ interface ManageTabProps {
     id: string;
     user_id: string;
     role: string | null;
+    guild_rank: string | null;
     is_creator: boolean;
     user: { display_name: string | null; discord_username: string | null; discord_avatar: string | null } | null;
   }>;
   onAccept: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
   onUpdateRole?: (id: string, role: ClanRole) => Promise<void>;
+  onUpdateRank?: (id: string, rank: string | null) => Promise<void>;
   onRemove?: (id: string) => Promise<void>;
   currentUserId: string;
   currentUserRole: ClanRole;
+  gameSlug?: string;
   t: (key: string) => string;
 }
 
@@ -31,11 +36,23 @@ export function ManageTab({
   onAccept,
   onReject,
   onUpdateRole,
+  onUpdateRank,
   onRemove,
   currentUserId,
   currentUserRole,
+  gameSlug = 'aoc',
   t,
 }: ManageTabProps) {
+  const gameConfig = getGameConfig(gameSlug);
+  const gameRanks = (gameConfig as any)?.ranks || [];
+  
+  // Helper to get rank hierarchy level
+  const getRankHierarchy = (rankId: string | null): number => {
+    if (!rankId) return 0;
+    const rank = gameRanks.find((r: any) => r.id === rankId);
+    return rank?.hierarchy || 0;
+  };
+
   return (
     <div className="space-y-6">
       {/* Pending Applications */}
@@ -187,6 +204,34 @@ export function ManageTab({
                             </option>
                           ))}
                       </select>
+
+                      {onUpdateRank && gameRanks.length > 0 && (
+                        <select
+                          value={member.guild_rank || ''}
+                          onChange={(e) => onUpdateRank(member.id, e.target.value || null)}
+                          className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-white text-sm cursor-pointer"
+                          title="Guild Rank"
+                        >
+                          <option value="">No Rank</option>
+                          {gameRanks
+                            .filter((rank: any) => {
+                              // Only allow managing ranks below your own
+                              if (currentUserRole === 'admin') return true;
+                              if (currentUserRole === 'officer') {
+                                const memberRankHierarchy = getRankHierarchy(member.guild_rank);
+                                const rankHierarchy = rank.hierarchy || 0;
+                                return rankHierarchy < getRankHierarchy(member.guild_rank) || memberRankHierarchy === 0;
+                              }
+                              return false;
+                            })
+                            .map((rank: any) => (
+                              <option key={rank.id} value={rank.id}>
+                                {rank.name}
+                              </option>
+                            ))}
+                        </select>
+                      )}
+
                       {onRemove && (
                         <button
                           onClick={() => onRemove(member.id)}
@@ -203,5 +248,4 @@ export function ManageTab({
         </div>
       </div>
     </div>
-  );
-}
+  );}

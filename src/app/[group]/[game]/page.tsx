@@ -148,6 +148,7 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
     acceptMember,
     rejectMember,
     updateRole,
+    updateRank,
     removeMember,
   } = useGroupMembership(groupId, user?.id || null);
 
@@ -528,9 +529,11 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
                 onAccept={acceptMember}
                 onReject={rejectMember}
                 onUpdateRole={canManageRoles ? updateRole : undefined}
+                onUpdateRank={canManageMembers ? updateRank : undefined}
                 onRemove={canManageRoles ? removeMember : undefined}
                 currentUserId={user.id}
                 currentUserRole={membership?.role || 'member'}
+                gameSlug={gameSlug}
                 t={t}
               />
 

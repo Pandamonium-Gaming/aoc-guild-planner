@@ -9,6 +9,7 @@ interface ClanMember {
   id: string;
   user_id: string;
   role: UserRole;
+  guild_rank: string | null;
   is_creator: boolean;
   applied_at: string;
   approved_at: string | null;
@@ -33,6 +34,7 @@ interface UseClanMembershipReturn {
   acceptMember: (membershipId: string) => Promise<void>;
   rejectMember: (membershipId: string) => Promise<void>;
   updateRole: (membershipId: string, role: ClanRole) => Promise<void>;
+  updateRank: (membershipId: string, rank: string | null) => Promise<void>;
   removeMember: (membershipId: string) => Promise<void>;
   refresh: () => Promise<void>;
   // Permission helpers
@@ -93,6 +95,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
           id,
           user_id,
           role,
+          guild_rank,
           is_creator,
           applied_at,
           approved_at,
@@ -250,6 +253,17 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     await refresh();
   };
 
+  const updateRank = async (membershipId: string, rank: string | null) => {
+    const { error } = await supabase
+      .from('group_members')
+      .update({ guild_rank: rank })
+      .eq('id', membershipId)
+      .select();
+
+    if (error) throw error;
+    await refresh();
+  };
+
   const removeMember = async (membershipId: string) => {
     await rejectMember(membershipId);
   };
@@ -270,6 +284,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     acceptMember,
     rejectMember,
     updateRole,
+    updateRank,
     removeMember,
     refresh,
     canView,
