@@ -10,8 +10,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ClanSettingsProps {
   groupId: string;
+  gameSlug?: string;
   currentWebhookUrl?: string;
   currentWelcomeWebhookUrl?: string;
+  currentAocWebhookUrl?: string;
+  currentAocEventsWebhookUrl?: string;
+  currentScWebhookUrl?: string;
+  currentScEventsWebhookUrl?: string;
   notifyOnEvents?: boolean;
   notifyOnAnnouncements?: boolean;
   announcementRoleId?: string;
@@ -22,8 +27,13 @@ interface ClanSettingsProps {
 
 export function ClanSettings({
   groupId,
+  gameSlug = 'aoc',
   currentWebhookUrl = '',
   currentWelcomeWebhookUrl = '',
+  currentAocWebhookUrl = '',
+  currentAocEventsWebhookUrl = '',
+  currentScWebhookUrl = '',
+  currentScEventsWebhookUrl = '',
   notifyOnEvents = true,
   notifyOnAnnouncements = true,
   announcementRoleId = '',
@@ -32,8 +42,14 @@ export function ClanSettings({
   onUpdate,
 }: ClanSettingsProps) {
   const { loading } = usePermissions(groupId);
+  // Legacy webhook support
   const [webhookUrl, setWebhookUrl] = useState(currentWebhookUrl);
   const [welcomeWebhookUrl, setWelcomeWebhookUrl] = useState(currentWelcomeWebhookUrl);
+  // Game-specific webhooks
+  const [aocWebhookUrl, setAocWebhookUrl] = useState(currentAocWebhookUrl);
+  const [aocEventsWebhookUrl, setAocEventsWebhookUrl] = useState(currentAocEventsWebhookUrl);
+  const [scWebhookUrl, setScWebhookUrl] = useState(currentScWebhookUrl);
+  const [scEventsWebhookUrl, setScEventsWebhookUrl] = useState(currentScEventsWebhookUrl);
   const [eventsEnabled, setEventsEnabled] = useState(notifyOnEvents);
   const [announcementsEnabled, setAnnouncementsEnabled] = useState(notifyOnAnnouncements);
   const [roleId, setRoleId] = useState(announcementRoleId);
@@ -58,6 +74,10 @@ export function ClanSettings({
         .update({
           group_webhook_url: webhookUrl.trim() || null,
           group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
+          aoc_webhook_url: aocWebhookUrl.trim() || null,
+          aoc_events_webhook_url: aocEventsWebhookUrl.trim() || null,
+          sc_webhook_url: scWebhookUrl.trim() || null,
+          sc_events_webhook_url: scEventsWebhookUrl.trim() || null,
           notify_on_events: eventsEnabled,
           notify_on_announcements: announcementsEnabled,
           discord_announcement_role_id: roleId.trim() || null,
