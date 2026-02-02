@@ -38,9 +38,7 @@ ALTER TABLE activity_log RENAME COLUMN clan_id TO group_id;
 ALTER TABLE announcements RENAME COLUMN clan_id TO group_id;
 ALTER TABLE alliance_members RENAME COLUMN clan_id TO group_id;
 ALTER TABLE alliances RENAME COLUMN leader_clan_id TO leader_group_id;
-ALTER TABLE dkp_points RENAME COLUMN clan_id TO group_id;
-ALTER TABLE loot_history RENAME COLUMN clan_id TO group_id;
-ALTER TABLE dkp_transactions RENAME COLUMN clan_id TO group_id;
+ALTER TABLE loot_systems RENAME COLUMN clan_id TO group_id;
 ALTER TABLE clan_permission_overrides RENAME TO group_permission_overrides;
 ALTER TABLE group_permission_overrides RENAME COLUMN clan_id TO group_id;
 
