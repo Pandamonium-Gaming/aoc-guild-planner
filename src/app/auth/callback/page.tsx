@@ -2,13 +2,11 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -20,7 +18,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // Check if the user came from dev domain (via Referer or redirect_to param)
+      // Check if the user came from dev domain (via localStorage)
       const redirectTo = localStorage.getItem('authRedirectTo');
       localStorage.removeItem('authRedirectTo');
       
