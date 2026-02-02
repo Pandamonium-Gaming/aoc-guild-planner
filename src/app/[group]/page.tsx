@@ -3,19 +3,20 @@
 import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, LogOut, ChevronRight, Home } from 'lucide-react';
+import { AlertCircle, LogOut, ChevronRight, Home, Plus, Trash2, Shield } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGroupBySlug } from '@/lib/auth';
+import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { ClanLoadingScreen } from '@/components/ClanLoadingScreen';
 import { ClanErrorScreen } from '@/components/ClanErrorScreen';
 import { ClanLoginScreen } from '@/components/ClanLoginScreen';
 import { InlineFooter } from '@/components/Footer';
 
-// Game configuration - could be expanded to support more games
-const SUPPORTED_GAMES = [
+// All available games that can be added to a group
+const ALL_AVAILABLE_GAMES = [
   { slug: 'aoc', name: 'Ashes of Creation', icon: '⚔️' },
-  // Add more games as needed
+  { slug: 'star-citizen', name: 'Star Citizen', icon: '🚀' },
   // { slug: 'bdo', name: 'Black Desert Online', icon: '🗡️' },
 ];
 
@@ -31,6 +32,8 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
   const [groupExists, setGroupExists] = useState<boolean | null>(null);
   const [checkError, setCheckError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enabledGames, setEnabledGames] = useState<string[]>(['aoc']); // Default to AoC
+  const [showAddGame, setShowAddGame] = useState(false);
 
   // Fetch group data
   useEffect(() => {
@@ -67,7 +70,14 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
     checkGroup();
   }, [groupSlug]);
 
+  // Get membership info to check if user is admin
+  const {
+    membership,
+    loading: membershipLoading,
+  } = useGroupMembership(groupId, user?.id || null);
+
   const displayName = profile?.display_name || profile?.discord_username || 'User';
+  const isAdmin = membership?.role === 'admin';
 
   // Loading state
   if (loading || authLoading) {
@@ -158,18 +168,54 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-2">Available Games</h2>
-          <p className="text-slate-400 text-sm">Click on a game to view your guild's chapter</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white mb-2">Available Games</h2>
+            <p className="text-slate-400 text-sm">Click on a game to view your guild's chapter</p>
+          </div>
+          {isAdmin && (
+            <button
+              onClick={() => setShowAddGame(!showAddGame)}
+              className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors cursor-pointer"
+              title="Add a game to this group"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline text-sm">Add Game</span>
+            </button>
+          )}
         </div>
+
+        {/* Add game dialog */}
+        {showAddGame && isAdmin && (
+          <div className="mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+            <h3 className="text-white font-semibold mb-4">Add a game to this group:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {ALL_AVAILABLE_GAMES.filter(g => !enabledGames.includes(g.slug)).map((game) => (
+                <button
+                  key={game.slug}
+                  onClick={() => {
+                    setEnabledGames([...enabledGames, game.slug]);
+                    setShowAddGame(false);
+                  }}
+                  className="text-left p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded border border-slate-600 hover:border-orange-500 transition-colors"
+                >
+                  <span className="text-2xl block mb-1">{game.icon}</span>
+                  <span className="text-white font-medium">{game.name}</span>
+                </button>
+              ))}
+            </div>
+            {ALL_AVAILABLE_GAMES.every(g => enabledGames.includes(g.slug)) && (
+              <p className="text-slate-400 text-sm">All available games are already enabled.</p>
+            )}
+          </div>
+        )}
 
         {/* Game cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {SUPPORTED_GAMES.map((game) => (
-            <button
+          {ALL_AVAILABLE_GAMES.filter(g => enabledGames.includes(g.slug)).map((game) => (
+            <div
               key={game.slug}
-              onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
-              className="group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-cyan-500 transition-all cursor-pointer p-6 text-left"
+              className="group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-left"
             >
               {/* Background gradient on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -177,25 +223,56 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
               {/* Content */}
               <div className="relative">
                 <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <span className="text-3xl block mb-2">{game.icon}</span>
-                    <h3 className="text-lg font-semibold text-white group-hover:text-cyan-400 transition-colors">
+                  <button
+                    onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
+                    className="flex-1 text-left group/link cursor-pointer"
+                  >
+                    <span className="text-3xl block mb-2 group-hover/link:scale-110 transition-transform">{game.icon}</span>
+                    <h3 className="text-lg font-semibold text-white group-hover/link:text-cyan-400 transition-colors">
                       {game.name}
                     </h3>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-cyan-400 transition-colors transform group-hover:translate-x-1" />
+                  </button>
+                  <button
+                    onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
+                    className="text-slate-500 hover:text-cyan-400 transition-colors transform group-hover:translate-x-1"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
-                <p className="text-sm text-slate-400">
+                <button
+                  onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
+                  className="text-sm text-slate-400 hover:text-slate-300 cursor-pointer w-full text-left"
+                >
                   View members, events, and manage guild operations
-                </p>
+                </button>
               </div>
-            </button>
+
+              {/* Admin delete button */}
+              {isAdmin && (
+                <button
+                  onClick={() => setEnabledGames(enabledGames.filter(g => g !== game.slug))}
+                  className="absolute top-2 right-2 p-2 opacity-0 group-hover:opacity-100 bg-red-500/20 hover:bg-red-500/40 rounded transition-all"
+                  title="Remove this game from the group"
+                >
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
-        {SUPPORTED_GAMES.length === 0 && (
+        {enabledGames.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-slate-400">No games configured for this group yet.</p>
+            <p className="text-slate-400 mb-4">No games enabled for this group yet.</p>
+            {isAdmin && (
+              <button
+                onClick={() => setShowAddGame(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Add a Game
+              </button>
+            )}
           </div>
         )}
       </main>
