@@ -1,9 +1,13 @@
--- Comprehensive schema fix and RLS policy recreation
--- This migration is idempotent and handles all remaining schema issues
+-- Comprehensive RLS policy recreation
+-- This migration handles:
+-- 1. Adding missing group_id and user_id columns to tables
+-- 2. Dropping all existing RLS policies
+-- 3. Recreating all RLS policies with correct column references
+-- This replaces migration 055
 
 DO $$
 BEGIN
-  -- Add missing group_id columns where needed
+  -- Add missing group_id columns where needed (idempotent)
   IF NOT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='bank_transactions' AND column_name='group_id') THEN
     ALTER TABLE bank_transactions ADD COLUMN group_id uuid REFERENCES groups(id);
   END IF;
@@ -260,4 +264,4 @@ CREATE POLICY "Admins can delete guest RSVPs" ON guest_event_rsvps FOR DELETE US
 
 CREATE POLICY "Users can update own RSVP" ON event_rsvps FOR UPDATE USING ((user_id = auth.uid()));
 
-INSERT INTO migration_history (filename) VALUES ('055_comprehensive_rls_fix.sql') ON CONFLICT DO NOTHING;
+INSERT INTO migration_history (filename) VALUES ('047_comprehensive_rls_recreation.sql') ON CONFLICT DO NOTHING;

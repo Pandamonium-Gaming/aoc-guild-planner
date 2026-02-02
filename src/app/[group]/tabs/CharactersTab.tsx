@@ -33,9 +33,7 @@ export function CharactersTab({
 }: CharactersTabProps) {
   const { user } = useAuthContext();
   const clanMembership = useGroupMembership(groupId, user?.id || null);
-  console.log('[DEBUG] clanMembership:', clanMembership);
   const userRole = clanMembership.membership?.role || 'pending';
-  console.log('[DEBUG] userRole from membership:', userRole);
 
   return (
     <div className="space-y-4">
@@ -56,14 +54,10 @@ export function CharactersTab({
         filterCharacters(characters, characterFilters).map((character) => {
           // Only allow edit if user owns character AND has 'characters_edit_own', or has 'characters_edit_any' permission
           const isAdmin = userRole === 'admin';
-          // Always log debug info for permissions
-          console.log('[DEBUG] userRole:', userRole, 'isAdmin:', isAdmin, 'userId:', user?.id, 'charUserId:', character.user_id);
-          // Force canEdit for admin for debugging
           const canEdit = isAdmin ? true : (
             (user?.id && character.user_id === user.id && roleHasPermission(userRole, 'characters_edit_own'))
             || roleHasPermission(userRole, 'characters_edit_any')
           );
-          console.log('[DEBUG] canEdit:', canEdit, 'readOnly:', !canEdit, 'character:', character.name);
           
           // Get main character name if this is an alt
           const mainCharacter = character.is_main ? null : characters.find(c => c.user_id === character.user_id && c.is_main);
