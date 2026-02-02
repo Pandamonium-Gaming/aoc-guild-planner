@@ -434,6 +434,7 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
                 setEditingCharacter={setEditingCharacter}
                 characterFilters={characterFilters}
                 setCharacterFilters={setCharacterFilters}
+                gameSlug={gameSlug}
               />
           ) : activeTab === 'events' ? (
             <EventsList

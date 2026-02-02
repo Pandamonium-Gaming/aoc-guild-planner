@@ -18,6 +18,7 @@ interface CharactersTabProps {
   setEditingCharacter: (character: CharacterWithProfessions) => void;
   characterFilters: any;
   setCharacterFilters: (filters: any) => void;
+  gameSlug?: string;
 }
 
 export function CharactersTab({
@@ -30,6 +31,7 @@ export function CharactersTab({
   setEditingCharacter,
   characterFilters,
   setCharacterFilters,
+  gameSlug = 'aoc',
 }: CharactersTabProps) {
   const { user } = useAuthContext();
   const clanMembership = useGroupMembership(groupId, user?.id || null);
@@ -37,7 +39,7 @@ export function CharactersTab({
 
   return (
     <div className="space-y-4">
-      <AddCharacterButton onAdd={addCharacter} />
+      <AddCharacterButton onAdd={addCharacter} gameSlug={gameSlug} />
       {characters.length > 0 && (
         <CharacterFiltersBar
           filters={characterFilters}
