@@ -17,6 +17,7 @@ interface ShipData {
     min: number;
     max: number;
   };
+  productionStatus: string;
   image?: string;
 }
 
@@ -24,7 +25,7 @@ interface CharacterShip {
   id: string;
   character_id: string;
   ship_id: string;
-  ownership_type: 'owned' | 'loaned' | 'pledged';
+  ownership_type: 'pledged' | 'in-game' | 'loaner';
   created_at: string;
 }
 
@@ -41,7 +42,7 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const [selectedShip, setSelectedShip] = useState<string | null>(null);
-  const [ownershipType, setOwnershipType] = useState<'owned' | 'loaned' | 'pledged'>('owned');
+  const [ownershipType, setOwnershipType] = useState<'pledged' | 'in-game' | 'loaner'>('pledged');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -266,12 +267,12 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
             </label>
             <select
               value={ownershipType}
-              onChange={(e) => setOwnershipType(e.target.value as 'owned' | 'loaned' | 'pledged')}
+              onChange={(e) => setOwnershipType(e.target.value as 'pledged' | 'in-game' | 'loaner')}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="owned">Owned</option>
-              <option value="loaned">Loaned</option>
               <option value="pledged">Pledged</option>
+              <option value="in-game">In-Game Purchase</option>
+              <option value="loaner">Loaner</option>
             </select>
           </div>
 
@@ -326,16 +327,30 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                           if (!shipData) return null;
 
                           const ownershipColor = {
-                            owned: 'bg-green-500/10 border-green-500/30 text-green-400',
-                            loaned: 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-                            pledged: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
+                            'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
+                            'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
+                            'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
                           }[ship.ownership_type];
+
+                          const ownershipLabel = {
+                            'pledged': 'Pledged',
+                            'in-game': 'In-Game',
+                            'loaner': 'Loaner',
+                          }[ship.ownership_type];
+
+                          // Check if ship is concept from ship data
+                          const isConcept = shipData.productionStatus !== 'flight-ready';
 
                           return (
                             <div key={ship.id} className={`border rounded-lg p-3 ${ownershipColor}`}>
                               <div className="flex items-start justify-between mb-2">
                                 <div>
-                                  <h5 className="font-semibold text-white">{shipData.name}</h5>
+                                  <div className="flex items-center gap-2">
+                                    <h5 className="font-semibold text-white">{shipData.name}</h5>
+                                    {isConcept && (
+                                      <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
+                                    )}
+                                  </div>
                                   <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
                                 </div>
                                 {canManage && ownerUserId === userId && (
@@ -366,7 +381,7 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                   <span>{shipData.cargo} SCU</span>
                                 </div>
                                 <div className="pt-2 border-t border-current/20">
-                                  <span className="capitalize text-xs font-medium">{ship.ownership_type}</span>
+                                  <span className="text-xs font-medium">{ownershipLabel}</span>
                                 </div>
                               </div>
                             </div>

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS character_ships (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
   ship_id TEXT NOT NULL, -- References ship ID from star-citizen-ships.json
-  ownership_type TEXT NOT NULL CHECK (ownership_type IN ('owned-pledge', 'owned-auec', 'concept-pledge', 'loaner')),
+  ownership_type TEXT NOT NULL CHECK (ownership_type IN ('pledged', 'in-game', 'loaner')),
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
