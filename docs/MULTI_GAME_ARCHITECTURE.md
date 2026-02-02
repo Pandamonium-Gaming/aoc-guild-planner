@@ -67,24 +67,27 @@ export const GAME_CONFIG = {
 ### Game Registry
 
 The `lib/games.ts` file provides:
-- `GAMES` - Object containing all available games
-- `getGame(id)` - Get a specific game's config
-- `getAllGames()` - Get all games
-- `hasFeature(gameId, feature)` - Check feature availability
+
+* `GAMES` - Object containing all available games
+* `getGame(id)` - Get a specific game's config
+* `getAllGames()` - Get all games
+* `hasFeature(gameId, feature)` - Check feature availability
 
 ### Game Selection State
 
 The `GameContext.tsx` manages:
-- `selectedGame` - Currently selected game ID
-- `setSelectedGame(gameId)` - Change selected game
-- `clearSelectedGame()` - Clear selection
+
+* `selectedGame` - Currently selected game ID
+* `setSelectedGame(gameId)` - Change selected game
+* `clearSelectedGame()` - Clear selection
 
 ### Database Support
 
 A new migration (`034_add_game_support.sql`) adds:
-- `game` column to `clans` table (tracks which game each clan belongs to)
-- `game_types` table (reference table for game definitions)
-- `user_games` table (tracks which games a user participates in)
+
+* `game` column to `clans` table (tracks which game each clan belongs to)
+* `game_types` table (reference table for game definitions)
+* `user_games` table (tracks which games a user participates in)
 
 ## User Flow
 
@@ -148,10 +151,12 @@ To add a new game (e.g., "World of Warcraft"):
 ## Database Schema
 
 ### clans table
-- `game VARCHAR(50)` - Game identifier (aoc, starcitizen, etc.)
-- Foreign key to `game_types` table
 
-### game_types table
+* `game VARCHAR(50)` - Game identifier (aoc, starcitizen, etc.)
+* Foreign key to `game_types` table
+
+### game\_types table
+
 ```sql
 CREATE TABLE game_types (
   id VARCHAR(50) PRIMARY KEY,
@@ -162,7 +167,8 @@ CREATE TABLE game_types (
 )
 ```
 
-### user_games table
+### user\_games table
+
 ```sql
 CREATE TABLE user_games (
   id UUID PRIMARY KEY,
@@ -176,14 +182,16 @@ CREATE TABLE user_games (
 ## Game-Specific Features
 
 ### Ashes of Creation
-- **Features**: professions, characters, guilds, economy, events, alliances
-- **Key entities**: Professions, ranks, items, supply chains
-- **Tracking**: member professions, builds, achievements
+
+* **Features**: professions, characters, guilds, economy, events, alliances
+* **Key entities**: Professions, ranks, items, supply chains
+* **Tracking**: member professions, builds, achievements
 
 ### Star Citizen
-- **Features**: ships, pilots, orgs, equipment, missions, logistics
-- **Key entities**: Ships by manufacturer, pilot roles, specializations
-- **Tracking**: pilot certifications, ship ownership, fleet composition
+
+* **Features**: ships, pilots, orgs, equipment, missions, logistics
+* **Key entities**: Ships by manufacturer, pilot roles, specializations
+* **Tracking**: pilot certifications, ship ownership, fleet composition
 
 ## Querying by Game
 
@@ -202,8 +210,8 @@ const userClans = await getUserClansForGame(userId, 'starcitizen');
 
 ## Future Considerations
 
-- **Route structure**: Consider implementing `src/app/[game]/[clan]` dynamic routes
-- **Localization**: Game-specific locale files could be nested under game directories
-- **Asset management**: Game logos, icons, and banners could be organized per game
-- **API separation**: Each game could have its own set of API routes (`src/app/api/[game]/...`)
-- **Game-specific hooks**: Create custom hooks per game in `games/[game]/hooks/`
+* **Route structure**: Consider implementing `src/app/[game]/[clan]` dynamic routes
+* **Localization**: Game-specific locale files could be nested under game directories
+* **Asset management**: Game logos, icons, and banners could be organized per game
+* **API separation**: Each game could have its own set of API routes (`src/app/api/[game]/...`)
+* **Game-specific hooks**: Create custom hooks per game in `games/[game]/hooks/`

@@ -1,84 +1,91 @@
 # Multi-Game Architecture Implementation Summary
 
 ## Overview
+
 The application has been successfully scaffolded to support multiple games (Ashes of Creation, Star Citizen, and more). Users now select a game after login and can manage organizations/guilds for that game.
 
 ## What Was Created
 
 ### 1. **Game Configuration Structure** (`src/games/`)
-- **`src/games/aoc/config/`** - Ashes of Creation configuration
-  - `index.ts` - Game config export with features and data references
-  - Existing professions, races, and item rarity data
-  
-- **`src/games/starcitizen/config/`** - Star Citizen configuration
-  - `index.ts` - Game config export
-  - `ships.json` - Ship manufacturers, categories, and ship details
-  - `roles.json` - Pilot roles and specializations
+
+* **`src/games/aoc/config/`** - Ashes of Creation configuration
+  * `index.ts` - Game config export with features and data references
+  * Existing professions, races, and item rarity data
+* **`src/games/starcitizen/config/`** - Star Citizen configuration
+  * `index.ts` - Game config export
+  * `ships.json` - Ship manufacturers, categories, and ship details
+  * `roles.json` - Pilot roles and specializations
 
 ### 2. **Game Registry & Utilities** (`src/lib/`)
-- **`games.ts`** - Game registry and lookup functions
-  - `GAMES` object mapping game IDs to configs
-  - `getGame()` - Get specific game config
-  - `getAllGames()` - List all games
-  - `hasFeature()` - Check if game has a feature
-  - `GameId` type: `'aoc' | 'starcitizen'`
 
-- **`gameConfig.ts`** - Dynamic config loader
-  - `loadGameConfig()` - Async config loading (for code-splitting)
-  - `getGameData()` - Type-safe access to game data
-  - `getGameFeatures()` - Get feature flags
+* **`games.ts`** - Game registry and lookup functions
+  * `GAMES` object mapping game IDs to configs
+  * `getGame()` - Get specific game config
+  * `getAllGames()` - List all games
+  * `hasFeature()` - Check if game has a feature
+  * `GameId` type: `'aoc' | 'starcitizen'`
 
-- **`gameTracking.ts`** - User-game relationship management
-  - `addUserGame()` - Track user's participation in a game
-  - `getUserGames()` - Get all games user is in
-  - `getUserClansForGame()` - Get user's clans filtered by game
+* **`gameConfig.ts`** - Dynamic config loader
+  * `loadGameConfig()` - Async config loading (for code-splitting)
+  * `getGameData()` - Type-safe access to game data
+  * `getGameFeatures()` - Get feature flags
 
-- **`gameValidation.ts`** - Game context validation
-  - `validateClanGame()` - Ensure clan belongs to correct game
-  - `getClanGame()` - Get game a clan belongs to
-  - `initializeClanWithGame()` - Setup new clan with game
+* **`gameTracking.ts`** - User-game relationship management
+  * `addUserGame()` - Track user's participation in a game
+  * `getUserGames()` - Get all games user is in
+  * `getUserClansForGame()` - Get user's clans filtered by game
+
+* **`gameValidation.ts`** - Game context validation
+  * `validateClanGame()` - Ensure clan belongs to correct game
+  * `getClanGame()` - Get game a clan belongs to
+  * `initializeClanWithGame()` - Setup new clan with game
 
 ### 3. **React Contexts** (`src/contexts/`)
-- **`GameContext.tsx`** - Game selection state management
-  - `selectedGame` - Currently selected game ID
-  - `setSelectedGame()` - Change selected game
-  - `clearSelectedGame()` - Reset selection
-  - `GameProvider` wrapper component
+
+* **`GameContext.tsx`** - Game selection state management
+  * `selectedGame` - Currently selected game ID
+  * `setSelectedGame()` - Change selected game
+  * `clearSelectedGame()` - Reset selection
+  * `GameProvider` wrapper component
 
 ### 4. **UI Components** (`src/components/`)
-- **`GameSelector.tsx`** - Game selection UI
-  - Displays all available games as cards
-  - Tracks game selection in `user_games` table
-  - Loading states during selection
-  - Feature badges for each game
 
-- **`GameSwitcher.tsx`** - Game switching dropdown
-  - Appears in header when user has selected a game
-  - Quick switcher for users with multiple games
-  - "Choose game again" option to return to selector
+* **`GameSelector.tsx`** - Game selection UI
+  * Displays all available games as cards
+  * Tracks game selection in `user_games` table
+  * Loading states during selection
+  * Feature badges for each game
+
+* **`GameSwitcher.tsx`** - Game switching dropdown
+  * Appears in header when user has selected a game
+  * Quick switcher for users with multiple games
+  * "Choose game again" option to return to selector
 
 ### 5. **Database Migration** (`supabase/migrations/`)
-- **`034_add_game_support.sql`**
-  - Adds `game` column to `clans` table
-  - Creates `game_types` reference table
-  - Creates `user_games` tracking table
-  - Adds indexes for performance
-  - Seeds initial games (aoc, starcitizen)
+
+* **`034_add_game_support.sql`**
+  * Adds `game` column to `clans` table
+  * Creates `game_types` reference table
+  * Creates `user_games` tracking table
+  * Adds indexes for performance
+  * Seeds initial games (aoc, starcitizen)
 
 ### 6. **Updated App Layout** (`src/app/`)
-- **`layout.tsx`** - Added `GameProvider` wrapper
-- **`page.tsx`** - Updated landing page
-  - Shows `GameSelector` for authenticated users
-  - Hides clan lists and features until game is selected
-  - Imports `GameSwitcher` component for header
+
+* **`layout.tsx`** - Added `GameProvider` wrapper
+* **`page.tsx`** - Updated landing page
+  * Shows `GameSelector` for authenticated users
+  * Hides clan lists and features until game is selected
+  * Imports `GameSwitcher` component for header
 
 ### 7. **Documentation** (`docs/`)
-- **`MULTI_GAME_ARCHITECTURE.md`** - Complete architecture guide
-  - Directory structure
-  - Core concepts and patterns
-  - Database schema
-  - How to add new games
-  - Game-specific features overview
+
+* **`MULTI_GAME_ARCHITECTURE.md`** - Complete architecture guide
+  * Directory structure
+  * Core concepts and patterns
+  * Database schema
+  * How to add new games
+  * Game-specific features overview
 
 ## User Flow
 
@@ -163,26 +170,28 @@ src/
 3. Login with Discord
 4. You should see the GameSelector
 5. Choose a game and verify:
-   - Game is stored in `user_games` table
-   - Clan form appears
-   - GameSwitcher shows in header
-   - Switching games works smoothly
+   * Game is stored in `user_games` table
+   * Clan form appears
+   * GameSwitcher shows in header
+   * Switching games works smoothly
 
 ## Files Modified
-- `src/app/layout.tsx` - Added GameProvider
-- `src/app/page.tsx` - Added GameSelector logic and GameSwitcher component
+
+* `src/app/layout.tsx` - Added GameProvider
+* `src/app/page.tsx` - Added GameSelector logic and GameSwitcher component
 
 ## Files Created
-- `src/games/aoc/config/index.ts`
-- `src/games/starcitizen/config/index.ts`
-- `src/games/starcitizen/config/ships.json`
-- `src/games/starcitizen/config/roles.json`
-- `src/lib/games.ts`
-- `src/lib/gameConfig.ts`
-- `src/lib/gameTracking.ts`
-- `src/lib/gameValidation.ts`
-- `src/contexts/GameContext.tsx`
-- `src/components/GameSelector.tsx`
-- `src/components/GameSwitcher.tsx`
-- `supabase/migrations/034_add_game_support.sql`
-- `docs/MULTI_GAME_ARCHITECTURE.md`
+
+* `src/games/aoc/config/index.ts`
+* `src/games/starcitizen/config/index.ts`
+* `src/games/starcitizen/config/ships.json`
+* `src/games/starcitizen/config/roles.json`
+* `src/lib/games.ts`
+* `src/lib/gameConfig.ts`
+* `src/lib/gameTracking.ts`
+* `src/lib/gameValidation.ts`
+* `src/contexts/GameContext.tsx`
+* `src/components/GameSelector.tsx`
+* `src/components/GameSwitcher.tsx`
+* `supabase/migrations/034_add_game_support.sql`
+* `docs/MULTI_GAME_ARCHITECTURE.md`
