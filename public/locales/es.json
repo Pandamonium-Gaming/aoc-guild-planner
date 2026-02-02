@@ -358,19 +358,19 @@
     "allRightsReserved": "Todos los derechos reservados"
   },
   "home": {
-    "title": "AoC Guild Planner",
-    "subtitle": "Planifica y gestiona las profesiones artesanales de tu clan para Ashes of Creation",
+    "title": "Planificador Multigame de Clanes",
+    "subtitle": "Gestiona tu clan en cualquier juego - Ashes of Creation, Star Citizen y más",
     "enterClanPlaceholder": "Nombre de tu clan...",
     "loggedInHint": "Podrás crear o unirte a este clan",
     "notLoggedInHint": "Inicia sesión con Discord para crear o unirte a clanes",
     "yourClans": "Tus Clanes",
     "noClans": "Aún no te has unido a ningún clan. ¡Escribe un nombre de clan arriba para empezar!",
-    "feature1Title": "Seguimiento de las 22 Profesiones",
-    "feature1Desc": "Recolección, Procesamiento y Fabricación con cadenas de dependencia completas",
-    "feature2Title": "Gestiona los Miembros del Clan",
-    "feature2Desc": "Asigna rangos desde Aprendiz hasta Gran Maestro",
-    "feature3Title": "Matriz de Cobertura del Clan",
-    "feature3Desc": "Visualiza la capacidad productiva de tu clan de un vistazo"
+    "featureMemberTitle": "Seguimiento de Miembros",
+    "featureMemberDesc": "Rastrear miembros, roles y permisos en toda tu organización",
+    "featureSyncTitle": "Sincronización en Tiempo Real",
+    "featureSyncDesc": "Todos los cambios se sincronizan instantáneamente en todo tu clan",
+    "featureInsightsTitle": "Informes e Insights",
+    "featureInsightsDesc": "Obtén información útil sobre la actividad de tu clan"
   },
   "nodes": {
     "title": "Ciudadanía de Nodo",

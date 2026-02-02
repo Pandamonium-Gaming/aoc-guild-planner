@@ -362,19 +362,19 @@
     "allRightsReserved": "All Rights Reserved"
   },
   "home": {
-    "title": "AoC Guild Planner",
-    "subtitle": "Plan and manage your guild's artisan professions for Ashes of Creation",
+    "title": "Multi-Game Guild Planner",
+    "subtitle": "Manage your guild across any game - Ashes of Creation, Star Citizen, and more",
     "enterClanPlaceholder": "Enter your clan name...",
     "loggedInHint": "You'll be able to create or join this clan",
     "notLoggedInHint": "Login with Discord to create or join clans",
     "yourClans": "Your Clans",
     "noClans": "You haven't joined any clans yet. Enter a clan name above to get started!",
-    "feature1Title": "Track All 22 Professions",
-    "feature1Desc": "Gathering, Processing, and Crafting with full dependency chains",
-    "feature2Title": "Manage Guild Members",
-    "feature2Desc": "Assign ranks from Apprentice to Grandmaster",
-    "feature3Title": "Guild Coverage Matrix",
-    "feature3Desc": "See your guild's productive strength at a glance"
+    "featureMemberTitle": "Member Tracking",
+    "featureMemberDesc": "Track members, roles, and permissions across your organization",
+    "featureSyncTitle": "Real-time Sync",
+    "featureSyncDesc": "All changes sync instantly across your entire guild",
+    "featureInsightsTitle": "Insights & Reports",
+    "featureInsightsDesc": "Get actionable insights about your guild's activity"
   },
   "nodes": {
     "title": "Node Citizenship",
