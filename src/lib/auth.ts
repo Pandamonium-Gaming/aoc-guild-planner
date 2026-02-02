@@ -41,7 +41,15 @@ export interface ClanMembership {
  * Sign in with Discord OAuth
  */
 export async function signInWithDiscord(redirectTo?: string) {
-  const callbackUrl = redirectTo || `${getURL()}auth/callback`;
+  // Detect if user is on dev domain and store that for later
+  const isDev = typeof window !== 'undefined' && 
+                window.location.hostname === 'dev.gp.pandamonium-gaming.com';
+  
+  // Always use production callback URL (since that's what Supabase is configured for)
+  // The API redirect route will handle routing back to dev if needed
+  const callbackUrl = isDev 
+    ? 'https://aoc.pandamonium-gaming.com/api/auth-redirect?dev=true'
+    : 'https://aoc.pandamonium-gaming.com/auth/callback';
   
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'discord',
