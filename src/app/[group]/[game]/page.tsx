@@ -582,6 +582,7 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
           setEditingCharacter(null);
         }}
         onCancel={() => setEditingCharacter(null)}
+        gameSlug={gameSlug}
       />
     </div>
   );

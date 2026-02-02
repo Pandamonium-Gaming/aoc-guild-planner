@@ -14,6 +14,7 @@ import {
   ArchetypeId
 } from '@/lib/characters';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getGameConfig } from '@/config';
 
 interface CharacterFormData {
   name: string;
@@ -22,6 +23,8 @@ interface CharacterFormData {
   secondary_archetype: Archetype | null;
   level: number;
   is_main: boolean;
+  preferred_role?: string | null;
+  rank?: string | null;
 }
 
 interface CharacterFormProps {
@@ -29,13 +32,15 @@ interface CharacterFormProps {
   onSubmit: (data: CharacterFormData) => Promise<void>;
   onCancel: () => void;
   isEditing?: boolean;
+  gameSlug?: string;
 }
 
 export function CharacterForm({ 
   initialData, 
   onSubmit, 
   onCancel,
-  isEditing = false
+  isEditing = false,
+  gameSlug = 'aoc'
 }: CharacterFormProps) {
   const [formData, setFormData] = useState<CharacterFormData>({
     name: initialData?.name || '',
@@ -44,15 +49,27 @@ export function CharacterForm({
     secondary_archetype: initialData?.secondary_archetype || null,
     level: initialData?.level || 1,
     is_main: initialData?.is_main || false,
+    preferred_role: initialData?.preferred_role || null,
+    rank: initialData?.rank || null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useLanguage();
 
+  const isAoC = gameSlug === 'aoc';
+  const gameConfig = getGameConfig(gameSlug);
+  const gameRoles = (gameConfig as any)?.roles || [];
+  const gameRanks = (gameConfig as any)?.ranks || [];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       setError('Name is required');
+      return;
+    }
+    
+    if (isAoC && (!formData.race || !formData.primary_archetype)) {
+      setError('Race and Primary Archetype are required for Ashes of Creation');
       return;
     }
     
@@ -76,7 +93,6 @@ export function CharacterForm({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 pb-24">
       <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Sword className="w-5 h-5 text-orange-400" />
@@ -93,7 +109,6 @@ export function CharacterForm({
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-5">
-          {/* Name */}
           <div>
             <label htmlFor="character-name" className="block text-sm font-medium text-slate-300 mb-2">
               Character Name *
@@ -109,155 +124,176 @@ export function CharacterForm({
             />
           </div>
 
-          {/* Race Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Race
-            </label>
-            <div className="space-y-3">
-              {Object.entries(PARENT_RACES).map(([parentRace, races]) => (
-                <div key={parentRace}>
-                  <div className="text-xs text-slate-500 mb-1">{parentRace}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {races.map((raceId) => {
-                      const race = RACES[raceId as RaceId];
-                      const isSelected = formData.race === raceId;
-                      return (
-                        <button
-                          key={raceId}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, race: raceId as Race })}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-orange-500 text-white'
-                              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                          }`}
-                          style={isSelected ? { backgroundColor: race.color } : undefined}
-                        >
-                          {race.name}
-                        </button>
-                      );
-                    })}
-                  </div>
+          {isAoC && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Race *</label>
+                <div className="space-y-3">
+                  {Object.entries(PARENT_RACES).map(([parentRace, races]) => (
+                    <div key={parentRace}>
+                      <div className="text-xs text-slate-500 mb-1">{parentRace}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {races.map((raceId) => {
+                          const race = RACES[raceId as RaceId];
+                          const isSelected = formData.race === raceId;
+                          return (
+                            <button
+                              key={raceId}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, race: raceId as Race })}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-orange-500 text-white'
+                                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                              }`}
+                              style={isSelected ? { backgroundColor: race.color } : undefined}
+                            >
+                              {race.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Primary Archetype */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Primary Archetype
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {Object.entries(ARCHETYPES).map(([id, archetype]) => {
-                const isSelected = formData.primary_archetype === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFormData({ 
-                      ...formData, 
-                      primary_archetype: id as Archetype,
-                      // Reset secondary if same as new primary
-                      secondary_archetype: formData.secondary_archetype === id ? null : formData.secondary_archetype
-                    })}
-                    className={`flex flex-col items-center p-2 rounded-lg text-sm transition-all cursor-pointer ${
-                      isSelected
-                        ? 'ring-2 ring-offset-2 ring-offset-slate-900'
-                        : 'bg-slate-800 hover:bg-slate-700'
-                    }`}
-                    style={isSelected ? { 
-                      backgroundColor: archetype.color + '30'
-                    } : undefined}
-                  >
-                    <span className="text-lg">{archetype.icon}</span>
-                    <span className={isSelected ? 'text-white' : 'text-slate-300'}>
-                      {archetype.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Secondary Archetype */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-              Secondary Archetype
-              <span className="text-xs text-slate-500">(Unlocks at level {SECONDARY_ARCHETYPE_LEVEL})</span>
-            </label>
-            <div className={`grid grid-cols-4 gap-2 ${!canHaveSecondary ? 'opacity-50' : ''}`}>
-              {Object.entries(ARCHETYPES).map(([id, archetype]) => {
-                const isSelected = formData.secondary_archetype === id;
-                const isDisabled = !canHaveSecondary || id === formData.primary_archetype;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    disabled={isDisabled}
-                    onClick={() => setFormData({ 
-                      ...formData, 
-                      secondary_archetype: isSelected ? null : id as Archetype 
-                    })}
-                    className={`flex flex-col items-center p-2 rounded-lg text-sm transition-all ${
-                      isDisabled 
-                        ? 'cursor-not-allowed opacity-40' 
-                        : 'cursor-pointer'
-                    } ${
-                      isSelected
-                        ? 'ring-2 ring-offset-2 ring-offset-slate-900'
-                        : 'bg-slate-800 hover:bg-slate-700'
-                    }`}
-                    style={isSelected ? { 
-                      backgroundColor: archetype.color + '30'
-                    } : undefined}
-                  >
-                    <span className="text-lg">{archetype.icon}</span>
-                    <span className={isSelected ? 'text-white' : 'text-slate-300'}>
-                      {archetype.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            {className && (
-              <div className="mt-2 text-sm text-slate-400">
-                Class: <span className="text-orange-400 font-medium">{className}</span>
               </div>
-            )}
-          </div>
 
-          {/* Level */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Level
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min="1"
-                max={MAX_LEVEL}
-                value={formData.level}
-                onChange={(e) => {
-                  const level = parseInt(e.target.value);
-                  setFormData({ 
-                    ...formData, 
-                    level,
-                    // Clear secondary if below threshold
-                    secondary_archetype: level < SECONDARY_ARCHETYPE_LEVEL ? null : formData.secondary_archetype
-                  });
-                }}
-                className="flex-1 accent-orange-500 cursor-pointer"
-                title={t('character.level')}
-              />
-              <span className="w-12 text-center text-white font-medium bg-slate-800 rounded px-2 py-1">
-                {formData.level}
-              </span>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Primary Archetype *</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {Object.entries(ARCHETYPES).map(([id, archetype]) => {
+                    const isSelected = formData.primary_archetype === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setFormData({ 
+                          ...formData, 
+                          primary_archetype: id as Archetype,
+                          secondary_archetype: formData.secondary_archetype === id ? null : formData.secondary_archetype
+                        })}
+                        className={`flex flex-col items-center p-2 rounded-lg text-sm transition-all cursor-pointer ${
+                          isSelected
+                            ? 'ring-2 ring-offset-2 ring-offset-slate-900'
+                            : 'bg-slate-800 hover:bg-slate-700'
+                        }`}
+                        style={isSelected ? { backgroundColor: archetype.color + '30' } : undefined}
+                      >
+                        <span className="text-lg">{archetype.icon}</span>
+                        <span className={isSelected ? 'text-white' : 'text-slate-300'}>
+                          {archetype.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                  Secondary Archetype
+                  <span className="text-xs text-slate-500">(Unlocks at level {SECONDARY_ARCHETYPE_LEVEL})</span>
+                </label>
+                <div className={`grid grid-cols-4 gap-2 ${!canHaveSecondary ? 'opacity-50' : ''}`}>
+                  {Object.entries(ARCHETYPES).map(([id, archetype]) => {
+                    const isSelected = formData.secondary_archetype === id;
+                    const isDisabled = !canHaveSecondary || id === formData.primary_archetype;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => setFormData({ 
+                          ...formData, 
+                          secondary_archetype: isSelected ? null : id as Archetype 
+                        })}
+                        className={`flex flex-col items-center p-2 rounded-lg text-sm transition-all ${
+                          isDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'
+                        } ${
+                          isSelected
+                            ? 'ring-2 ring-offset-2 ring-offset-slate-900'
+                            : 'bg-slate-800 hover:bg-slate-700'
+                        }`}
+                        style={isSelected ? { backgroundColor: archetype.color + '30' } : undefined}
+                      >
+                        <span className="text-lg">{archetype.icon}</span>
+                        <span className={isSelected ? 'text-white' : 'text-slate-300'}>
+                          {archetype.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {className && (
+                  <div className="mt-2 text-sm text-slate-400">
+                    Class: <span className="text-orange-400 font-medium">{className}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Level</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max={MAX_LEVEL}
+                    value={formData.level}
+                    onChange={(e) => {
+                      const level = parseInt(e.target.value);
+                      setFormData({ 
+                        ...formData, 
+                        level,
+                        secondary_archetype: level < SECONDARY_ARCHETYPE_LEVEL ? null : formData.secondary_archetype
+                      });
+                    }}
+                    className="flex-1 accent-orange-500 cursor-pointer"
+                    title={t('character.level')}
+                  />
+                  <span className="w-12 text-center text-white font-medium bg-slate-800 rounded px-2 py-1">
+                    {formData.level}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {!isAoC && gameRoles.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Preferred Role</label>
+              <select
+                value={formData.preferred_role || ''}
+                onChange={(e) => setFormData({ ...formData, preferred_role: e.target.value || null })}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="">Select a role...</option>
+                {gameRoles.map((role: any) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
+          )}
 
-          {/* Is Main */}
+          {!isAoC && gameRanks.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Guild Rank</label>
+              <select
+                value={formData.rank || ''}
+                onChange={(e) => setFormData({ ...formData, rank: e.target.value || null })}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="">Select a rank...</option>
+                {gameRanks.map((rank: any) => (
+                  <option key={rank.id} value={rank.id}>
+                    {rank.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -276,14 +312,12 @@ export function CharacterForm({
             </p>
           </div>
 
-          {/* Error */}
           {error && (
             <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
               {error}
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button
               type="button"

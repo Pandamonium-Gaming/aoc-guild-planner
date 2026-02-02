@@ -53,5 +53,37 @@
       "name": "Support",
       "description": "General support roles"
     }
+  ],
+  "ranks": [
+    {
+      "id": "lowlife",
+      "name": "Lowlife",
+      "description": "Entry level"
+    },
+    {
+      "id": "pirate",
+      "name": "Pirate",
+      "description": "Pirate rank"
+    },
+    {
+      "id": "enforcer",
+      "name": "Enforcer",
+      "description": "Enforcer rank"
+    },
+    {
+      "id": "captain",
+      "name": "Captain",
+      "description": "Captain rank"
+    },
+    {
+      "id": "vice-admiral",
+      "name": "Vice Admiral",
+      "description": "Vice Admiral rank"
+    },
+    {
+      "id": "admiral",
+      "name": "Admiral",
+      "description": "Admiral rank"
+    }
   ]
 }
