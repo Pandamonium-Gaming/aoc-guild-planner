@@ -6,13 +6,13 @@ import { supabase } from '@/lib/supabase';
  * Use in protected routes to validate game context
  */
 export async function validateClanGame(
-  clanId: string,
+  groupId: string,
   expectedGameId: GameId
 ): Promise<boolean> {
   const { data, error } = await supabase
-    .from('clans')
+    .from('groups')
     .select('game')
-    .eq('id', clanId)
+    .eq('id', groupId)
     .single();
 
   if (error || !data) {
@@ -26,11 +26,11 @@ export async function validateClanGame(
 /**
  * Get the game a clan belongs to
  */
-export async function getClanGame(clanId: string): Promise<GameId | null> {
+export async function getClanGame(groupId: string): Promise<GameId | null> {
   const { data, error } = await supabase
-    .from('clans')
+    .from('groups')
     .select('game')
-    .eq('id', clanId)
+    .eq('id', groupId)
     .single();
 
   if (error || !data) {
@@ -46,15 +46,15 @@ export async function getClanGame(clanId: string): Promise<GameId | null> {
  * Called when creating a new clan
  */
 export async function initializeClanWithGame(
-  clanId: string,
+  groupId: string,
   gameId: GameId,
   userId: string
 ): Promise<void> {
   // Update clan with game
   const { error: clanError } = await supabase
-    .from('clans')
+    .from('groups')
     .update({ game: gameId })
-    .eq('id', clanId);
+    .eq('id', groupId);
 
   if (clanError) {
     console.error('Error setting clan game:', clanError);

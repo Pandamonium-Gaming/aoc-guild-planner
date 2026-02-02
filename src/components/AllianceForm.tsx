@@ -17,7 +17,7 @@ interface AllianceFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: AllianceData, invitedClans: string[]) => Promise<void>;
-  clanId: string;
+  groupId: string;
   initialData?: Partial<AllianceData>;
   isEditing?: boolean;
 }
@@ -29,7 +29,7 @@ export function AllianceForm({
   isOpen,
   onClose,
   onSubmit,
-  clanId,
+  groupId,
   initialData,
   isEditing = false,
 }: AllianceFormProps) {
@@ -85,8 +85,8 @@ export function AllianceForm({
     }
   };
 
-  const handleRemoveClan = (clanId: string) => {
-    setSelectedClans(selectedClans.filter(c => c.id !== clanId));
+  const handleRemoveClan = (groupId: string) => {
+    setSelectedClans(selectedClans.filter(c => c.id !== groupId));
   };
 
   return (

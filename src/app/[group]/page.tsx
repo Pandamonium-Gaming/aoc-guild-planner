@@ -13,8 +13,8 @@ import Link from 'next/link';
 import { Users, Home, Loader2, AlertCircle, LogOut, Shield, Clock, UserPlus, Settings, Swords } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useClanData } from '@/hooks/useClanData';
-import { useClanMembership } from '@/hooks/useClanMembership';
+import { useGroupData } from '@/hooks/useGroupData';
+import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { useEvents } from '@/hooks/useEvents';
 import { CharactersTab } from './tabs/CharactersTab';
 import { PartiesTab } from './tabs/PartiesTab';
@@ -32,7 +32,7 @@ import { ClanMatrix } from '@/components/ClanMatrix';
 import { SiegeTab } from './tabs/SiegeTab';
 import { EconomyTab } from './tabs/EconomyTab';
 import { MoreTabContent } from '@/components/MoreTabContent';
-import { createClan, getClanBySlug } from '@/lib/auth';
+import { createGroup, getGroupBySlug } from '@/lib/auth';
 import { CharacterWithProfessions } from '@/lib/types';
 import { ClanLoadingScreen } from '@/components/ClanLoadingScreen';
 import { ClanErrorScreen } from '@/components/ClanErrorScreen';
@@ -41,8 +41,8 @@ import { ClanCreateScreen } from '@/components/ClanCreateScreen';
 
 // Tab type now imported from ClanTabNav
 
-export default function ClanPage({ params }: { params: Promise<{ clan: string }> }) {
-  const { clan: clanSlug } = use(params);
+export default function GroupPage({ params }: { params: Promise<{ group: string }> }) {
+  const { group: groupSlug } = use(params);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -50,7 +50,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   
   // Use state for activeTab, but let ClanTabNav manage URL sync
   const [activeTab, setActiveTab] = useState<Tab>('characters');
-  const [clanId, setClanId] = useState<string | null>(null);
+  const [groupId, setGroupId] = useState<string | null>(null);
   const [clanExists, setClanExists] = useState<boolean | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
@@ -72,37 +72,37 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     }
   }, [searchParams]);
 
-  // Fetch clan ID first
+  // Fetch group ID first
   useEffect(() => {
-    async function checkClan() {
-      console.log('checkClan: starting for slug', clanSlug);
+    async function checkGroup() {
+      console.log('checkGroup: starting for slug', groupSlug);
       setCheckError(null);
       try {
         // Add timeout to prevent infinite hanging
         const timeoutPromise = new Promise<{ id: string } | null>((_, reject) => {
-          setTimeout(() => reject(new Error('Timeout checking clan')), 15000);
+          setTimeout(() => reject(new Error('Timeout checking group')), 15000);
         });
 
-        const clan = await Promise.race([
-          getClanBySlug(clanSlug),
+        const group = await Promise.race([
+          getGroupBySlug(groupSlug),
           timeoutPromise
         ]) as { id: string } | null;
 
-        console.log('checkClan: result', clan);
-        if (clan) {
-          setClanId(clan.id);
+        console.log('checkGroup: result', group);
+        if (group) {
+          setGroupId(group.id);
           setClanExists(true);
         } else {
           setClanExists(false);
         }
       } catch (err) {
-        console.error('Error checking clan:', err);
-        setCheckError(err instanceof Error ? err.message : 'Failed to check clan');
+        console.error('Error checking group:', err);
+        setCheckError(err instanceof Error ? err.message : 'Failed to check group');
         // Do NOT set clanExists to false here, or it will show "Create Clan"
       }
     }
-    checkClan();
-  }, [clanSlug]);
+    checkGroup();
+  }, [groupSlug]);
 
   const {
     membership,
@@ -117,10 +117,10 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     rejectMember,
     updateRole,
     removeMember,
-  } = useClanMembership(clanId, user?.id || null);
+  } = useGroupMembership(groupId, user?.id || null);
 
   const {
-    clan,
+    group,
     characters,
     loading: dataLoading,
     error,
@@ -130,7 +130,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     updateMember,
     deleteMember,
     setProfessionRank,
-  } = useClanData(clanSlug);
+  } = useGroupData(groupSlug);
 
   // Events hook
   const {
@@ -145,21 +145,21 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     createAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,
-  } = useEvents(clanId, user?.id || null, clanSlug);
+  } = useEvents(groupId, user?.id || null, groupSlug);
 
   // Guild icon state for live update
-  const [guildIconUrl, setGuildIconUrl] = useState(clan?.guild_icon_url || '');
+  const [guildIconUrl, setGuildIconUrl] = useState(group?.group_icon_url || '');
 
   // Keep guildIconUrl in sync with DB
   useEffect(() => {
-    setGuildIconUrl(clan?.guild_icon_url || '');
-  }, [clan?.guild_icon_url]);
+    setGuildIconUrl(group?.group_icon_url || '');
+  }, [group?.group_icon_url]);
 
   // Refresh the icon from the DB after upload
   async function refreshGuildIcon() {
-    if (!clanSlug) return;
-    const latest = await getClanBySlug(clanSlug);
-    if (latest?.guild_icon_url) setGuildIconUrl(latest.guild_icon_url);
+    if (!groupSlug) return;
+    const latest = await getGroupBySlug(groupSlug);
+    if (latest?.group_icon_url) setGuildIconUrl(latest.group_icon_url);
   }
 
   // Helper function to get main character name for an alt (automatic based on user_id)
@@ -199,12 +199,12 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     if (!user) return;
     setIsCreating(true);
     try {
-      const createdClan = await createClan(
-        clanSlug,
-        clanSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      const createdClan = await createGroup(
+        groupSlug,
+        groupSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
         user.id
       );
-      setClanId(createdClan.id);
+      setGroupId(createdClan.id);
       setClanExists(true);
       // Small delay to allow Supabase to propagate the new clan data
       // This prevents the "Connection Error" on immediate refresh
@@ -241,8 +241,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   if (checkError) {
     return (
       <ClanErrorScreen
-        title={t('clan.connectionError')}
-        message={t('clan.connectionErrorMessage')}
+        title={t('group.connectionError')}
+        message={t('group.connectionErrorMessage')}
         error={checkError}
         retryLabel={t('common.retryConnection')}
         onRetry={() => window.location.reload()}
@@ -255,10 +255,10 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   if (!user) {
     return (
       <ClanLoginScreen
-        title={t('clan.loginRequired')}
-        message={t('clan.signInToAccess', { name: clanSlug })}
+        title={t('group.loginRequired')}
+        message={t('group.signInToAccess', { name: groupSlug })}
         onSignIn={() => {
-          localStorage.setItem('authRedirectTo', `/${clanSlug}`);
+          localStorage.setItem('authRedirectTo', `/${groupSlug}`);
           signIn();
         }}
         signInLabel={t('common.continueWithDiscord')}
@@ -271,12 +271,12 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
   if (!clanExists) {
     return (
       <ClanCreateScreen
-        title={t('clan.createNew')}
-        message={t('clan.createDescription', { name: clanSlug })}
+        title={t('group.createNew')}
+        message={t('group.createDescription', { name: groupSlug })}
         onCreate={handleCreateClan}
         creating={isCreating}
-        createLabel={t('clan.create')}
-        adminNote={t('clan.youWillBeAdmin')}
+        createLabel={t('group.create')}
+        adminNote={t('group.youWillBeAdmin')}
         homeLabel={t('common.returnHome')}
       />
     );
@@ -288,9 +288,9 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <Users className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">{t('clan.joinClan')}</h2>
+          <h2 className="text-xl font-semibold text-white mb-2">{t('group.joinClan')}</h2>
           <p className="text-slate-400 mb-6">
-            {t('clan.applyDescription', { name: clan?.name || clanSlug })}
+            {t('group.applyDescription', { name: group?.name || groupSlug })}
           </p>
           <button
             onClick={handleApply}
@@ -302,7 +302,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
             ) : (
               <UserPlus className="w-5 h-5" />
             )}
-            {t('clan.applyToJoin')}
+            {t('group.applyToJoin')}
           </button>
           <Link
             href="/"
@@ -321,12 +321,12 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <Clock className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">{t('clan.applicationPending')}</h2>
+          <h2 className="text-xl font-semibold text-white mb-2">{t('group.applicationPending')}</h2>
           <p className="text-slate-400 mb-6">
-            {t('clan.pendingApproval', { name: clan?.name || clanSlug })}
+            {t('group.pendingApproval', { name: group?.name || groupSlug })}
           </p>
           <div className="bg-slate-800/50 rounded-lg p-4 text-sm text-slate-400">
-            {t('clan.accessAfterApproval')}
+            {t('group.accessAfterApproval')}
           </div>
           <Link
             href="/"
@@ -345,7 +345,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">{t('clan.errorLoading')}</h2>
+          <h2 className="text-xl font-semibold text-white mb-2">{t('group.errorLoading')}</h2>
           <p className="text-slate-400 mb-4">{error}</p>
           <Link
             href="/"
@@ -363,8 +363,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header - fixed at top */}
       <ClanHeader
-        clanName={clan?.name || ''}
-        clanSlug={clanSlug}
+        clanName={group?.name || ''}
+        groupSlug={groupSlug}
         characterCount={characters.length}
         role={membership.role || ''}
         displayName={displayName}
@@ -377,7 +377,7 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
         <div className="max-w-7xl mx-auto px-4 py-6 pb-4">
             {activeTab === 'characters' ? (
               <CharactersTab
-                clanId={clanId!}
+                groupId={groupId!}
                 characters={characters}
                 addCharacter={addCharacter}
                 updateMember={updateMember}
@@ -392,8 +392,8 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               events={events}
               announcements={announcements}
               timezone={profile?.timezone || 'UTC'}
-              clanId={clanId!}
-              clanSlug={clanSlug}
+              groupId={groupId!}
+              groupSlug={groupSlug}
               userId={user.id}
               characters={characters}
               canManage={canManageMembers}
@@ -413,41 +413,41 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
             />
           ) : activeTab === 'parties' ? (
             <PartiesTab
-              clanId={clanId!}
+              groupId={groupId!}
               characters={characters}
               userId={user.id}
               canManage={canManageMembers}
             />
           ) : activeTab === 'siege' ? (
             <SiegeTab
-              clanId={clanId!}
+              groupId={groupId!}
               characters={characters}
               userId={user.id}
             />
           ) : activeTab === 'achievements' ? (
             <AchievementsTab
-              clanId={clanId!}
+              groupId={groupId!}
               isOfficer={canManageMembers}
             />
           ) : activeTab === 'alliances' ? (
             <AlliancesTab
-              clanId={clanId!}
+              groupId={groupId!}
               isOfficer={canManageMembers}
             />
           ) : activeTab === 'builds' ? (
             <BuildsTab
-              clanId={clanId!}
+              groupId={groupId!}
             />
           ) : activeTab === 'matrix' ? (
             <ClanMatrix members={characters} />
           ) : activeTab === 'economy' ? (
             <EconomyTab
-              clanId={clanId!}
+              groupId={groupId!}
               isOfficer={canManageMembers}
             />
           ) : activeTab === 'more' ? (
             <MoreTabContent
-              clanId={clanId!}
+              groupId={groupId!}
               userId={user.id}
               characters={characters}
               isOfficer={canManageMembers}
@@ -461,11 +461,11 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               </div>
 
               {/* Guild Icon Uploader (Admin only) */}
-              {membership?.role === 'admin' && clan && (
+              {membership?.role === 'admin' && group && (
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-2">Guild Icon</h3>
                   <GuildIconUploaderWrapper
-                    clanId={clan.id}
+                    groupId={group.id}
                     currentUrl={guildIconUrl}
                     onIconChange={refreshGuildIcon}
                   />
@@ -486,30 +486,30 @@ export default function ClanPage({ params }: { params: Promise<{ clan: string }>
               />
 
               {/* Permissions Settings (Admin only) */}
-              {membership?.role === 'admin' && clan && (
+              {membership?.role === 'admin' && group && (
                 <PermissionsSettings
-                  clanId={clan.id}
+                  groupId={group.id}
                   userRole={membership?.role || 'member'}
                 />
               )}
               
               {/* Clan Settings (Admin only) */}
-              {membership?.role === 'admin' && clan && (
+              {membership?.role === 'admin' && group && (
                 <ClanSettings
-                  clanId={clan.id}
-                  currentWebhookUrl={clan.discord_webhook_url || ''}
-                  currentWelcomeWebhookUrl={clan.discord_welcome_webhook_url || ''}
-                  notifyOnEvents={clan.notify_on_events ?? true}
-                  notifyOnAnnouncements={clan.notify_on_announcements ?? true}
-                  announcementRoleId={clan.discord_announcement_role_id || ''}
+                  groupId={group.id}
+                  currentWebhookUrl={group.group_webhook_url || ''}
+                  currentWelcomeWebhookUrl={group.group_welcome_webhook_url || ''}
+                  notifyOnEvents={group.notify_on_events ?? true}
+                  notifyOnAnnouncements={group.notify_on_announcements ?? true}
+                  announcementRoleId={group.discord_announcement_role_id || ''}
                 />
               )}
               
               {/* Recruitment Settings (Admin only) */}
-              {membership?.role === 'admin' && clan && (
+              {membership?.role === 'admin' && group && (
                 <RecruitmentSettings
-                  clanId={clan.id}
-                  clanSlug={clanSlug}
+                  groupId={group.id}
+                  groupSlug={groupSlug}
                 />
               )}
             </div>

@@ -9,7 +9,7 @@ import { testDiscordWebhook } from '@/lib/discord';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ClanSettingsProps {
-  clanId: string;
+  groupId: string;
   currentWebhookUrl?: string;
   currentWelcomeWebhookUrl?: string;
   notifyOnEvents?: boolean;
@@ -19,7 +19,7 @@ interface ClanSettingsProps {
 }
 
 export function ClanSettings({
-  clanId,
+  groupId,
   currentWebhookUrl = '',
   currentWelcomeWebhookUrl = '',
   notifyOnEvents = true,
@@ -27,7 +27,7 @@ export function ClanSettings({
   announcementRoleId = '',
   onUpdate,
 }: ClanSettingsProps) {
-  const { loading } = usePermissions(clanId);
+  const { loading } = usePermissions(groupId);
   const [webhookUrl, setWebhookUrl] = useState(currentWebhookUrl);
   const [welcomeWebhookUrl, setWelcomeWebhookUrl] = useState(currentWelcomeWebhookUrl);
   const [eventsEnabled, setEventsEnabled] = useState(notifyOnEvents);
@@ -48,15 +48,15 @@ export function ClanSettings({
 
     try {
       const { error: updateError } = await supabase
-        .from('clans')
+        .from('groups')
         .update({
-          discord_webhook_url: webhookUrl.trim() || null,
-          discord_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
+          group_webhook_url: webhookUrl.trim() || null,
+          group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
           notify_on_events: eventsEnabled,
           notify_on_announcements: announcementsEnabled,
           discord_announcement_role_id: roleId.trim() || null,
         })
-        .eq('id', clanId)
+        .eq('id', groupId)
         .select();
 
       if (updateError) throw updateError;

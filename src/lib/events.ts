@@ -98,7 +98,7 @@ export const EVENT_ROLES: Record<EventRole, {
 // Database types
 export interface Event {
   id: string;
-  clan_id: string;
+  group_id: string;
   created_by: string | null;
   title: string;
   description: string | null;
@@ -148,7 +148,7 @@ export interface EventRsvp {
 export interface GuestEventRsvp {
   id: string;
   event_id: string;
-  allied_clan_id: string | null;
+  allied_group_id: string | null;
   guest_name: string;
   guest_email?: string | null;
   class_id: string | null;
@@ -178,7 +178,7 @@ export interface EventWithRsvps extends Event {
 
 export interface Announcement {
   id: string;
-  clan_id: string;
+  group_id: string;
   created_by: string | null;
   title: string;
   content: string;

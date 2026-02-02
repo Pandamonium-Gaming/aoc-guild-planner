@@ -3,18 +3,18 @@ import { AchievementsView } from '@/components/AchievementsView';
 import { AchievementAdminPanel } from '@/components/AchievementAdminPanel';
 
 export interface AchievementsTabProps {
-  clanId: string;
+  groupId: string;
   isOfficer: boolean;
 }
 
-export function AchievementsTab({ clanId, isOfficer }: AchievementsTabProps) {
+export function AchievementsTab({ groupId, isOfficer }: AchievementsTabProps) {
   const {
     achievements,
     unlockedCount,
     totalPoints,
     loading: achievementsLoading,
     refresh: refreshAchievements,
-  } = useAchievements(clanId);
+  } = useAchievements(groupId);
 
   if (achievementsLoading) {
     return <div className="text-center py-8 text-slate-400">Loading...</div>;

@@ -25,7 +25,7 @@ import {
 interface EventCardProps {
   event: EventWithRsvps;
   timezone: string;
-  clanId: string;
+  groupId: string;
   userId: string;
   characters: CharacterWithProfessions[];
   onRsvp: (status: RsvpStatus, role?: EventRole | null, characterId?: string, targetUserId?: string) => void;
@@ -39,7 +39,7 @@ interface EventCardProps {
 export function EventCard({ 
   event, 
   timezone, 
-  clanId,
+  groupId,
   userId,
   characters,
   onRsvp, 
@@ -57,7 +57,7 @@ export function EventCard({
   const [isRsvpLoading, setIsRsvpLoading] = useState(false);
   const { showToast } = useToast();
   const { t } = useLanguage();
-  const { hasPermission } = usePermissions(clanId);
+  const { hasPermission } = usePermissions(groupId);
 
   // Get user's main character and filter characters for this user
   const userCharacters = characters.filter(c => c.user_id === userId);
@@ -127,7 +127,7 @@ export function EventCard({
   const userRsvp = event.user_rsvp;
   
   // Check if user can edit or delete events
-  const { loading } = usePermissions(clanId);
+  const { loading } = usePermissions(groupId);
   const canEditEvent = hasPermission('events_edit_any') || (hasPermission('events_edit_own') && event.created_by === userId);
   const canDeleteEvent = hasPermission('events_delete_any') || (hasPermission('events_delete_own') && event.created_by === userId);
 

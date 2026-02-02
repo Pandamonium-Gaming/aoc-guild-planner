@@ -16,12 +16,12 @@ import {
 } from '@/lib/permissions';
 
 interface PermissionsSettingsProps {
-  clanId: string;
+  groupId: string;
   userRole: ClanRole;
   onSave?: (rolePermissions: Record<ClanRole, Set<string>>) => Promise<void>;
 }
 
-export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSettingsProps) {
+export function PermissionsSettings({ groupId, userRole, onSave }: PermissionsSettingsProps) {
   const { t } = useLanguage();
   const { session } = useAuth();
   const [selectedRole, setSelectedRole] = useState<ClanRole>('member');
@@ -51,7 +51,7 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
     const loadPermissions = async () => {
       try {
         const response = await fetch(
-          `/api/clan/permissions?clan_id=${clanId}`,
+          `/api/group/permissions?group_id=${groupId}`,
           {
             headers: {
               'Authorization': `Bearer ${session.access_token}`,
@@ -109,7 +109,7 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
     };
 
     loadPermissions();
-  }, [session, clanId, userRole]);
+  }, [session, groupId, userRole]);
 
   const hierarchy = getRoleHierarchy();
   const canEditRole = userRole === 'admin';
@@ -157,18 +157,18 @@ export function PermissionsSettings({ clanId, userRole, onSave }: PermissionsSet
       });
 
       const payload = {
-        clanId,
+        groupId,
         rolePermissions,
       };
       
       console.log('Sending permissions:', {
-        clanId,
+        groupId,
         roles: Object.keys(rolePermissions),
         totalPermissions: Object.keys(PERMISSIONS).length,
         sampleRole: rolePermissions['member'] ? Object.keys(rolePermissions['member']).length + ' perms' : 'none'
       });
 
-      const response = await fetch('/api/clan/permissions', {
+      const response = await fetch('/api/group/permissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

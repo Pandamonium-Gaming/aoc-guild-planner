@@ -10,7 +10,7 @@ import { InviteGuildModal } from './InviteGuildModal';
 
 interface AllianceViewProps {
   alliance: AllianceWithMembers | null;
-  clanId: string;
+  groupId: string;
   onCreateAlliance?: (data: AllianceData) => Promise<string>;
   onInviteGuild?: (allianceId: string, targetClanId: string) => Promise<void>;
   onLeave: (allianceId: string) => Promise<void>;
@@ -19,7 +19,7 @@ interface AllianceViewProps {
 
 export function AllianceView({
   alliance,
-  clanId,
+  groupId,
   onCreateAlliance,
   onInviteGuild,
   onLeave,
@@ -37,7 +37,7 @@ export function AllianceView({
     // Invite selected clans if any
     if (onInviteGuild && invitedClans.length > 0) {
       for (const clanId of invitedClans) {
-        await onInviteGuild(allianceId, clanId);
+        await onInviteGuild(allianceId, groupId);
       }
     }
   };
@@ -80,8 +80,8 @@ export function AllianceView({
     );
   }
 
-  const isLeader = alliance.leader_clan_id === clanId;
-  const myMembership = alliance.members.find(m => m.clan_id === clanId);
+  const isLeader = alliance.leader_group_id === clanId;
+  const myMembership = alliance.members.find(m => m.clan_id === groupId);
   const activeMembers = alliance.members.filter(m => m.status === 'active');
   const memberClanIds = alliance.members.map(m => m.clan_id);
 
@@ -137,7 +137,7 @@ export function AllianceView({
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    member.clan_id === alliance.leader_clan_id
+                    member.clan_id === alliance.leader_group_id
                       ? 'bg-amber-500/20'
                       : 'bg-slate-700'
                   }`}>
@@ -149,7 +149,7 @@ export function AllianceView({
                   </div>
                   <div>
                     <div className="font-medium text-white">
-                      {member.clan?.name || 'Unknown Guild'}
+                      {member.group?.name || 'Unknown Guild'}
                     </div>
                     <div className="flex gap-2 text-xs text-slate-500">
                       {member.can_invite && (

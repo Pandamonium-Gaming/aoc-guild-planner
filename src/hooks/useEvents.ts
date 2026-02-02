@@ -26,7 +26,7 @@ interface UseEventsReturn {
   refresh: () => Promise<void>;
 }
 
-export function useEvents(clanId: string | null, userId: string | null, clanSlug?: string): UseEventsReturn {
+export function useEvents(groupId: string | null, userId: string | null, clanSlug?: string): UseEventsReturn {
   const [events, setEvents] = useState<EventWithRsvps[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
 
   // Fetch all events with RSVPs
   const fetchEvents = useCallback(async () => {
-    if (!clanId) return;
+    if (!groupId) return;
 
     try {
       const { data: eventsData, error: eventsError } = await supabase
@@ -48,7 +48,7 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
           ),
           guest_event_rsvps (*)
         `)
-        .eq('clan_id', clanId)
+        .eq('group_id', groupId)
         .gte('starts_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24h + future
         .order('starts_at', { ascending: true });
 
@@ -103,17 +103,17 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
       console.error('Error fetching events:', err);
       setError(err instanceof Error ? err.message : 'Failed to load events');
     }
-  }, [clanId, userId]);
+  }, [groupId, userId]);
 
   // Fetch announcements
   const fetchAnnouncements = useCallback(async () => {
-    if (!clanId) return;
+    if (!groupId) return;
 
     try {
       const { data, error: annError } = await supabase
         .from('announcements')
         .select('*')
-        .eq('clan_id', clanId)
+        .eq('group_id', groupId)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false })
         .limit(20);
@@ -135,10 +135,10 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
 
   // Initial fetch
   useEffect(() => {
-    if (clanId) {
+    if (groupId) {
       fetchData();
     }
-  }, [clanId, fetchData]);
+  }, [groupId, fetchData]);
 
   // Create event
   const createEvent = async (
@@ -164,19 +164,19 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
       console.log('Discord notification enabled, proceeding...');
       try {
         const { data: clanData } = await supabase
-          .from('clans')
-          .select('name, slug, discord_webhook_url, notify_on_events, discord_announcement_role_id')
+          .from('groups')
+          .select('name, slug, group_webhook_url, notify_on_events, discord_announcement_role_id')
           .eq('id', event.clan_id)
           .single();
 
-        if (clanData?.discord_webhook_url && clanData.notify_on_events !== false) {
+        if (clanData?.group_webhook_url && groupData.notify_on_events !== false) {
           console.log('Sending Discord notification for event:', data.title);
           await notifyNewEvent(
-            clanData.discord_webhook_url, 
+            groupData.group_webhook_url, 
             data, 
-            clanData.name, 
-            clanSlug || clanData.slug,
-            clanData.discord_announcement_role_id
+            groupData.name, 
+            clanSlug || groupData.slug,
+            groupData.discord_announcement_role_id
           );
         } else {
           console.log('Skipping Discord notification - webhook or notify_on_events not configured');
@@ -307,18 +307,18 @@ export function useEvents(clanId: string | null, userId: string | null, clanSlug
     if (sendDiscordNotification) {
       try {
         const { data: clanData } = await supabase
-          .from('clans')
-          .select('name, slug, discord_webhook_url, notify_on_announcements, discord_announcement_role_id')
+          .from('groups')
+          .select('name, slug, group_webhook_url, notify_on_announcements, discord_announcement_role_id')
           .eq('id', announcement.clan_id)
           .single();
 
-        if (clanData?.discord_webhook_url && clanData.notify_on_announcements !== false) {
+        if (clanData?.group_webhook_url && groupData.notify_on_announcements !== false) {
           await notifyAnnouncement(
-            clanData.discord_webhook_url, 
+            groupData.group_webhook_url, 
             data, 
-            clanData.name,
-            clanSlug || clanData.slug,
-            clanData.discord_announcement_role_id
+            groupData.name,
+            clanSlug || groupData.slug,
+            groupData.discord_announcement_role_id
           );
         }
       } catch (err) {

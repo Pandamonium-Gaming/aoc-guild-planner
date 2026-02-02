@@ -3,10 +3,10 @@
 import { EconomyTabContent } from '@/components/EconomyTabContent';
 
 export interface EconomyTabProps {
-  clanId: string;
+  groupId: string;
   isOfficer: boolean;
 }
 
-export function EconomyTab({ clanId, isOfficer }: EconomyTabProps) {
+export function EconomyTab({ groupId, isOfficer }: EconomyTabProps) {
   return <EconomyTabContent clanId={clanId} isOfficer={isOfficer} />;
 }

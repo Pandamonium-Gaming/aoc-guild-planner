@@ -4,11 +4,11 @@ import { useAlliances } from '@/hooks/useAlliances';
 import { AllianceView } from '@/components/AllianceView';
 
 export interface AlliancesTabProps {
-  clanId: string;
+  groupId: string;
   isOfficer: boolean;
 }
 
-export function AlliancesTab({ clanId, isOfficer }: AlliancesTabProps) {
+export function AlliancesTab({ groupId, isOfficer }: AlliancesTabProps) {
   const {
     myAlliance,
     createAlliance,
@@ -16,7 +16,7 @@ export function AlliancesTab({ clanId, isOfficer }: AlliancesTabProps) {
     leaveAlliance,
     loading,
     error,
-  } = useAlliances(clanId);
+  } = useAlliances(groupId);
 
   if (loading) return <div className="text-slate-400">Loading alliances...</div>;
   if (error) return <div className="text-red-400">{error}</div>;

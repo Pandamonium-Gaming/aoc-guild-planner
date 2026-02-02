@@ -22,7 +22,7 @@ function getSupabaseAdmin() {
 
 export type PermissionOverrides = {
   id: string;
-  clan_id: string;
+  group_id: string;
   role: ClanRole;
   characters_create: boolean;
   characters_read_all: boolean;
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const clanId = searchParams.get('clan_id');
 
-  if (!clanId) {
+  if (!groupId) {
     return NextResponse.json({ error: 'Missing clan_id' }, { status: 400 });
   }
 
@@ -111,9 +111,9 @@ export async function GET(request: NextRequest) {
 
     // Check if user is a member of the clan (any role)
     const { data: membership } = await supabaseAdmin
-      .from('clan_members')
+      .from('group_members')
       .select('role')
-      .eq('clan_id', clanId)
+      .eq('group_id', groupId)
       .eq('user_id', user.id)
       .single();
 
@@ -123,9 +123,9 @@ export async function GET(request: NextRequest) {
 
     // Fetch permission overrides - may not exist if table hasn't been created yet
     const { data, error } = await supabaseAdmin
-      .from('clan_permission_overrides')
+      .from('group_permission_overrides')
       .select('*')
-      .eq('clan_id', clanId)
+      .eq('group_id', groupId)
       .order('role', { ascending: true });
 
     if (error) {
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ permissions: data || [] });
   } catch (error) {
-    console.error('Error in GET /api/clan/permissions:', error);
+    console.error('Error in GET /api/group/permissions:', error);
     return NextResponse.json({ error: 'Internal server error', details: String(error) }, { status: 500 });
   }
 }
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { clanId, rolePermissions } = body;
+    const { groupId, rolePermissions } = body;
 
     if (!clanId || !rolePermissions) {
       return NextResponse.json({ error: 'Missing required fields: clanId and rolePermissions' }, { status: 400 });
@@ -196,9 +196,9 @@ export async function POST(request: NextRequest) {
 
     // Check if user is admin
     const { data: membership } = await supabaseAdmin
-      .from('clan_members')
+      .from('group_members')
       .select('role')
-      .eq('clan_id', clanId)
+      .eq('group_id', groupId)
       .eq('user_id', user.id)
       .single();
 
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
     const updates = Object.entries(rolePermissions).map(([role, permissions]) => {
       const permsRecord = permissions as Record<string, boolean>;
       return {
-        clan_id: clanId,
+        group_id: groupId,
         role,
         ...permsRecord,
         updated_at: new Date().toISOString(),
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('Saving permissions:', { 
-      clanId, 
+      groupId, 
       updateCount: updates.length,
       roles: updates.map(u => u.role),
       firstUpdate: updates[0] ? Object.keys(updates[0]).length + ' fields' : 'none'
@@ -227,8 +227,8 @@ export async function POST(request: NextRequest) {
     let result;
     try {
       result = await supabaseAdmin
-        .from('clan_permission_overrides')
-        .upsert(updates, { onConflict: 'clan_id,role' });
+        .from('group_permission_overrides')
+        .upsert(updates, { onConflict: 'group_id,role' });
     } catch (upsertException) {
       console.error('Exception during upsert:', upsertException);
       throw upsertException;
@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
     console.log('Permissions saved successfully');
     return NextResponse.json({ success: true, saved: updates.length });
   } catch (error) {
-    console.error('Error in POST /api/clan/permissions:', {
+    console.error('Error in POST /api/group/permissions:', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       type: error instanceof Error ? error.constructor.name : typeof error

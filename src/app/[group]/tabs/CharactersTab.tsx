@@ -2,14 +2,14 @@
 import { AddCharacterButton } from "@/components/AddCharacterButton";
 import { CharacterFiltersBar, filterCharacters, DEFAULT_FILTERS } from "@/components/CharacterFilters";
 import { CharacterCard } from "@/components/MemberCard";
-import { useClanMembership } from '@/hooks/useClanMembership';
+import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { useAuthContext } from '@/components/AuthProvider';
 import { roleHasPermission } from '@/lib/permissions';
 import { CharacterWithProfessions } from "@/lib/types";
 import { useState } from "react";
 
 interface CharactersTabProps {
-  clanId: string;
+  groupId: string;
   characters: CharacterWithProfessions[];
   addCharacter: (data: any) => Promise<void>;
   updateMember: (id: string, name: string) => Promise<void>;
@@ -21,7 +21,7 @@ interface CharactersTabProps {
 }
 
 export function CharactersTab({
-  clanId,
+  groupId,
   characters,
   addCharacter,
   updateMember,
@@ -32,7 +32,7 @@ export function CharactersTab({
   setCharacterFilters,
 }: CharactersTabProps) {
   const { user } = useAuthContext();
-  const clanMembership = useClanMembership(clanId, user?.id || null);
+  const clanMembership = useGroupMembership(groupId, user?.id || null);
   console.log('[DEBUG] clanMembership:', clanMembership);
   const userRole = clanMembership.membership?.role || 'pending';
   console.log('[DEBUG] userRole from membership:', userRole);

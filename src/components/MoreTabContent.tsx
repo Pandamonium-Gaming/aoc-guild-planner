@@ -19,13 +19,13 @@ import { useBuilds } from '@/hooks/useBuilds';
 type MoreSubTab = 'parties' | 'siege' | 'achievements' | 'builds' | 'alliances';
 
 interface MoreTabContentProps {
-  clanId: string;
+  groupId: string;
   userId: string;
   characters: CharacterWithProfessions[];
   isOfficer: boolean;
 }
 
-export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTabContentProps) {
+export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreTabContentProps) {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,7 +58,7 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
     assignCharacter,
     removeFromRoster,
     toggleConfirmed,
-  } = useParties(clanId, characters);
+  } = useParties(groupId, characters);
 
   const {
     achievements,
@@ -66,7 +66,7 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
     totalPoints,
     loading: achievementsLoading,
     refresh: refreshAchievements,
-  } = useAchievements(clanId);
+  } = useAchievements(groupId);
 
   const {
     myAlliance,
@@ -74,7 +74,7 @@ export function MoreTabContent({ clanId, userId, characters, isOfficer }: MoreTa
     createAlliance,
     inviteGuild,
     leaveAlliance,
-  } = useAlliances(clanId);
+  } = useAlliances(groupId);
 
   const {
     builds,

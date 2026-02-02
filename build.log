@@ -1,0 +1,25 @@
+
+> aoc-guild-profession-planner@0.1.0 build
+> node scripts/generate-migration-list.js && next build
+
+Migration file list written to J:\Projects\aoc-guild-profession-planner\src\migration_files.json
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 1706.8ms
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/[group]/tabs/AchievementsTab.tsx:28:11
+Type error: Type '{ achievements: ClanAchievementWithDefinition[]; clanId: any; onRefresh: () => Promise<void>; }' is not assignable to type 'IntrinsicAttributes & AchievementAdminPanelProps'.
+  Property 'clanId' does not exist on type 'IntrinsicAttributes & AchievementAdminPanelProps'.
+
+  26 |         <AchievementAdminPanel
+  27 |           achievements={achievements}
+> 28 |           clanId={clanId}
+     |           ^
+  29 |           onRefresh={refreshAchievements}
+  30 |         />
+  31 |       )}
+Next.js build worker exited with code: 1 and signal: null

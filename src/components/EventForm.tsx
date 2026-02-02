@@ -31,7 +31,7 @@ interface EventFormData {
 
 interface EventFormProps {
   initialData?: Partial<Event>;
-  clanId: string;
+  groupId: string;
   userId: string;
   onSubmit: (event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'is_cancelled'>, sendDiscordNotification: boolean) => Promise<void>;
   onCancel: () => void;
@@ -40,7 +40,7 @@ interface EventFormProps {
 
 export function EventForm({ 
   initialData, 
-  clanId,
+  groupId,
   userId,
   onSubmit, 
   onCancel,
@@ -103,7 +103,7 @@ export function EventForm({
         melee_dps_min_parsed: parseInt(formData.melee_dps_min),
       });
       const eventData = {
-        clan_id: clanId,
+        group_id: groupId,
         created_by: userId,
         title: formData.title.trim(),
         description: formData.description.trim() || null,

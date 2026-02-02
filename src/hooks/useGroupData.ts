@@ -15,8 +15,8 @@ export interface CharacterData {
   user_id?: string | null; // Allow setting user_id for ownership
 }
 
-interface UseClanDataReturn {
-  clan: Clan | null;
+interface UseGroupDataReturn {
+  group: Clan | null;
   characters: CharacterWithProfessions[];
   loading: boolean;
   error: string | null;
@@ -33,8 +33,8 @@ interface UseClanDataReturn {
   deleteMember: (id: string) => Promise<void>;
 }
 
-export function useClanData(clanSlug: string): UseClanDataReturn {
-  const [clan, setClan] = useState<Clan | null>(null);
+export function useGroupData(groupSlug: string): UseGroupDataReturn {
+  const [group, setGroup] = useState<Clan | null>(null);
   const [characters, setCharacters] = useState<CharacterWithProfessions[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
   const fetchClan = useCallback(async (): Promise<Clan | null> => {
     try {
       const { data: existingClan, error: fetchError } = await supabase
-        .from('clans')
+        .from('groups')
         .select('*')
         .eq('slug', clanSlug)
         .maybeSingle();
@@ -66,13 +66,13 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     setError(null);
 
     try {
-      const clanData = await fetchClan();
+      const groupData = await fetchClan();
       if (!clanData) {
         setLoading(false);
         return;
       }
 
-      setClan(clanData);
+      setGroup(clanData);
 
       // Fetch characters with their professions
       const { data: charactersData, error: charactersError } = await supabase
@@ -81,7 +81,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
           *,
           member_professions (*)
         `)
-        .eq('clan_id', clanData.id)
+        .eq('group_id', groupData.id)
         .order('is_main', { ascending: false })
         .order('name');
 
@@ -124,7 +124,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
       await supabase
         .from('members')
         .update({ is_main: false })
-        .eq('clan_id', clan.id)
+        .eq('group_id', clan.id)
         .eq('user_id', user.id)
         .eq('is_main', true);
     }
@@ -132,7 +132,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
     const { error: insertError } = await supabase
       .from('members')
       .insert({ 
-        clan_id: clan.id, 
+        group_id: clan.id, 
         user_id: user?.id || null, // Set user_id to link characters
         name: data.name,
         race: data.race || null,
@@ -161,7 +161,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
       await supabase
         .from('members')
         .update({ is_main: false })
-        .eq('clan_id', clan?.id || '')
+        .eq('group_id', group?.id || '')
         .eq('user_id', user.id)
         .eq('is_main', true)
         .neq('id', id); // Don't update the character we're about to update
@@ -299,7 +299,7 @@ export function useClanData(clanSlug: string): UseClanDataReturn {
   const deleteMember = deleteCharacter;
 
   return {
-    clan,
+    group,
     characters,
     loading,
     error,

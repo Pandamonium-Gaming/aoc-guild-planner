@@ -37,7 +37,7 @@ export async function submitAnonymousGuestRsvp(input: AnonymousGuestRsvpInput) {
         guest_email: input.guestEmail,
         class_id: input.classId,
         role: input.role,
-        allied_clan_id: null, // Not part of an allied clan - completely anonymous
+        allied_group_id: null, // Not part of an allied clan - completely anonymous
       })
       .select()
       .single();

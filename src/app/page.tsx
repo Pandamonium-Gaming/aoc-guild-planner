@@ -7,7 +7,7 @@ import { Sword, Hammer, Pickaxe, LogOut, User, Shield, Users, Settings, Loader2 
 import { useAuthContext } from '@/components/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InlineFooter } from '@/components/Footer';
-import { getUserClans } from '@/lib/auth';
+import { getUserGroups } from '@/lib/auth';
 
 import { LandingHero } from '@/components/LandingHero';
 import { LandingClanForm } from '@/components/LandingClanForm';
@@ -22,7 +22,7 @@ interface UserClan {
   name: string;
   role: string;
   isCreator: boolean;
-  guild_icon_url?: string;
+  group_icon_url?: string;
 }
 
 export default function Home() {
@@ -44,7 +44,7 @@ export default function Home() {
       
       setClansLoading(true);
       try {
-        const clans = await getUserClans(user.id);
+        const clans = await getUserGroups(user.id);
         setUserClans(clans as UserClan[]);
       } catch (err) {
         console.error('Error fetching user clans:', err);
@@ -171,16 +171,16 @@ export default function Home() {
             </div>
           ) : userClans.length > 0 ? (
             <div className="grid gap-3">
-              {userClans.map((clan) => (
+              {userClans.map((group) => (
                 <Link
                   key={clan.id}
-                  href={`/${clan.slug}`}
+                  href={`/${group.slug}`}
                   className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
-                    {clan.guild_icon_url ? (
+                    {clan.group_icon_url ? (
                       <img
-                        src={clan.guild_icon_url}
+                        src={clan.group_icon_url}
                         alt="Guild Icon"
                         className="w-8 h-8 rounded-full border border-slate-700 bg-slate-800"
                       />
@@ -192,7 +192,7 @@ export default function Home() {
                     </span>
                   </div>
                   <span className={`text-sm ${getRoleColor(clan.role)}`}>
-                    {t(`clan.${clan.role}`)}
+                    {t(`clan.${group.role}`)}
                     {clan.isCreator && ` (${t('clan.creator')})`}
                   </span>
                 </Link>

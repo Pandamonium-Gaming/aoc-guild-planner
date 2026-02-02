@@ -108,8 +108,8 @@ export function PublicEventsView() {
 
   // Group events by clan
   const eventsByClans = events.reduce((acc, event) => {
-    const clanName = event.clan?.name || 'Unknown Guild';
-    const clanSlug = event.clan?.slug || '';
+    const clanName = event.group?.name || 'Unknown Guild';
+    const clanSlug = event.group?.slug || '';
     if (!acc[clanName]) {
       acc[clanName] = { slug: clanSlug, events: [] };
     }

@@ -12,7 +12,7 @@ import { Plus, Users } from 'lucide-react';
 interface PartiesListProps {
   parties: PartyWithRoster[];
   characters: CharacterWithProfessions[];
-  clanId: string;
+  groupId: string;
   userId: string;
   canManage: boolean;
   onCreateParty: (party: Omit<Party, 'id' | 'created_at' | 'updated_at'>) => Promise<Party | null>;
@@ -26,7 +26,7 @@ interface PartiesListProps {
 export function PartiesList({
   parties,
   characters,
-  clanId,
+  groupId,
   userId,
   canManage,
   onCreateParty,
@@ -39,7 +39,7 @@ export function PartiesList({
 
   const [showForm, setShowForm] = useState(false);
   const [editingParty, setEditingParty] = useState<PartyWithRoster | null>(null);
-  const { loading, isLeadership, isAdmin } = usePermissions(clanId);
+  const { loading, isLeadership, isAdmin } = usePermissions(groupId);
 
   const handleCreate = async (data: Omit<Party, 'id' | 'created_at' | 'updated_at'>) => {
     await onCreateParty(data);

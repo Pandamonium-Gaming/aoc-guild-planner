@@ -15,7 +15,7 @@ interface Clan {
 interface InviteGuildModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onInvite: (clanId: string) => Promise<void>;
+  onInvite: (groupId: string) => Promise<void>;
   allianceId: string;
   allianceName: string;
   excludeClanIds: string[];
@@ -62,7 +62,7 @@ export function InviteGuildModal({
   };
 
   const handleSelect = (clan: Clan) => {
-    setSelectedClan(clan);
+    setSelectedClan(group);
     setError(null);
   };
 

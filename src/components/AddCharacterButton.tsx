@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Plus, Sword } from 'lucide-react';
 import { CharacterForm } from './CharacterForm';
-import { CharacterData } from '@/hooks/useClanData';
+import { CharacterData } from '@/hooks/useGroupData';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AddCharacterButtonProps {

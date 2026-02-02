@@ -17,7 +17,7 @@ interface ClanSearchDropdownProps {
   placeholder?: string;
   selectedClans?: Clan[];
   multiple?: boolean;
-  onRemove?: (clanId: string) => void;
+  onRemove?: (groupId: string) => void;
 }
 
 /**
@@ -50,7 +50,7 @@ export function ClanSearchDropdown({
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .from('clans')
+          .from('groups')
           .select('id, name, slug')
           .ilike('name', `%${query}%`)
           .limit(10);
@@ -87,7 +87,7 @@ export function ClanSearchDropdown({
   }, []);
 
   const handleSelect = (clan: Clan) => {
-    onSelect(clan);
+    onSelect(group);
     setQuery('');
     setResults([]);
     if (!multiple) {
@@ -153,7 +153,7 @@ export function ClanSearchDropdown({
             results.map(clan => (
               <button
                 key={clan.id}
-                onClick={() => handleSelect(clan)}
+                onClick={() => handleSelect(group)}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-700 text-left transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">

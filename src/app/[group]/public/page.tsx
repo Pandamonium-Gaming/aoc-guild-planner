@@ -8,8 +8,8 @@ import { ARCHETYPES } from '@/lib/characters';
 import { RecruitmentForm } from '@/components/RecruitmentForm';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-interface PublicClanData {
-  clan: Clan & {
+interface PublicGroupData {
+  group: Clan & {
     is_public: boolean;
     recruitment_open: boolean;
     recruitment_message?: string;
@@ -20,10 +20,10 @@ interface PublicClanData {
   upcomingEvents: number;
 }
 
-export default function PublicClanPage({ params }: { params: Promise<{ clan: string }> }) {
-  const { clan: clanSlug } = use(params);
+export default function PublicGroupPage({ params }: { params: Promise<{ group: string }> }) {
+  const { group: groupSlug } = use(params);
   const { t } = useLanguage();
-  const [data, setData] = useState<PublicClanData | null>(null);
+  const [data, setData] = useState<PublicGroupData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRecruitmentForm, setShowRecruitmentForm] = useState(false);
 
@@ -31,7 +31,7 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
     async function fetchPublicData() {
       try {
         // Use API route to get public data (bypasses RLS)
-        const response = await fetch(`/api/clan-public?slug=${encodeURIComponent(clanSlug)}`);
+        const response = await fetch(`/api/clan-public?slug=${encodeURIComponent(groupSlug)}`);
         
         if (!response.ok) {
           setData(null);
@@ -42,7 +42,7 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
         const publicData = await response.json();
         
         setData({
-          clan: publicData.clan,
+          group: publicData.group,
           memberCount: publicData.memberCount || 0,
           professionCoverage: 75, // Could calculate this
           upcomingEvents: publicData.upcomingEvents || 0,
@@ -56,7 +56,7 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
     }
 
     fetchPublicData();
-  }, [clanSlug]);
+  }, [groupSlug]);
 
   if (loading) {
     return (
@@ -84,7 +84,7 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
     );
   }
 
-  const { clan, memberCount, professionCoverage, upcomingEvents } = data;
+  const { group, memberCount, professionCoverage, upcomingEvents } = data;
 
   return (
     <div className="min-h-screen">
@@ -93,11 +93,11 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white font-display">{clan.name}</h1>
+              <h1 className="text-3xl font-bold text-white font-display">{group.name}</h1>
               <p className="text-slate-400 mt-1">{t('publicPage.ashesOfCreationGuild')}</p>
             </div>
             <Link
-              href={`/${clanSlug}`}
+              href={`/${groupSlug}`}
               className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
             >
               <ExternalLink size={16} />
@@ -110,10 +110,10 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
       {/* Main content */}
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         {/* Description */}
-        {clan.public_description && (
+        {group.public_description && (
           <section className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
             <h2 className="text-lg font-semibold text-white mb-3">{t('publicPage.aboutUs')}</h2>
-            <p className="text-slate-300 whitespace-pre-wrap">{clan.public_description}</p>
+            <p className="text-slate-300 whitespace-pre-wrap">{group.public_description}</p>
           </section>
         )}
 
@@ -166,13 +166,13 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
         </section>
 
         {/* Recruitment CTA */}
-        {clan.recruitment_open && (
+        {group.recruitment_open && (
           <section className="bg-gradient-to-r from-orange-500/20 to-rose-500/20 rounded-lg border border-orange-500/30 p-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-white">{t('publicPage.joinOurGuildTitle')}</h2>
                 <p className="text-slate-300 mt-1">
-                  {clan.recruitment_message || t('publicPage.recruitmentClosed')}
+                  {group.recruitment_message || t('publicPage.recruitmentClosed')}
                 </p>
               </div>
               <button
@@ -200,8 +200,8 @@ export default function PublicClanPage({ params }: { params: Promise<{ clan: str
       {/* Recruitment Form Modal */}
       {showRecruitmentForm && (
         <RecruitmentForm
-          clanId={clan.id}
-          clanName={clan.name}
+          groupId={group.id}
+          groupName={group.name}
           onClose={() => setShowRecruitmentForm(false)}
           onSuccess={() => {
             setShowRecruitmentForm(false);

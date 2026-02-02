@@ -14,7 +14,7 @@ interface AchievementProgress {
 }
 
 async function calculateAchievementProgress(
-  clanId: string
+  groupId: string
 ): Promise<AchievementProgress[]> {
   try {
     // Helper function to check profession mastery
@@ -26,7 +26,7 @@ async function calculateAchievementProgress(
       const { data: characters } = await supabaseAdmin
         .from('characters')
         .select('id, professions')
-        .eq('clan_id', clanId);
+        .eq('group_id', groupId);
 
       if (!characters || characters.length === 0) return 0;
 
@@ -81,9 +81,9 @@ async function calculateAchievementProgress(
       // Milestone achievements - based on member count
       'member_count': async () => {
         const { count } = await supabaseAdmin
-          .from('clan_members')
+          .from('group_members')
           .select('id', { count: 'exact', head: true })
-          .eq('clan_id', clanId);
+          .eq('group_id', groupId);
         console.log(`Calculated member_count: ${count}`);
         return count || 0;
       },
@@ -93,7 +93,7 @@ async function calculateAchievementProgress(
         const { data: sieges } = await supabaseAdmin
           .from('siege_events')
           .select('id')
-          .eq('clan_id', clanId)
+          .eq('group_id', groupId)
           .eq('result', 'win');
         console.log(`Calculated siege_wins: ${sieges?.length || 0}`);
         return sieges?.length || 0;
@@ -105,11 +105,11 @@ async function calculateAchievementProgress(
         const { data: bank } = await supabaseAdmin
           .from('guild_banks')
           .select('id')
-          .eq('clan_id', clanId)
+          .eq('group_id', groupId)
           .single();
 
         if (!bank) {
-          console.log(`No bank found for clan ${clanId}`);
+          console.log(`No bank found for clan ${groupId}`);
           return 0;
         }
 
@@ -126,7 +126,7 @@ async function calculateAchievementProgress(
         const { count } = await supabaseAdmin
           .from('caravans')
           .select('id', { count: 'exact', head: true })
-          .eq('clan_id', clanId)
+          .eq('group_id', groupId)
           .eq('status', 'completed');
         console.log(`Calculated caravan_complete: ${count}`);
         return count || 0;
@@ -137,7 +137,7 @@ async function calculateAchievementProgress(
         const { data: characters } = await supabaseAdmin
           .from('characters')
           .select('id, professions')
-          .eq('clan_id', clanId);
+          .eq('group_id', groupId);
 
         const grandmasters = new Set<string>();
         for (const char of characters || []) {
@@ -164,7 +164,7 @@ async function calculateAchievementProgress(
         const { count } = await supabaseAdmin
           .from('events')
           .select('id', { count: 'exact', head: true })
-          .eq('clan_id', clanId);
+          .eq('group_id', groupId);
         console.log(`Calculated events_hosted: ${count}`);
         return count || 0;
       },
@@ -176,7 +176,7 @@ async function calculateAchievementProgress(
         const { data: activities } = await supabaseAdmin
           .from('activity_log')
           .select('user_id')
-          .eq('clan_id', clanId)
+          .eq('group_id', groupId)
           .gte('created_at', oneWeekAgo.toISOString());
 
         const uniqueUsers = new Set(activities?.map(a => a.user_id) || []);
@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
 
     const { clanId } = await request.json();
 
-    if (!clanId) {
+    if (!groupId) {
       return NextResponse.json(
         { error: 'Missing clanId' },
         { status: 400 }
@@ -314,9 +314,9 @@ export async function POST(request: NextRequest) {
 
     // Verify user is admin/officer of the clan
     const { data: membership } = await supabaseAdmin
-      .from('clan_members')
+      .from('group_members')
       .select('role')
-      .eq('clan_id', clanId)
+      .eq('group_id', groupId)
       .eq('user_id', user.id)
       .single();
 
@@ -328,15 +328,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate achievement progress
-    const progress = await calculateAchievementProgress(clanId);
+    const progress = await calculateAchievementProgress(groupId);
 
     // Upsert achievements with calculated values
     for (const achievement of progress) {
       const { error: upsertError } = await supabaseAdmin
-        .from('clan_achievements')
+        .from('group_achievements')
         .upsert(
           {
-            clan_id: clanId,
+            group_id: groupId,
             achievement_id: achievement.achievement_id,
             current_value: achievement.current_value,
             is_unlocked: achievement.is_unlocked,
@@ -345,7 +345,7 @@ export async function POST(request: NextRequest) {
               : null,
             updated_at: new Date().toISOString(),
           },
-          { onConflict: 'clan_id,achievement_id' }
+          { onConflict: 'group_id,achievement_id' }
         );
 
       if (upsertError) {

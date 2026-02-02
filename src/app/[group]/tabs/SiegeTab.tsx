@@ -2,12 +2,12 @@ import { SiegeTabContent } from '@/components/SiegeTabContent';
 import { CharacterWithProfessions } from '@/lib/types';
 
 export interface SiegeTabProps {
-  clanId: string;
+  groupId: string;
   characters: CharacterWithProfessions[];
   userId: string;
 }
 
-export function SiegeTab({ clanId, characters, userId }: SiegeTabProps) {
+export function SiegeTab({ groupId, characters, userId }: SiegeTabProps) {
   return (
     <SiegeTabContent
       clanId={clanId}

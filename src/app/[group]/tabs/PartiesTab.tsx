@@ -3,13 +3,13 @@ import { PartiesList } from '@/components/PartiesList';
 import { CharacterWithProfessions } from '@/lib/types';
 
 export interface PartiesTabProps {
-  clanId: string;
+  groupId: string;
   characters: CharacterWithProfessions[];
   userId: string;
   canManage: boolean;
 }
 
-export function PartiesTab({ clanId, characters, userId, canManage }: PartiesTabProps) {
+export function PartiesTab({ groupId, characters, userId, canManage }: PartiesTabProps) {
   const {
     parties,
     createParty,
@@ -18,7 +18,7 @@ export function PartiesTab({ clanId, characters, userId, canManage }: PartiesTab
     assignCharacter,
     removeFromRoster,
     toggleConfirmed,
-  } = useParties(clanId, characters);
+  } = useParties(groupId, characters);
 
   return (
     <PartiesList

@@ -41,12 +41,12 @@ export async function getUserGames(userId: string): Promise<GameId[]> {
 /**
  * Get a user's clans for a specific game
  */
-export async function getUserClansForGame(
+export async function getUserGroupsForGame(
   userId: string,
   gameId: GameId
 ): Promise<any[]> {
   const { data, error } = await supabase
-    .from('clan_members')
+    .from('group_members')
     .select(
       `
       clan_id,
@@ -57,7 +57,7 @@ export async function getUserClansForGame(
         slug,
         name,
         game,
-        guild_icon_url
+        group_icon_url
       )
     `
     )
@@ -77,7 +77,7 @@ export async function getUserClansForGame(
       game: row.clans.game,
       role: row.role,
       isCreator: row.is_creator,
-      guild_icon_url: row.clans.guild_icon_url,
+      group_icon_url: row.clans.group_icon_url,
     })) || []
   );
 }

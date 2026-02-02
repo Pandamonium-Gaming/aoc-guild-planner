@@ -4,7 +4,7 @@ import { useBuilds } from '@/hooks/useBuilds';
 import { BuildLibrary } from '@/components/BuildLibrary';
 
 export interface BuildsTabProps {
-  clanId: string;
+  groupId: string;
 }
 
 export function BuildsTab({ clanId }: BuildsTabProps) {
@@ -15,7 +15,7 @@ export function BuildsTab({ clanId }: BuildsTabProps) {
     copyBuild,
     loading,
     error,
-  } = useBuilds(clanId);
+  } = useBuilds(groupId);
 
   if (loading) return <div className="text-slate-400">Loading builds...</div>;
   if (error) return <div className="text-red-400">{error}</div>;

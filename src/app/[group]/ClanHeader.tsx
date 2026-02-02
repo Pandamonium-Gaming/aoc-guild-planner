@@ -3,7 +3,7 @@ import { Home, Settings, LogOut } from 'lucide-react';
 
 interface ClanHeaderProps {
   clanName: string;
-  clanSlug: string;
+  groupSlug: string;
   characterCount: number;
   role: string;
   displayName: string;
@@ -13,7 +13,7 @@ interface ClanHeaderProps {
 
 export function ClanHeader({
   clanName,
-  clanSlug,
+  groupSlug,
   characterCount,
   role,
   displayName,
@@ -38,7 +38,7 @@ export function ClanHeader({
             )}
             <div>
               <h1 className="font-display text-base md:text-xl font-semibold text-white">
-                {clanName || clanSlug}
+                {clanName || groupSlug}
               </h1>
               <p className="text-slate-500 text-xs md:text-sm hidden sm:block">
                 {characterCount} characters •

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useClanMembership } from '@/hooks/useClanMembership';
+import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { ClanRole, ROLE_CONFIG, getRoleHierarchy } from '@/lib/permissions';
 
 export interface ClanMember {
@@ -17,18 +17,18 @@ export interface ClanMember {
 }
 
 interface RoleManagementProps {
-  clanId: string;
+  groupId: string;
   members: ClanMember[];
   userRole: ClanRole;
   onRoleChange?: (userId: string, newRole: ClanRole) => Promise<void>;
 }
 
-export function RoleManagement({ clanId, members, userRole, onRoleChange }: RoleManagementProps) {
+export function RoleManagement({ groupId, members, userRole, onRoleChange }: RoleManagementProps) {
   const { t } = useLanguage();
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [message, setMessage] = useState<{ userId: string; type: 'success' | 'error'; text: string } | null>(null);
-  const { updateRole } = useClanMembership(clanId, null);
+  const { updateRole } = useGroupMembership(groupId, null);
 
   const hierarchy = getRoleHierarchy();
   const canManage = userRole === 'admin' || userRole === 'officer';
@@ -48,7 +48,7 @@ export function RoleManagement({ clanId, members, userRole, onRoleChange }: Role
     setMessage(null);
 
     try {
-      // Use the updateRole hook from useClanMembership
+      // Use the updateRole hook from useGroupMembership
       await updateRole(memberId, newRole);
       setMessage({ userId, type: 'success', text: `Role updated to ${ROLE_CONFIG[newRole].label}` });
       setExpandedUserId(null);
