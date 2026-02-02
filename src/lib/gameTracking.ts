@@ -7,7 +7,7 @@ import { GameId } from '@/lib/games';
 export async function addUserGame(userId: string, gameId: GameId) {
   const { error } = await supabase
     .from('user_games')
-    .insert({
+    .upsert({
       user_id: userId,
       game: gameId,
     });
