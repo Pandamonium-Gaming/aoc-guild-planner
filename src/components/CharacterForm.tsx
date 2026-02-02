@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Sword, Star } from 'lucide-react';
+import { X, Sword, Star, Ship, Truck } from 'lucide-react';
 import { Race, Archetype } from '@/lib/types';
 import { 
   RACES, 
@@ -15,6 +15,7 @@ import {
 } from '@/lib/characters';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
+import ShipSelector from './ShipSelector';
 
 interface CharacterFormData {
   name: string;
@@ -25,6 +26,16 @@ interface CharacterFormData {
   is_main: boolean;
   preferred_role?: string | null;
   rank?: string | null;
+  ships?: Array<{
+    ship_id: string;
+    ownership_type: 'owned-pledge' | 'owned-auec' | 'concept-pledge' | 'loaner';
+    notes?: string;
+  }>;
+  vehicles?: Array<{
+    ship_id: string;
+    ownership_type: 'owned-pledge' | 'owned-auec' | 'concept-pledge' | 'loaner';
+    notes?: string;
+  }>;
 }
 
 interface CharacterFormProps {
@@ -51,12 +62,17 @@ export function CharacterForm({
     is_main: initialData?.is_main || false,
     preferred_role: initialData?.preferred_role || null,
     rank: initialData?.rank || null,
+    ships: initialData?.ships || [],
+    vehicles: initialData?.vehicles || [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showShipsSection, setShowShipsSection] = useState(false);
+  const [showVehiclesSection, setShowVehiclesSection] = useState(false);
   const { t } = useLanguage();
 
   const isAoC = gameSlug === 'aoc';
+  const isStarCitizen = gameSlug === 'star-citizen';
   const gameConfig = getGameConfig(gameSlug);
   const gameRoles = (gameConfig as any)?.roles || [];
   const gameRanks = (gameConfig as any)?.ranks || [];
@@ -292,6 +308,68 @@ export function CharacterForm({
                 ))}
               </select>
             </div>
+          )}
+
+          {isStarCitizen && (
+            <>
+              <div className="border-t border-slate-700 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowShipsSection(!showShipsSection)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <Ship className="w-5 h-5 text-blue-400" />
+                    <span className="font-medium text-white">Ships</span>
+                    {formData.ships && formData.ships.length > 0 && (
+                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">
+                        {formData.ships.length}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-slate-400">{showShipsSection ? '−' : '+'}</span>
+                </button>
+                
+                {showShipsSection && (
+                  <div className="mt-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                    <ShipSelector
+                      selectedShips={formData.ships || []}
+                      onChange={(ships) => setFormData({ ...formData, ships })}
+                      includeVehicles={false}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowVehiclesSection(!showVehiclesSection)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-amber-400" />
+                    <span className="font-medium text-white">Ground Vehicles</span>
+                    {formData.vehicles && formData.vehicles.length > 0 && (
+                      <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded">
+                        {formData.vehicles.length}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-slate-400">{showVehiclesSection ? '−' : '+'}</span>
+                </button>
+                
+                {showVehiclesSection && (
+                  <div className="mt-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                    <ShipSelector
+                      selectedShips={formData.vehicles || []}
+                      onChange={(vehicles) => setFormData({ ...formData, vehicles })}
+                      includeVehicles={true}
+                    />
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           <div className="flex items-center gap-3">
