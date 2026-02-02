@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Home, Settings, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface ClanHeaderProps {
   clanName: string;
@@ -26,6 +26,9 @@ export function ClanHeader({
   guildIconUrl,
 }: ClanHeaderProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab') || 'characters';
+  
   return (
     <header className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-800 shrink-0 z-50">
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-2 md:py-4">
@@ -64,7 +67,7 @@ export function ClanHeader({
                 {enabledGames.map((game) => (
                   <button
                     key={game.slug}
-                    onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
+                    onClick={() => router.push(`/${groupSlug}/${game.slug}?tab=${currentTab}`)}
                     className={`px-2 py-1 rounded text-sm transition-colors ${
                       gameSlug === game.slug
                         ? 'bg-slate-700 text-white'
