@@ -1,5 +1,8 @@
 'use client';
 
+// Build timestamp for debugging/version tracking
+const BUILD_TIMESTAMP = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP || new Date().toISOString();
+
 // Inline footer component for use inside flex layouts
 // variant: 'default' = original dark bg (for pages without BottomNav)
 // variant: 'matching' = matches BottomNav bg (for pages with BottomNav)
@@ -14,6 +17,14 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
   const className = variant === 'default' 
     ? 'border-slate-800 bg-slate-950/95'
     : '';
+
+  const buildDate = new Date(BUILD_TIMESTAMP).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return (
     <footer className={className} style={style}>
@@ -40,6 +51,8 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
         </a>
         <span className="mx-2">©</span>
         <span>{new Date().getFullYear()} Todos los derechos reservados</span>
+        <span className="mx-2">•</span>
+        <span title={BUILD_TIMESTAMP} className="text-slate-500">Build: {buildDate}</span>
       </div>
     </footer>
   );
