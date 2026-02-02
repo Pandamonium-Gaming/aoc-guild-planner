@@ -31,8 +31,8 @@ CREATE POLICY "Users can view games for their groups"
 CREATE POLICY "Admins can manage group games"
   ON group_games FOR ALL
   USING (
-    user_has_clan_role(group_id, auth.uid(), 'admin')
+    user_has_clan_role(group_id, auth.uid(), ARRAY['admin'])
   )
   WITH CHECK (
-    user_has_clan_role(group_id, auth.uid(), 'admin')
+    user_has_clan_role(group_id, auth.uid(), ARRAY['admin'])
   );
