@@ -7,7 +7,7 @@ export interface BuildsTabProps {
   groupId: string;
 }
 
-export function BuildsTab({ clanId }: BuildsTabProps) {
+export function BuildsTab({ groupId }: BuildsTabProps) {
   const {
     guildBuilds,
     createBuild,

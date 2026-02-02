@@ -123,7 +123,7 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
     } catch (err) {
       console.error('Error fetching announcements:', err);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   // Fetch all data
   const fetchData = useCallback(async () => {
@@ -166,17 +166,17 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
         const { data: clanData } = await supabase
           .from('groups')
           .select('name, slug, group_webhook_url, notify_on_events, discord_announcement_role_id')
-          .eq('id', event.clan_id)
+          .eq('id', event.group_id)
           .single();
 
-        if (clanData?.group_webhook_url && groupData.notify_on_events !== false) {
+        if (clanData?.group_webhook_url && clanData.notify_on_events !== false) {
           console.log('Sending Discord notification for event:', data.title);
           await notifyNewEvent(
-            groupData.group_webhook_url, 
+            clanData.group_webhook_url, 
             data, 
-            groupData.name, 
-            clanSlug || groupData.slug,
-            groupData.discord_announcement_role_id
+            clanData.name, 
+            clanSlug || clanData.slug,
+            clanData.discord_announcement_role_id
           );
         } else {
           console.log('Skipping Discord notification - webhook or notify_on_events not configured');
@@ -309,16 +309,16 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
         const { data: clanData } = await supabase
           .from('groups')
           .select('name, slug, group_webhook_url, notify_on_announcements, discord_announcement_role_id')
-          .eq('id', announcement.clan_id)
+          .eq('id', announcement.group_id)
           .single();
 
-        if (clanData?.group_webhook_url && groupData.notify_on_announcements !== false) {
+        if (clanData?.group_webhook_url && clanData.notify_on_announcements !== false) {
           await notifyAnnouncement(
-            groupData.group_webhook_url, 
+            clanData.group_webhook_url, 
             data, 
-            groupData.name,
-            clanSlug || groupData.slug,
-            groupData.discord_announcement_role_id
+            clanData.name,
+            clanSlug || clanData.slug,
+            clanData.discord_announcement_role_id
           );
         }
       } catch (err) {

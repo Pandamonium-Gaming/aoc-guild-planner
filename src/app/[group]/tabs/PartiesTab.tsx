@@ -24,7 +24,7 @@ export function PartiesTab({ groupId, characters, userId, canManage }: PartiesTa
     <PartiesList
       parties={parties}
       characters={characters}
-      clanId={clanId}
+      groupId={groupId}
       userId={userId}
       canManage={canManage}
       onCreateParty={createParty}

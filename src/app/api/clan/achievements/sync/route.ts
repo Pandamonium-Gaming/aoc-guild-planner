@@ -303,11 +303,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { clanId } = await request.json();
+    const { clanId: groupId } = await request.json();
 
     if (!groupId) {
       return NextResponse.json(
-        { error: 'Missing clanId' },
+        { error: 'Missing group_id' },
         { status: 400 }
       );
     }

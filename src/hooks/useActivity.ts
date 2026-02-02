@@ -61,7 +61,7 @@ export function useActivity(groupId: string | null): UseActivityReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();

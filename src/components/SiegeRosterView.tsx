@@ -33,7 +33,7 @@ export function SiegeRosterView({
   onCheckIn,
 }: SiegeRosterViewProps) {
   const { t } = useLanguage();
-  const { hasPermission } = usePermissions(siege.clan_id);
+  const { hasPermission } = usePermissions(siege.group_id);
   const [selectedRole, setSelectedRole] = useState<SiegeRole | null>(null);
   const [selectedCharacter, setSelectedCharacter] = useState<string>('');
 

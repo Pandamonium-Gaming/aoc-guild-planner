@@ -8,5 +8,5 @@ export interface EconomyTabProps {
 }
 
 export function EconomyTab({ groupId, isOfficer }: EconomyTabProps) {
-  return <EconomyTabContent clanId={clanId} isOfficer={isOfficer} />;
+  return <EconomyTabContent groupId={groupId} isOfficer={isOfficer} />;
 }

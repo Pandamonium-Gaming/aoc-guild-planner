@@ -74,16 +74,16 @@ export function AllianceView({
           isOpen={showCreateForm}
           onClose={() => setShowCreateForm(false)}
           onSubmit={handleCreateAlliance}
-          clanId={clanId}
+          groupId={groupId}
         />
       </>
     );
   }
 
-  const isLeader = alliance.leader_group_id === clanId;
-  const myMembership = alliance.members.find(m => m.clan_id === groupId);
+  const isLeader = alliance.leader_group_id === groupId;
+  const myMembership = alliance.members.find(m => m.group_id === groupId);
   const activeMembers = alliance.members.filter(m => m.status === 'active');
-  const memberClanIds = alliance.members.map(m => m.clan_id);
+  const memberGroupIds = alliance.members.map(m => m.group_id);
 
   return (
     <>
@@ -137,7 +137,7 @@ export function AllianceView({
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    member.clan_id === alliance.leader_group_id
+                    member.group_id === alliance.leader_group_id
                       ? 'bg-amber-500/20'
                       : 'bg-slate-700'
                   }`}>
@@ -149,7 +149,7 @@ export function AllianceView({
                   </div>
                   <div>
                     <div className="font-medium text-white">
-                      {member.group?.name || 'Unknown Guild'}
+                      {member.clan?.name || 'Unknown Guild'}
                     </div>
                     <div className="flex gap-2 text-xs text-slate-500">
                       {member.can_invite && (
@@ -187,7 +187,7 @@ export function AllianceView({
         onInvite={handleInviteGuild}
         allianceId={alliance.id}
         allianceName={alliance.name}
-        excludeClanIds={memberClanIds}
+        excludeClanIds={memberGroupIds}
       />
     </>
   );

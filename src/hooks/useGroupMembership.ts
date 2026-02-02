@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserRole, applyToGroup, getGroupMembership } from '@/lib/auth';
-import { getClanById } from '@/lib/auth';
 import { ClanRole } from '@/lib/permissions';
 
 interface ClanMember {
@@ -51,8 +50,8 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   const [error, setError] = useState<string | null>(null);
 
   const fetchMembership = useCallback(async () => {
-    console.log('[DEBUG] useGroupMembership: clanId', groupId, 'userId', userId);
-    if (!clanId || !userId) {
+    console.log('[DEBUG] useGroupMembership: groupId', groupId, 'userId', userId);
+    if (!groupId || !userId) {
       setMembership(null);
       setLoading(false);
       return;
@@ -110,7 +109,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     } catch (err) {
       console.error('Error fetching members:', err);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -129,7 +128,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   }, [refresh]);
 
   const apply = async () => {
-    if (!clanId || !userId) throw new Error('Not authenticated');
+    if (!groupId || !userId) throw new Error('Not authenticated');
     await applyToGroup(groupId, userId);
     await refresh();
   };
@@ -141,7 +140,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
 
     const { data: memberData, error: memberFetchError } = await supabase
       .from('group_members')
-      .select('user_id, clan_id, users!clan_members_user_id_fkey(discord_username)')
+      .select('user_id, group_id, users!clan_members_user_id_fkey(discord_username)')
       .eq('id', membershipId)
       .maybeSingle();
     if (memberFetchError || !memberData) throw memberFetchError || new Error('Member not found');
@@ -151,7 +150,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     const discordUsername = Array.isArray(users)
       ? users[0]?.discord_username
       : users?.discord_username;
-    const clanIdForWebhook = memberData.clan_id;
+    const groupIdForWebhook = memberData.group_id;
 
     // Update the member's role
     const { error } = await supabase
@@ -168,8 +167,12 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     // Fetch the clan's webhook URLs
     let webhookUrl = null;
     try {
-      const group = await getGroupById(clanIdForWebhook);
-      webhookUrl = group?.group_welcome_webhook_url || group?.group_webhook_url;
+      const group = await supabase
+        .from('groups')
+        .select('group_welcome_webhook_url, group_webhook_url')
+        .eq('id', groupIdForWebhook)
+        .maybeSingle();
+      webhookUrl = group.data?.group_welcome_webhook_url || group.data?.group_webhook_url;
     } catch (e) {
       // ignore, just don't send if not found
     }

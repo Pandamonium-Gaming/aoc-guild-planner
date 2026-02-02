@@ -32,7 +32,7 @@ export function AchievementAdminPanel({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ clanId }),
+        body: JSON.stringify({ clanId: groupId }),
       });
 
       if (!response.ok) {

@@ -46,10 +46,10 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
 
         if (clanData) {
           console.log('[RecruitmentSettings] Clan data:', clanData);
-          setIsPublic(groupData.is_public || false);
-          setRecruitmentOpen(groupData.recruitment_open || false);
-          setRecruitmentMessage(groupData.recruitment_message || '');
-          setPublicDescription(groupData.public_description || '');
+          setIsPublic(clanData.is_public || false);
+          setRecruitmentOpen(clanData.recruitment_open || false);
+          setRecruitmentMessage(clanData.recruitment_message || '');
+          setPublicDescription(clanData.public_description || '');
         }
 
         // Fetch applications
@@ -91,7 +91,7 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
     return () => {
       isMounted = false;
     };
-  }, [clanId]);
+  }, [groupId]);
 
   const handleSave = async () => {
     setSaving(true);

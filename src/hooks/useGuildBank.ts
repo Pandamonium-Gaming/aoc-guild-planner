@@ -169,7 +169,7 @@ export function useGuildBank(groupId: string | null): UseGuildBankReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();
@@ -181,7 +181,7 @@ export function useGuildBank(groupId: string | null): UseGuildBankReturn {
 
     const { data, error: createError } = await supabase
       .from('guild_banks')
-      .insert({ group_id: clanId })
+      .insert({ group_id: groupId })
       .select()
       .single();
 

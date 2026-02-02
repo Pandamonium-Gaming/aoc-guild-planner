@@ -87,14 +87,14 @@ export function useAlliances(groupId: string | null): UseAlliancesReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const myAlliance = alliances.find((a) =>
-    a.members.some((m) => m.clan_id === clanId && m.status === 'active')
+    a.members.some((m) => m.group_id === groupId && m.status === 'active')
   ) || null;
 
   const createAlliance = async (data: AllianceData): Promise<string> => {

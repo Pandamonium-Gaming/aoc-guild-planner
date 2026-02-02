@@ -10,7 +10,7 @@ export interface SiegeTabProps {
 export function SiegeTab({ groupId, characters, userId }: SiegeTabProps) {
   return (
     <SiegeTabContent
-      clanId={clanId}
+      groupId={groupId}
       characters={characters}
       userId={userId}
     />

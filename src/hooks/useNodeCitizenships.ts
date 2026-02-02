@@ -98,7 +98,7 @@ export function useNodeCitizenships(groupId: string | null): UseNodeCitizenships
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   // Initial fetch
   useEffect(() => {

@@ -12,13 +12,13 @@ export interface RolePermissions {
 
 export function usePermissions(groupId ?: string) {
   const { user } = useAuth();
-  const { membership } = useGroupMembership(clanId || null, user?.id || null);
+  const { membership } = useGroupMembership(groupId || null, user?.id || null);
   const [customPermissions, setCustomPermissions] = useState<Record<string, boolean> | null>(null);
   const [loading, setLoading] = useState(false);
   
   // Fetch custom permission overrides from the server
   useEffect(() => {
-    if (!clanId || !user) return;
+    if (!groupId || !user) return;
 
     const fetchPermissions = async () => {
       setLoading(true);
@@ -26,8 +26,8 @@ export function usePermissions(groupId ?: string) {
         const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession();
         if (!session) return;
 
-        // Include clan_id as a query parameter
-        const response = await fetch(`/api/group/permissions?group_id=${encodeURIComponent(clanId!)}` , {
+        // Include group_id as a query parameter
+        const response = await fetch(`/api/group/permissions?group_id=${encodeURIComponent(groupId!)}` , {
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
           },

@@ -95,7 +95,7 @@ export function useCaravans(groupId: string | null): UseCaravansReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();

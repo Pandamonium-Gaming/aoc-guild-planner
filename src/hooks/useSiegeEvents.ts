@@ -141,7 +141,7 @@ export function useSiegeEvents(groupId: string | null): UseSiegeEventsReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   // Initial fetch
   useEffect(() => {

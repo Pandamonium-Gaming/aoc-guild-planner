@@ -109,7 +109,7 @@ export function PartiesList({
         <PartyForm
           onSubmit={handleCreate}
           onCancel={() => setShowForm(false)}
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
         />
       )}
@@ -120,7 +120,7 @@ export function PartiesList({
           initialData={editingParty}
           onSubmit={handleUpdate}
           onCancel={() => setEditingParty(null)}
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
         />
       )}

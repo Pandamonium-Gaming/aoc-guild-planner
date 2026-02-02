@@ -45,7 +45,7 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
       const { data: existingClan, error: fetchError } = await supabase
         .from('groups')
         .select('*')
-        .eq('slug', clanSlug)
+        .eq('slug', groupSlug)
         .maybeSingle();
 
       if (fetchError) {
@@ -58,7 +58,7 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
       setError(err instanceof Error ? err.message : 'Failed to load clan');
       return null;
     }
-  }, [clanSlug]);
+  }, [groupSlug]);
 
   // Fetch all data
   const fetchData = useCallback(async () => {
@@ -67,12 +67,12 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
 
     try {
       const groupData = await fetchClan();
-      if (!clanData) {
+      if (!groupData) {
         setLoading(false);
         return;
       }
 
-      setGroup(clanData);
+      setGroup(groupData);
 
       // Fetch characters with their professions
       const { data: charactersData, error: charactersError } = await supabase
@@ -114,7 +114,7 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
 
   // Add character with full data
   const addCharacter = async (data: CharacterData) => {
-    if (!clan) return;
+    if (!group) return;
 
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
@@ -124,7 +124,7 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
       await supabase
         .from('members')
         .update({ is_main: false })
-        .eq('group_id', clan.id)
+        .eq('group_id', group.id)
         .eq('user_id', user.id)
         .eq('is_main', true);
     }
@@ -132,7 +132,7 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
     const { error: insertError } = await supabase
       .from('members')
       .insert({ 
-        group_id: clan.id, 
+        group_id: group.id, 
         user_id: user?.id || null, // Set user_id to link characters
         name: data.name,
         race: data.race || null,

@@ -25,7 +25,7 @@ export function AchievementsTab({ groupId, isOfficer }: AchievementsTabProps) {
       {isOfficer && (
         <AchievementAdminPanel
           achievements={achievements}
-          clanId={clanId}
+          groupId={groupId}
           onRefresh={refreshAchievements}
         />
       )}

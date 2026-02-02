@@ -23,7 +23,7 @@ export function PublicClanEventsView({ groupId, groupName }: PublicClanEventsVie
 
   useEffect(() => {
     fetchPublicEvents();
-  }, [clanId]);
+  }, [groupId]);
 
   async function fetchPublicEvents() {
     try {
@@ -145,7 +145,7 @@ export function PublicClanEventsView({ groupId, groupName }: PublicClanEventsVie
               key={event.id}
               event={event}
               timezone="UTC"
-              clanId={clanId}
+              groupId={groupId}
               userId="" // Anonymous user
               characters={[]}
               onRsvp={() => {

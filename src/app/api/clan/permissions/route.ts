@@ -63,10 +63,10 @@ export type PermissionOverrides = {
 // GET: Fetch permission overrides for a clan
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const clanId = searchParams.get('clan_id');
+  const groupId = searchParams.get('group_id');
 
   if (!groupId) {
-    return NextResponse.json({ error: 'Missing clan_id' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing group_id' }, { status: 400 });
   }
 
   const supabaseAdmin = getSupabaseAdmin();
@@ -151,8 +151,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { groupId, rolePermissions } = body;
 
-    if (!clanId || !rolePermissions) {
-      return NextResponse.json({ error: 'Missing required fields: clanId and rolePermissions' }, { status: 400 });
+    if (!groupId || !rolePermissions) {
+      return NextResponse.json({ error: 'Missing required fields: groupId and rolePermissions' }, { status: 400 });
     }
 
     const supabaseAdmin = getSupabaseAdmin();

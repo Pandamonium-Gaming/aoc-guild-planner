@@ -274,7 +274,7 @@ export function EventsList({
               key={event.id}
               event={event}
               timezone={localTimezone}
-              clanId={clanId}
+              groupId={groupId}
               userId={userId}
               characters={characters}
               onRsvp={(status, role, characterId, targetUserId) => onRsvp(event.id, status, role, characterId, targetUserId)}
@@ -290,7 +290,7 @@ export function EventsList({
       {/* Create Event Modal */}
       {showEventForm && (
         <EventForm
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
           onSubmit={handleCreateEvent}
           onCancel={() => setShowEventForm(false)}
@@ -300,7 +300,7 @@ export function EventsList({
       {/* Edit Event Modal */}
       {editingEvent && (
         <EventForm
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
           initialData={editingEvent}
           onSubmit={handleEditEvent}
@@ -312,7 +312,7 @@ export function EventsList({
       {/* Create Announcement Modal */}
       {showAnnouncementForm && (
         <AnnouncementForm
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
           onSubmit={handleCreateAnnouncement}
           onCancel={() => setShowAnnouncementForm(false)}
@@ -322,7 +322,7 @@ export function EventsList({
       {/* Edit Announcement Modal */}
       {editingAnnouncement && (
         <AnnouncementForm
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
           initialData={editingAnnouncement}
           onSubmit={handleEditAnnouncement}

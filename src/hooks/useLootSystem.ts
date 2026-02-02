@@ -201,7 +201,7 @@ export function useLootSystem(groupId: string | null): UseLootSystemReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   // Initial fetch
   useEffect(() => {

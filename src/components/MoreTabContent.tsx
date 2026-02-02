@@ -82,7 +82,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreT
     createBuild,
     likeBuild,
     copyBuild,
-  } = useBuilds(clanId!);
+  } = useBuilds(groupId);
 
   const SUB_TABS = [
     { id: 'parties', icon: Swords, label: t('nav.parties') },
@@ -119,7 +119,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreT
         <PartiesList
           parties={parties}
           characters={characters}
-          clanId={clanId}
+          groupId={groupId}
           userId={userId}
           canManage={isOfficer}
           onCreateParty={createParty}
@@ -133,7 +133,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreT
 
       {subTab === 'siege' && (
         <SiegeTabContent
-          clanId={clanId}
+          groupId={groupId}
           characters={characters}
           userId={userId}
         />
@@ -147,7 +147,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreT
             {isOfficer && (
               <AchievementAdminPanel
                 achievements={achievements}
-                clanId={clanId}
+                groupId={groupId}
                 onRefresh={refreshAchievements}
               />
             )}
@@ -179,7 +179,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer }: MoreT
         ) : (
           <AllianceView
             alliance={myAlliance}
-            clanId={clanId}
+            groupId={groupId}
             onCreateAlliance={isOfficer ? createAlliance : undefined}
             onInviteGuild={isOfficer ? inviteGuild : undefined}
             onLeave={leaveAlliance}

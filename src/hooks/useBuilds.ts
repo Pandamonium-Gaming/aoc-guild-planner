@@ -97,7 +97,7 @@ export function useBuilds(groupId: string | null): UseBuildsReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();

@@ -100,7 +100,7 @@ export function useAchievements(groupId: string | null): UseAchievementsReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();

@@ -173,14 +173,14 @@ export default function Home() {
             <div className="grid gap-3">
               {userClans.map((group) => (
                 <Link
-                  key={clan.id}
+                  key={group.id}
                   href={`/${group.slug}`}
                   className="flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
-                    {clan.group_icon_url ? (
+                    {group.group_icon_url ? (
                       <img
-                        src={clan.group_icon_url}
+                        src={group.group_icon_url}
                         alt="Guild Icon"
                         className="w-8 h-8 rounded-full border border-slate-700 bg-slate-800"
                       />
@@ -188,12 +188,12 @@ export default function Home() {
                       <Users className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
                     )}
                     <span className="text-white font-medium group-hover:text-orange-300 transition-colors">
-                      {clan.name}
+                      {group.name}
                     </span>
                   </div>
-                  <span className={`text-sm ${getRoleColor(clan.role)}`}>
+                  <span className={`text-sm ${getRoleColor(group.role)}`}>
                     {t(`clan.${group.role}`)}
-                    {clan.isCreator && ` (${t('clan.creator')})`}
+                    {group.isCreator && ` (${t('clan.creator')})`}
                   </span>
                 </Link>
               ))}

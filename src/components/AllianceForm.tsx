@@ -192,7 +192,7 @@ export function AllianceForm({
             </label>
             <ClanSearchDropdown
               onSelect={handleAddClan}
-              excludeClanIds={[clanId]}
+              excludeClanIds={[groupId]}
               selectedClans={selectedClans}
               multiple
               onRemove={handleRemoveClan}

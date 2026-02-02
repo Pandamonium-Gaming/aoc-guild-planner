@@ -24,7 +24,7 @@ export function AlliancesTab({ groupId, isOfficer }: AlliancesTabProps) {
   return (
     <AllianceView
       alliance={myAlliance}
-      clanId={clanId}
+      groupId={groupId}
       onCreateAlliance={createAlliance}
       onInviteGuild={inviteGuild}
       onLeave={leaveAlliance}

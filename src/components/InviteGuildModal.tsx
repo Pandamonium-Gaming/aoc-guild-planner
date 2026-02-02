@@ -62,7 +62,7 @@ export function InviteGuildModal({
   };
 
   const handleSelect = (clan: Clan) => {
-    setSelectedClan(group);
+    setSelectedClan(clan);
     setError(null);
   };
 

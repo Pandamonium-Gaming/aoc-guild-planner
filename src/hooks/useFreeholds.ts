@@ -84,7 +84,7 @@ export function useFreeholds(groupId: string | null): UseFreeholdsReturn {
     } finally {
       setLoading(false);
     }
-  }, [clanId]);
+  }, [groupId]);
 
   useEffect(() => {
     fetchData();
