@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { Home, Settings, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ClanHeaderProps {
   clanName: string;
   groupSlug: string;
+  gameSlug: string;
+  enabledGames: Array<{ slug: string; name: string; icon: string }>;
   characterCount: number;
   role: string;
   displayName: string;
@@ -14,12 +17,15 @@ interface ClanHeaderProps {
 export function ClanHeader({
   clanName,
   groupSlug,
+  gameSlug,
+  enabledGames,
   characterCount,
   role,
   displayName,
   onSignOut,
   guildIconUrl,
 }: ClanHeaderProps) {
+  const router = useRouter();
   return (
     <header className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-800 shrink-0 z-50">
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-2 md:py-4">
@@ -51,6 +57,27 @@ export function ClanHeader({
                 </span>
               </p>
             </div>
+
+            {/* Game Switcher */}
+            {enabledGames.length > 1 && (
+              <div className="hidden sm:flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
+                {enabledGames.map((game) => (
+                  <button
+                    key={game.slug}
+                    onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
+                    className={`px-2 py-1 rounded text-sm transition-colors ${
+                      gameSlug === game.slug
+                        ? 'bg-slate-700 text-white'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                    }`}
+                    title={game.name}
+                  >
+                    <span className="mr-1">{game.icon}</span>
+                    <span className="hidden md:inline">{game.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right: User info */}

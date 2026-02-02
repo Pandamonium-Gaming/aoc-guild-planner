@@ -26,18 +26,18 @@ interface UseEventsReturn {
   refresh: () => Promise<void>;
 }
 
-export function useEvents(groupId: string | null, userId: string | null, clanSlug?: string): UseEventsReturn {
+export function useEvents(groupId: string | null, userId: string | null, gameSlug?: string, clanSlug?: string): UseEventsReturn {
   const [events, setEvents] = useState<EventWithRsvps[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset state when groupId changes (prevent stale data on route transition)
+  // Reset state when groupId or gameSlug changes (prevent stale data on route transition)
   useEffect(() => {
     setEvents([]);
     setAnnouncements([]);
     setLoading(true);
-  }, [groupId]);
+  }, [groupId, gameSlug]);
 
   // Fetch all events with RSVPs
   const fetchEvents = useCallback(async () => {
@@ -56,6 +56,7 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
           guest_event_rsvps (*)
         `)
         .eq('group_id', groupId)
+        .eq('game_slug', gameSlug || 'aoc')
         .gte('starts_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24h + future
         .order('starts_at', { ascending: true });
 
@@ -153,9 +154,14 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
     sendDiscordNotification: boolean
   ): Promise<Event | null> => {
     console.log('Creating event with data:', event, 'sendDiscordNotification:', sendDiscordNotification, 'type:', typeof sendDiscordNotification);
+    // Ensure game_slug is set
+    const eventWithGame = {
+      ...event,
+      game_slug: gameSlug || 'aoc'
+    };
     const { data, error: createError } = await supabase
       .from('events')
-      .insert(event)
+      .insert(eventWithGame)
       .select()
       .single();
     console.log('Created event result:', data, 'error:', createError);

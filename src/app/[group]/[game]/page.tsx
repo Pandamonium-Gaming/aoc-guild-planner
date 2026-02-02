@@ -40,6 +40,12 @@ import { ClanLoginScreen } from '@/components/ClanLoginScreen';
 import { ClanCreateScreen } from '@/components/ClanCreateScreen';
 import { getGroupGames } from '@/lib/group-games';
 
+// Game definitions
+const ALL_AVAILABLE_GAMES = [
+  { slug: 'aoc', name: 'Ashes of Creation', icon: '⚔️' },
+  { slug: 'star-citizen', name: 'Star Citizen', icon: '🚀' },
+];
+
 // Tab type now imported from ClanTabNav
 
 export default function GameGroupPage({ params }: { params: Promise<{ group: string; game: string }> }) {
@@ -58,7 +64,8 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
   const [editingCharacter, setEditingCharacter] = useState<CharacterWithProfessions | null>(null);
   const [characterFilters, setCharacterFilters] = useState<CharacterFilters>(DEFAULT_FILTERS);
   const [checkError, setCheckError] = useState<string | null>(null);
-  const [enabledGames, setEnabledGames] = useState<string[]>(['aoc']);
+  const [enabledGameSlugs, setEnabledGameSlugs] = useState<string[]>(['aoc']);
+  const [enabledGames, setEnabledGames] = useState<Array<{ slug: string; name: string; icon: string }>>([]);
   const [gameNotEnabled, setGameNotEnabled] = useState(false);
   const { t } = useLanguage();
 
@@ -99,17 +106,23 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
           
           // Load enabled games and validate current game
           try {
-            const games = await getGroupGames(group.id);
-            setEnabledGames(games.length > 0 ? games : ['aoc']);
+            const gameSlugs = await getGroupGames(group.id);
+            const slugsToUse = gameSlugs.length > 0 ? gameSlugs : ['aoc'];
+            setEnabledGameSlugs(slugsToUse);
+            
+            // Convert slugs to game objects
+            const gameObjects = ALL_AVAILABLE_GAMES.filter(g => slugsToUse.includes(g.slug));
+            setEnabledGames(gameObjects);
             
             // Check if the requested game is enabled
-            if (!games.includes(gameSlug)) {
+            if (!slugsToUse.includes(gameSlug)) {
               console.warn(`Game ${gameSlug} is not enabled for group ${groupSlug}`);
               setGameNotEnabled(true);
             }
           } catch (err) {
             console.error('Error loading group games:', err);
-            setEnabledGames(['aoc']);
+            setEnabledGameSlugs(['aoc']);
+            setEnabledGames([ALL_AVAILABLE_GAMES[0]]);
           }
         } else {
           setClanExists(false);
@@ -276,7 +289,7 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
       <ClanErrorScreen
         title="Game Not Enabled"
         message={`The game "${gameSlug}" is not enabled for this group.`}
-        error={`Available games: ${enabledGames.join(', ')}`}
+        error={`Available games: ${enabledGameSlugs.join(', ')}`}
         retryLabel={t('common.returnHome')}
         onRetry={() => router.push(`/${groupSlug}`)}
         homeLabel={t('common.returnHome')}
@@ -398,6 +411,8 @@ export default function GameGroupPage({ params }: { params: Promise<{ group: str
       <ClanHeader
         clanName={group?.name || ''}
         groupSlug={groupSlug}
+        gameSlug={gameSlug}
+        enabledGames={enabledGames}
         characterCount={characters.length}
         role={membership.role || ''}
         displayName={displayName}

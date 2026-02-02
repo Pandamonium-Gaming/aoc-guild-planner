@@ -46,5 +46,7 @@
   "045_add_game_support.sql",
   "046_comprehensive_clans_to_groups_migration.sql",
   "047_comprehensive_rls_recreation.sql",
-  "048_create_group_games_table.sql"
+  "048_create_group_games_table.sql",
+  "049_add_game_to_characters.sql",
+  "050_add_game_to_events.sql"
 ]

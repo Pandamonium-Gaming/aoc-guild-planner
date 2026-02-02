@@ -89,6 +89,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
           member_professions (*)
         `)
         .eq('group_id', groupData.id)
+        .eq('game_slug', gameSlug || 'aoc')
         .order('is_main', { ascending: false })
         .order('name');
 
@@ -140,13 +141,14 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       .from('members')
       .insert({ 
         group_id: group.id, 
-        user_id: user?.id || null, // Set user_id to link characters
+        user_id: data.user_id !== undefined ? data.user_id : (user?.id || null),
         name: data.name,
         race: data.race || null,
         primary_archetype: data.primary_archetype || null,
         secondary_archetype: data.secondary_archetype || null,
         level: data.level || 1,
         is_main: data.is_main || false,
+        game_slug: gameSlug || 'aoc',
       })
       .select();
 
