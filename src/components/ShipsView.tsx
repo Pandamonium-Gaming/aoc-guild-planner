@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Ship, Plus, Trash2, Loader2, AlertCircle } from 'lucide-react';
+import { 
+  Ship, Plus, Trash2, Loader2, AlertCircle,
+  Sword, Shield, Package, Wrench, Search, Rocket, Heart,
+  Zap, Users, Plane, Target, Radio, Pickaxe, Boxes, Truck
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
@@ -34,6 +38,114 @@ interface ShipsViewProps {
   userId: string;
   canManage: boolean;
   groupId: string;
+}
+
+// Normalize and group ship roles into logical categories
+function normalizeRole(role: string): string {
+  const roleLower = role.toLowerCase();
+  
+  // Combat roles
+  if (roleLower.includes('fighter')) return 'Fighter';
+  if (roleLower.includes('bomber')) return 'Bomber';
+  if (roleLower.includes('gunship') || roleLower.includes('gun ship')) return 'Gunship';
+  if (roleLower.includes('interdiction') || roleLower.includes('interdictor')) return 'Interdiction';
+  if (roleLower.includes('stealth')) return 'Stealth';
+  if (roleLower.includes('assault') || roleLower.includes('boarding')) return 'Assault';
+  if (roleLower.includes('patrol')) return 'Patrol';
+  if (roleLower.includes('anti-air') || roleLower.includes('minelayer')) return 'Anti-Aircraft';
+  
+  // Capital ships
+  if (roleLower.includes('carrier')) return 'Carrier';
+  if (roleLower.includes('frigate')) return 'Frigate';
+  if (roleLower.includes('destroyer')) return 'Destroyer';
+  if (roleLower.includes('corvette')) return 'Corvette';
+  
+  // Industrial roles
+  if (roleLower.includes('freight') || roleLower.includes('cargo')) return 'Cargo';
+  if (roleLower.includes('mining') || roleLower.includes('prospecting')) return 'Mining';
+  if (roleLower.includes('salvage')) return 'Salvage';
+  if (roleLower.includes('refinery') || roleLower.includes('refining')) return 'Refinery';
+  if (roleLower.includes('construction')) return 'Construction';
+  
+  // Support roles
+  if (roleLower.includes('medical') || roleLower.includes('ambulance')) return 'Medical';
+  if (roleLower.includes('repair')) return 'Repair';
+  if (roleLower.includes('refuel')) return 'Refueling';
+  if (roleLower.includes('recovery')) return 'Recovery';
+  
+  // Exploration & Science
+  if (roleLower.includes('exploration') || roleLower.includes('pathfinder') || roleLower.includes('expedition')) return 'Exploration';
+  if (roleLower.includes('recon') || roleLower.includes('reconnaissance')) return 'Reconnaissance';
+  if (roleLower.includes('science')) return 'Science';
+  if (roleLower.includes('data') || roleLower.includes('reporting')) return 'Data';
+  
+  // Civilian roles
+  if (roleLower.includes('transport') || roleLower.includes('passenger') || roleLower.includes('dropship')) return 'Transport';
+  if (roleLower.includes('touring') || roleLower.includes('luxury')) return 'Luxury';
+  if (roleLower.includes('racing')) return 'Racing';
+  if (roleLower.includes('starter') || roleLower.includes('generalist')) return 'Starter';
+  
+  // Vehicles
+  if (roleLower.includes('military') && roleLower.includes('vehicle')) return 'Military Vehicle';
+  if (roleLower.includes('combat') && roleLower.includes('vehicle')) return 'Combat Vehicle';
+  if (roleLower.includes('vehicle')) return 'Ground Vehicle';
+  
+  // Multi-role or unclassified
+  if (roleLower.includes('multi') || roleLower.includes('modular')) return 'Multi-Role';
+  if (roleLower.includes('combat')) return 'Combat';
+  
+  // Return original if no match (with title casing)
+  return role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+}
+
+// Title case the size attribute
+function formatSize(size: string): string {
+  if (size === 'vehicle') return 'Vehicle';
+  return size.charAt(0).toUpperCase() + size.slice(1);
+}
+
+// Get icon component for ship role
+function getRoleIcon(role: string) {
+  const roleLower = role.toLowerCase();
+  if (roleLower.includes('fighter') || roleLower.includes('combat') || roleLower.includes('gun')) return Sword;
+  if (roleLower.includes('bomber') || roleLower.includes('assault')) return Rocket;
+  if (roleLower.includes('freight') || roleLower.includes('cargo')) return Package;
+  if (roleLower.includes('mining') || roleLower.includes('prospecting')) return Pickaxe;
+  if (roleLower.includes('medical') || roleLower.includes('ambulance')) return Heart;
+  if (roleLower.includes('repair') || roleLower.includes('construction')) return Wrench;
+  if (roleLower.includes('salvage') || roleLower.includes('recovery')) return Boxes;
+  if (roleLower.includes('exploration') || roleLower.includes('pathfinder') || roleLower.includes('recon')) return Search;
+  if (roleLower.includes('transport') || roleLower.includes('passenger') || roleLower.includes('dropship')) return Users;
+  if (roleLower.includes('refuel') || roleLower.includes('refining')) return Zap;
+  if (roleLower.includes('stealth') || roleLower.includes('interdiction')) return Target;
+  if (roleLower.includes('racing')) return Plane;
+  if (roleLower.includes('data') || roleLower.includes('reporting')) return Radio;
+  if (roleLower.includes('capital') || roleLower.includes('carrier') || roleLower.includes('frigate') || roleLower.includes('destroyer') || roleLower.includes('corvette')) return Shield;
+  if (roleLower.includes('starter') || roleLower.includes('generalist')) return Ship;
+  if (roleLower.includes('military') || roleLower.includes('vehicle')) return Truck;
+  return Ship;
+}
+
+// Get color scheme for ship role
+function getRoleColor(role: string) {
+  const roleLower = role.toLowerCase();
+  if (roleLower.includes('fighter') || roleLower.includes('combat') || roleLower.includes('gun')) return 'text-red-400 bg-red-500/10';
+  if (roleLower.includes('bomber') || roleLower.includes('assault')) return 'text-orange-400 bg-orange-500/10';
+  if (roleLower.includes('freight') || roleLower.includes('cargo')) return 'text-yellow-400 bg-yellow-500/10';
+  if (roleLower.includes('mining') || roleLower.includes('prospecting')) return 'text-amber-400 bg-amber-500/10';
+  if (roleLower.includes('medical') || roleLower.includes('ambulance')) return 'text-pink-400 bg-pink-500/10';
+  if (roleLower.includes('repair') || roleLower.includes('construction')) return 'text-blue-400 bg-blue-500/10';
+  if (roleLower.includes('salvage') || roleLower.includes('recovery')) return 'text-slate-400 bg-slate-500/10';
+  if (roleLower.includes('exploration') || roleLower.includes('pathfinder') || roleLower.includes('recon')) return 'text-teal-400 bg-teal-500/10';
+  if (roleLower.includes('transport') || roleLower.includes('passenger') || roleLower.includes('dropship')) return 'text-indigo-400 bg-indigo-500/10';
+  if (roleLower.includes('refuel') || roleLower.includes('refining')) return 'text-violet-400 bg-violet-500/10';
+  if (roleLower.includes('stealth') || roleLower.includes('interdiction')) return 'text-purple-400 bg-purple-500/10';
+  if (roleLower.includes('racing')) return 'text-fuchsia-400 bg-fuchsia-500/10';
+  if (roleLower.includes('data') || roleLower.includes('reporting')) return 'text-sky-400 bg-sky-500/10';
+  if (roleLower.includes('capital') || roleLower.includes('carrier') || roleLower.includes('frigate') || roleLower.includes('destroyer') || roleLower.includes('corvette')) return 'text-emerald-400 bg-emerald-500/10';
+  if (roleLower.includes('starter') || roleLower.includes('generalist')) return 'text-cyan-400 bg-cyan-500/10';
+  if (roleLower.includes('military') || roleLower.includes('vehicle')) return 'text-lime-400 bg-lime-500/10';
+  return 'text-slate-400 bg-slate-500/10';
 }
 
 export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewProps) {
@@ -321,8 +433,19 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                     {ships.length === 0 ? (
                       <p className="text-slate-400 text-sm">No ships added yet</p>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {ships.map(ship => {
+                      <div className="space-y-6">
+                        {/* Ships Section */}
+                        {ships.filter(s => {
+                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
+                          return shipData && shipData.size !== 'vehicle';
+                        }).length > 0 && (
+                          <div className="space-y-3">
+                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ships</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {ships.filter(s => {
+                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
+                          return shipData && shipData.size !== 'vehicle';
+                        }).map(ship => {
                           const shipData = getShipData(ship.ship_id);
                           if (!shipData) return null;
 
@@ -340,9 +463,106 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
 
                           // Check if ship is concept from ship data
                           const isConcept = shipData.productionStatus !== 'flight-ready';
+                          const RoleIcon = getRoleIcon(shipData.role);
+                          const roleColor = getRoleColor(shipData.role);
 
                           return (
-                            <div key={ship.id} className={`border rounded-lg p-3 ${ownershipColor}`}>
+                            <div key={ship.id} className="flex items-start gap-3 border border-slate-700 rounded-lg p-3 bg-slate-800/50">
+                              <div className={`p-2 rounded-lg ${roleColor}`}>
+                                <RoleIcon className="w-5 h-5" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <h5 className="font-semibold text-white">{shipData.name}</h5>
+                                      {isConcept && (
+                                        <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                  </div>
+                                  <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
+                                    {ownershipLabel}
+                                  </span>
+                                </div>
+                              
+                                <div className="space-y-1 text-xs">
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Role:</span>
+                                    <span>{normalizeRole(shipData.role)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Size:</span>
+                                    <span>{formatSize(shipData.size)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Crew:</span>
+                                    <span>{shipData.crew.min}-{shipData.crew.max}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Cargo:</span>
+                                    <span>{shipData.cargo} SCU</span>
+                                  </div>
+                                </div>
+                              </div>
+                              {canManage && ownerUserId === userId && (
+                                <button
+                                  onClick={() => handleDeleteShip(ship.id)}
+                                  className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                  title="Remove ship"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Ground Vehicles Section */}
+                        {ships.filter(s => {
+                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
+                          return shipData && shipData.size === 'vehicle';
+                        }).length > 0 && (
+                          <div className="space-y-3">
+                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ground Vehicles</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {ships.filter(s => {
+                              const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
+                              return shipData && shipData.size === 'vehicle';
+                            }).map((ship) => {
+                          const shipData = (shipsData.ships as ShipData[]).find(s => s.id === ship.ship_id);
+                          if (!shipData) return null;
+
+                          const ownershipColor = {
+                            'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
+                            'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
+                            'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
+                          }[ship.ownership_type];
+
+                          const ownershipLabel = {
+                            'pledged': 'Pledged',
+                            'in-game': 'In-Game',
+                            'loaner': 'Loaner',
+                          }[ship.ownership_type];
+
+                          const isConcept = shipData.productionStatus !== 'flight-ready';
+                          const RoleIcon = getRoleIcon(shipData.role);
+                          const roleColor = getRoleColor(shipData.role);
+
+                          return (
+                            <div
+                              key={ship.id}
+                              className="flex items-start justify-between p-3 bg-slate-800 border border-slate-700 rounded-lg"
+                            >
+                              <div className="flex items-center gap-3 flex-1">
+                                <div className={`p-2 rounded-lg ${roleColor}`}>
+                                  <RoleIcon className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1">
                               <div className="flex items-start justify-between mb-2">
                                 <div>
                                   <div className="flex items-center gap-2">
@@ -353,40 +573,41 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                   </div>
                                   <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
                                 </div>
-                                {canManage && ownerUserId === userId && (
-                                  <button
-                                    onClick={() => handleDeleteShip(ship.id)}
-                                    className="p-1 hover:bg-red-500/20 rounded transition-colors"
-                                  >
-                                    <Trash2 className="w-4 h-4 text-red-400" />
-                                  </button>
-                                )}
+                                <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
+                                  {ownershipLabel}
+                                </span>
                               </div>
-                              
-                              <div className="space-y-1 text-xs">
-                                <div className="flex justify-between">
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
                                   <span className="text-slate-400">Role:</span>
-                                  <span>{shipData.role}</span>
+                                  <span className="ml-1 text-white">{normalizeRole(shipData.role)}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400">Size:</span>
-                                  <span>{shipData.size}</span>
-                                </div>
-                                <div className="flex justify-between">
+                                <div>
                                   <span className="text-slate-400">Crew:</span>
-                                  <span>{shipData.crew.min}-{shipData.crew.max}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400">Cargo:</span>
-                                  <span>{shipData.cargo} SCU</span>
-                                </div>
-                                <div className="pt-2 border-t border-current/20">
-                                  <span className="text-xs font-medium">{ownershipLabel}</span>
+                                  <span className="ml-1 text-white">
+                                    {shipData.crew.min === shipData.crew.max
+                                      ? shipData.crew.min
+                                      : `${shipData.crew.min}-${shipData.crew.max}`}
+                                  </span>
                                 </div>
                               </div>
+                              </div>
+                              </div>
+                              {canManage && (
+                                <button
+                                  onClick={() => handleDeleteShip(ship.id)}
+                                  className="ml-2 p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                  title="Remove vehicle"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
                             </div>
                           );
                         })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
