@@ -36,3 +36,6 @@ CREATE POLICY "Admins can manage group games"
   WITH CHECK (
     user_has_clan_role(group_id, auth.uid(), ARRAY['admin'])
   );
+
+-- Track this migration
+INSERT INTO migration_history (filename) VALUES ('048_create_group_games_table.sql') ON CONFLICT DO NOTHING;
