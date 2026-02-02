@@ -39,6 +39,13 @@ export function useGroupData(groupSlug: string): UseGroupDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset state when groupSlug changes (prevent stale data on route transition)
+  useEffect(() => {
+    setGroup(null);
+    setCharacters([]);
+    setLoading(true);
+  }, [groupSlug]);
+
   // Fetch clan (no longer auto-creates - that's handled by UI)
   const fetchClan = useCallback(async (): Promise<Clan | null> => {
     try {

@@ -18,6 +18,9 @@ ALTER TABLE groups RENAME COLUMN discord_welcome_webhook_url TO group_welcome_we
 -- 5. Update foreign key columns in group_members
 ALTER TABLE group_members RENAME COLUMN clan_id TO group_id;
 
+-- 5b. Update foreign key columns in members table
+ALTER TABLE members RENAME COLUMN clan_id TO group_id;
+
 -- 6. Update foreign key columns in group_achievements
 ALTER TABLE group_achievements RENAME COLUMN clan_id TO group_id;
 
@@ -26,6 +29,7 @@ ALTER INDEX idx_clans_game RENAME TO idx_groups_game;
 ALTER INDEX idx_clan_members_user_id RENAME TO idx_group_members_user_id;
 ALTER INDEX idx_clan_members_clan_id RENAME TO idx_group_members_group_id;
 ALTER INDEX idx_clan_achievements_clan RENAME TO idx_group_achievements_group;
+ALTER INDEX idx_members_clan_id RENAME TO idx_members_group_id;
 
 -- 8. Update foreign key columns in other tables that reference clans
 -- Note: Only renaming columns in tables that definitely exist based on migrations
@@ -48,3 +52,15 @@ ALTER TABLE guest_event_rsvps RENAME COLUMN allied_clan_id TO allied_group_id;
 -- 10. Update constraint references
 -- The foreign key constraints should auto-update, but we need to handle the constraint names
 ALTER TABLE groups RENAME CONSTRAINT valid_game TO groups_valid_game;
+
+-- 10b. Fix remaining foreign key constraint references to clans -> groups
+-- The guest_event_rsvps table has a constraint that references clans, update it to groups
+ALTER TABLE guest_event_rsvps DROP CONSTRAINT IF EXISTS guest_event_rsvps_allied_clan_id_fkey;
+ALTER TABLE guest_event_rsvps 
+  ADD CONSTRAINT guest_event_rsvps_allied_group_id_fkey 
+  FOREIGN KEY (allied_group_id) REFERENCES groups(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
+-- 10c. Update any RLS policies that reference the columns
+-- Functions and policies will be updated by the next migration or manually if needed
+
+INSERT INTO migration_history (filename) VALUES ('046_rename_clans_to_groups.sql');

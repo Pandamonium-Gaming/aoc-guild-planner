@@ -39,4 +39,4 @@ CREATE INDEX idx_user_games_game ON user_games(game);
 -- Create index on clans.game for faster filtering
 CREATE INDEX idx_clans_game ON clans(game);
 
-INSERT INTO migration_history (filename) VALUES ('034_add_game_support.sql');
+INSERT INTO migration_history (filename) VALUES ('045_add_game_support.sql');

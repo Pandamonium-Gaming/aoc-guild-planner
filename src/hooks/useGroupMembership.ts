@@ -49,6 +49,14 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset state when groupId or userId changes (prevent stale data on route transition)
+  useEffect(() => {
+    setMembership(null);
+    setMembers([]);
+    setPendingMembers([]);
+    setLoading(true);
+  }, [groupId, userId]);
+
   const fetchMembership = useCallback(async () => {
     console.log('[DEBUG] useGroupMembership: groupId', groupId, 'userId', userId);
     if (!groupId || !userId) {

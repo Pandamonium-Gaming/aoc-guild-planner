@@ -32,6 +32,13 @@ export function useEvents(groupId: string | null, userId: string | null, clanSlu
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset state when groupId changes (prevent stale data on route transition)
+  useEffect(() => {
+    setEvents([]);
+    setAnnouncements([]);
+    setLoading(true);
+  }, [groupId]);
+
   // Fetch all events with RSVPs
   const fetchEvents = useCallback(async () => {
     if (!groupId) return;
