@@ -256,7 +256,7 @@ export function formatEventTime(
     timeZone: timezone,
     ...options,
   };
-  return date.toLocaleString('en-US', defaultOptions);
+  return date.toLocaleString('en-GB', defaultOptions);
 }
 
 /**
@@ -264,7 +264,7 @@ export function formatEventTime(
  */
 export function formatEventDate(isoDate: string, timezone: string = 'UTC'): string {
   const date = new Date(isoDate);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('en-GB', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -277,7 +277,7 @@ export function formatEventDate(isoDate: string, timezone: string = 'UTC'): stri
  */
 export function formatTime(isoDate: string, timezone: string = 'UTC'): string {
   const date = new Date(isoDate);
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

@@ -18,7 +18,7 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
     ? 'border-slate-800 bg-slate-950/95'
     : '';
 
-  const buildDate = new Date(BUILD_TIMESTAMP).toLocaleDateString('en-US', {
+  const buildDate = new Date(BUILD_TIMESTAMP).toLocaleDateString('en-GB', {
     month: 'short',
     day: 'numeric',
     year: '2-digit',
