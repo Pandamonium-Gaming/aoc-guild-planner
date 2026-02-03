@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
 import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ShipData {
   id: string;
@@ -130,6 +131,7 @@ function getRoleColor(role: string) {
 }
 
 export function FleetView({ characters, userId, canManage, groupId }: FleetViewProps) {
+  const { t } = useLanguage();
   const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -265,9 +267,9 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
         <div className="flex items-start gap-2 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
           <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium mb-1">Database Migration Required</p>
-            <p className="text-sm text-amber-300">
-              The ship tracking feature requires a database migration. Please run the latest migrations to enable this feature.
+          <p className="font-medium mb-1">{t('fleet.migrationRequired')}</p>
+          <p className="text-sm text-amber-300">
+            {t('fleet.migrationMessage')}
             </p>
           </div>
         </div>
@@ -285,8 +287,8 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
         <div className="flex items-center gap-3">
           <Ship className="w-6 h-6 text-cyan-400" />
           <div>
-            <h2 className="text-2xl font-bold text-white">Fleet Management</h2>
-            <p className="text-sm text-slate-400">Manage ships by character</p>
+            <h2 className="text-2xl font-bold text-white">{t('fleet.title')}</h2>
+            <p className="text-sm text-slate-400">{t('fleet.subtitle')}</p>
           </div>
         </div>
         {canManage && !showAddForm && (
@@ -295,7 +297,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
             className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5" />
-            Add Ship
+            {t('fleet.addShip')}
           </button>
         )}
       </div>
@@ -311,18 +313,18 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
       {/* Add Ship Form */}
       {showAddForm && canManage && (
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Add Ship</h3>
+          <h3 className="text-lg font-semibold text-white">{t('fleet.addShip')}</h3>
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Character
+              {t('fleet.character')}
             </label>
             <select
               value={selectedCharacter || ''}
               onChange={(e) => setSelectedCharacter(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">Select a character...</option>
+              <option value="">{t('fleet.selectCharacter')}</option>
               {playerCharacters.map(char => (
                 <option key={char.id} value={char.id}>
                   {char.name}
@@ -333,14 +335,14 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Ship
+              {t('fleet.ship')}
             </label>
             <select
               value={selectedShip || ''}
               onChange={(e) => setSelectedShip(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">Select a ship...</option>
+              <option value="">{t('fleet.selectShip')}</option>
               {shipsData.ships.map(ship => (
                 <option key={ship.id} value={ship.id}>
                   {ship.name} ({ship.manufacturer}) - {ship.role}
@@ -351,16 +353,16 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Ownership Type
+              {t('fleet.ownershipType')}
             </label>
             <select
               value={ownershipType}
               onChange={(e) => setOwnershipType(e.target.value as 'pledged' | 'in-game' | 'loaner')}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="pledged">Pledged</option>
-              <option value="in-game">In-Game Purchase</option>
-              <option value="loaner">Loaner</option>
+              <option value="pledged">{t('fleet.pledged')}</option>
+              <option value="in-game">{t('fleet.inGame')}</option>
+              <option value="loaner">{t('fleet.loaner')}</option>
             </select>
           </div>
 

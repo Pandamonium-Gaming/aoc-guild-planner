@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
 import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ShipData {
   id: string;
@@ -144,8 +145,7 @@ function getRoleColor(role: string) {
   return 'text-slate-400 bg-slate-500/10';
 }
 
-export function ShipsView({ characters, userId, canManage, groupId, gameSlug = 'aoc' }: ShipsViewProps) {
-  const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
+export function ShipsView({ characters, userId, canManage, groupId, gameSlug = 'aoc' }: ShipsViewProps) {  const { t } = useLanguage();  const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
   const [guildCharacters, setGuildCharacters] = useState<CharacterWithProfessions[]>(characters);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -285,15 +285,15 @@ export function ShipsView({ characters, userId, canManage, groupId, gameSlug = '
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Ship className="w-6 h-6 text-cyan-400" />
-            <h2 className="text-2xl font-bold text-white">Ships Overview</h2>
+            <h2 className="text-2xl font-bold text-white">{t('ships.overview')}</h2>
           </div>
         </div>
         <div className="flex items-start gap-2 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
           <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium mb-1">Database Migration Required</p>
+            <p className="font-medium mb-1">{t('ships.migrationRequired')}</p>
             <p className="text-sm text-amber-300">
-              The ship tracking feature requires a database migration. Please run the latest migrations to enable this feature.
+              {t('ships.migrationMessage')}
             </p>
           </div>
         </div>
@@ -339,13 +339,13 @@ export function ShipsView({ characters, userId, canManage, groupId, gameSlug = '
         <div className="flex items-center gap-3">
           <Ship className="w-6 h-6 text-cyan-400" />
           <div>
-            <h2 className="text-2xl font-bold text-white">Ships Overview</h2>
-            <p className="text-sm text-slate-400">Guild ships by type and role</p>
+            <h2 className="text-2xl font-bold text-white">{t('ships.overview')}</h2>
+            <p className="text-sm text-slate-400">{t('ships.subtitle')}</p>
           </div>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-cyan-400">{allShips.length}</div>
-          <div className="text-xs text-slate-400">Total Ships</div>
+          <div className="text-xs text-slate-400">{t('ships.totalShips')}</div>
         </div>
       </div>
 

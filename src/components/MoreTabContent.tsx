@@ -101,7 +101,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer, gameSlu
     { id: 'achievements' as const, icon: Trophy, label: t('achievements.title'), games: ['aoc'] },
     { id: 'builds' as const, icon: Hammer, label: t('builds.title'), games: ['aoc'] },
     { id: 'alliances' as const, icon: Handshake, label: t('alliance.title'), games: ['aoc'] },
-    { id: 'ships' as const, icon: Rocket, label: 'Ships Overview', games: ['star-citizen'] },
+    { id: 'ships' as const, icon: Rocket, label: t('ships.overview'), games: ['star-citizen'] },
   ];
 
   // Filter tabs based on current game
