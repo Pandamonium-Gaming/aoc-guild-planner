@@ -459,3 +459,4 @@ export const productionStatuses: Record<string, ProductionStatusConfig> = {
     bgColor: 'bg-yellow-500/20'
   }
 };
+

@@ -1,7 +1,7 @@
 // Character editing permission logic
 // Determines which users can edit/delete which characters based on role hierarchy
 
-import { ClanRole, getRoleHierarchy } from './permissions';
+import { GroupRole, getRoleHierarchy } from './permissions';
 
 /**
  * Determines if a user can edit a specific character
@@ -11,7 +11,7 @@ import { ClanRole, getRoleHierarchy } from './permissions';
  * @returns true if the user can edit the character
  */
 export function canEditCharacter(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string
 ): boolean {
@@ -44,7 +44,7 @@ export function canEditCharacter(
  * Same rules as editing for now, but can be customized
  */
 export function canDeleteCharacter(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string
 ): boolean {
@@ -59,8 +59,8 @@ export function canDeleteCharacter(
  * @returns true if officer can edit target user's characters
  */
 export function canOfficerManageUser(
-  userRole: ClanRole,
-  targetUserRole: ClanRole
+  userRole: GroupRole,
+  targetUserRole: GroupRole
 ): boolean {
   if (userRole !== 'officer') {
     return false;
@@ -75,7 +75,7 @@ export function canOfficerManageUser(
  * Gets a human-readable error message for why a user can't edit a character
  */
 export function getEditPermissionErrorMessage(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string
 ): string {
@@ -99,3 +99,4 @@ export function getEditPermissionErrorMessage(
 
   return 'You do not have permission to edit this character';
 }
+

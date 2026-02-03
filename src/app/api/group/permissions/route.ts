@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { ClanRole } from '@/lib/permissions';
+import { GroupRole } from '@/lib/permissions';
 
 // Get Supabase service role client for server-side operations
 function getSupabaseAdmin() {
@@ -23,7 +23,7 @@ function getSupabaseAdmin() {
 export type PermissionOverrides = {
   id: string;
   group_id: string;
-  role: ClanRole;
+  role: GroupRole;
   characters_create: boolean;
   characters_read_all: boolean;
   characters_edit_own: boolean;
@@ -65,7 +65,7 @@ export type PermissionOverrides = {
   updated_at: string;
 };
 
-// GET: Fetch permission overrides for a clan
+// GET: Fetch permission overrides for a group
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('group_id');
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Check if user is a member of the clan (any role)
+    // Check if user is a member of the group (any role)
     const { data: membership } = await supabaseAdmin
       .from('group_members')
       .select('role')
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!membership) {
-      return NextResponse.json({ error: 'Forbidden - user is not a member of this clan' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden - user is not a member of this group' }, { status: 403 });
     }
 
     // Fetch permission overrides - may not exist if table hasn't been created yet
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Save permission overrides for a clan
+// POST: Save permission overrides for a group
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Verify user is admin of the clan
+    // Verify user is admin of the group
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({ error: 'Unauthorized - no auth header' }, { status: 401 });
@@ -277,3 +277,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+

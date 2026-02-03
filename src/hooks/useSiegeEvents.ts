@@ -276,3 +276,4 @@ export function useSiegeEvents(groupId: string | null): UseSiegeEventsReturn {
     refresh: fetchData,
   };
 }
+

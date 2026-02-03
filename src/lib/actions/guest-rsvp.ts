@@ -59,3 +59,4 @@ export async function submitGuestRsvp(data: GuestRsvpRequest) {
     return { error: err instanceof Error ? err.message : 'Failed to submit RSVP' };
   }
 }
+

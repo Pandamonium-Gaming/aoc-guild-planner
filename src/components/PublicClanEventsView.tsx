@@ -159,3 +159,4 @@ export function PublicClanEventsView({ groupId, groupName }: PublicClanEventsVie
     </div>
   );
 }
+

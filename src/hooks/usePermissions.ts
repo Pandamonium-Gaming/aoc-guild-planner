@@ -3,10 +3,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useGroupMembership } from './useGroupMembership';
-import { ClanRole, roleHasPermission, canManageRole, DEFAULT_ROLE_PERMISSIONS } from '@/lib/permissions';
+import { GroupRole, roleHasPermission, canManageRole, DEFAULT_ROLE_PERMISSIONS } from '@/lib/permissions';
 
 export interface RolePermissions {
-  role: ClanRole;
+  role: GroupRole;
   permissions: Set<string>;
 }
 
@@ -72,17 +72,17 @@ export function usePermissions(groupId ?: string) {
     }
 
     // Fall back to default role permissions
-    const userRole = membership.role as ClanRole;
+    const userRole = membership.role as GroupRole;
     return roleHasPermission(userRole, permission);
   }, [user, membership, customPermissions]);
 
   // Get current user's role
-  const getUserRole = useCallback((): ClanRole => {
-    return (membership?.role as ClanRole) ?? 'pending';
+  const getUserRole = useCallback((): GroupRole => {
+    return (membership?.role as GroupRole) ?? 'pending';
   }, [membership]);
 
   // Check if user can manage another role
-  const canManage = useCallback((targetRole: ClanRole): boolean => {
+  const canManage = useCallback((targetRole: GroupRole): boolean => {
     const userRole = getUserRole();
     return canManageRole(userRole, targetRole);
   }, [getUserRole]);
@@ -120,3 +120,4 @@ export function usePermissions(groupId ?: string) {
     loading,
   };
 }
+

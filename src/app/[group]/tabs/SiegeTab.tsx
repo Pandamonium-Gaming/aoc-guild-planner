@@ -16,3 +16,4 @@ export function SiegeTab({ groupId, characters, userId }: SiegeTabProps) {
     />
   );
 }
+

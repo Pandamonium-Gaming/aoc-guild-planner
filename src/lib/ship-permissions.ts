@@ -1,7 +1,7 @@
 // Ship management permission logic
 // Determines which users can manage ships based on role hierarchy
 
-import { ClanRole, getRoleHierarchy } from './permissions';
+import { GroupRole, getRoleHierarchy } from './permissions';
 
 /**
  * Determines if a user can manage (add/edit/delete) ships for a character
@@ -12,10 +12,10 @@ import { ClanRole, getRoleHierarchy } from './permissions';
  * @returns true if the user can manage ships for this character
  */
 export function canManageShips(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string,
-  minRoleForGameShips: ClanRole = 'member'
+  minRoleForGameShips: GroupRole = 'member'
 ): boolean {
   // Check if user's role meets minimum requirement for ship management
   const hierarchy = getRoleHierarchy();
@@ -51,10 +51,10 @@ export function canManageShips(
  * Same rules as managing for now, but can be customized
  */
 export function canDeleteShip(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string,
-  minRoleForGameShips: ClanRole = 'member'
+  minRoleForGameShips: GroupRole = 'member'
 ): boolean {
   return canManageShips(userRole, characterOwnerId, currentUserId, minRoleForGameShips);
 }
@@ -63,10 +63,10 @@ export function canDeleteShip(
  * Gets a human-readable error message for why a user can't manage ships
  */
 export function getShipManagementErrorMessage(
-  userRole: ClanRole,
+  userRole: GroupRole,
   characterOwnerId: string | null,
   currentUserId: string,
-  minRoleForGameShips: ClanRole = 'member'
+  minRoleForGameShips: GroupRole = 'member'
 ): string {
   const hierarchy = getRoleHierarchy();
   
@@ -94,3 +94,4 @@ export function getShipManagementErrorMessage(
 
   return 'You do not have permission to manage ships for this character';
 }
+

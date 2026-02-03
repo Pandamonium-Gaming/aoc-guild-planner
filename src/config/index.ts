@@ -75,3 +75,4 @@ export function getSupplyChainForProfession(professionId: string) {
     chain.flow.includes(professionId)
   );
 }
+

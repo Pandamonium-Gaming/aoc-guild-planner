@@ -114,3 +114,4 @@ export function useActivity(groupId: string | null): UseActivityReturn {
     refresh: fetchData,
   };
 }
+

@@ -32,3 +32,4 @@ export function AlliancesTab({ groupId, isOfficer }: AlliancesTabProps) {
     />
   );
 }
+

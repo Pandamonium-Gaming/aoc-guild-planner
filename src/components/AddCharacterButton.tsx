@@ -46,3 +46,4 @@ export function AddCharacterButton({ onAdd, gameSlug = 'aoc' }: AddCharacterButt
 
 // Legacy export for backward compatibility
 export { AddCharacterButton as AddMemberButton };
+

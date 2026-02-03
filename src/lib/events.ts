@@ -359,3 +359,4 @@ export function getEventTypesForGame(gameSlug: string): Record<string, { name: s
     other: EVENT_TYPES.other,
   };
 }
+

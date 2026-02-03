@@ -1,7 +1,7 @@
 // Permission system for the Guild Planner
 // Defines all available permissions and their configuration
 
-export type ClanRole = 'admin' | 'officer' | 'member' | 'trial' | 'pending';
+export type GroupRole = 'admin' | 'officer' | 'member' | 'trial' | 'pending';
 
 export type PermissionCategory = 'characters' | 'guild_bank' | 'events' | 'parties' | 'siege' | 'ships' | 'announcements' | 'recruitment' | 'settings';
 
@@ -269,7 +269,7 @@ export function getAllPermissionCategories(): PermissionCategory[] {
 
 // Default permissions for each role
 // Admin gets all permissions, Officer gets most, Member gets basic, Trial gets very limited
-export const DEFAULT_ROLE_PERMISSIONS: Record<ClanRole, Set<string>> = {
+export const DEFAULT_ROLE_PERMISSIONS: Record<GroupRole, Set<string>> = {
   admin: new Set([
     // All permissions for admins
     ...Object.keys(PERMISSIONS),
@@ -350,18 +350,18 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<ClanRole, Set<string>> = {
 };
 
 // Check if a role has a permission
-export function roleHasPermission(role: ClanRole, permission: string): boolean {
+export function roleHasPermission(role: GroupRole, permission: string): boolean {
   return DEFAULT_ROLE_PERMISSIONS[role]?.has(permission) ?? false;
 }
 
 // Get all permissions for a role
-export function getRolePermissions(role: ClanRole): Permission[] {
+export function getRolePermissions(role: GroupRole): Permission[] {
   const permIds = DEFAULT_ROLE_PERMISSIONS[role] ?? new Set();
   return Object.values(PERMISSIONS).filter(p => permIds.has(p.id));
 }
 
 // Role hierarchy: admin > officer > member > trial > pending
-export function getRoleHierarchy(): Record<ClanRole, number> {
+export function getRoleHierarchy(): Record<GroupRole, number> {
   return {
     admin: 5,
     officer: 4,
@@ -371,13 +371,13 @@ export function getRoleHierarchy(): Record<ClanRole, number> {
   };
 }
 
-export function canManageRole(userRole: ClanRole, targetRole: ClanRole): boolean {
+export function canManageRole(userRole: GroupRole, targetRole: GroupRole): boolean {
   const hierarchy = getRoleHierarchy();
   return hierarchy[userRole] > hierarchy[targetRole];
 }
 
 // Role display configuration
-export const ROLE_CONFIG: Record<ClanRole, { label: string; color: string; borderColor: string; description: string }> = {
+export const ROLE_CONFIG: Record<GroupRole, { label: string; color: string; borderColor: string; description: string }> = {
   admin: {
     label: 'Admin',
     color: 'text-amber-400', // legendary
@@ -409,3 +409,4 @@ export const ROLE_CONFIG: Record<ClanRole, { label: string; color: string; borde
     description: 'Application awaiting approval',
   }
 };
+

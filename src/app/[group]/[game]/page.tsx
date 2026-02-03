@@ -27,7 +27,7 @@ import { PermissionsSettings } from '@/components/PermissionsSettings';
 import { ClanTabNav } from '@/components/ClanTabNav';
 import { Tab } from '@/components/tabs';
 import { InlineFooter } from '@/components/Footer';
-import { ROLE_CONFIG, ClanRole } from '@/lib/permissions';
+import { ROLE_CONFIG, GroupRole } from '@/lib/permissions';
 import { ClanMatrix } from '@/components/ClanMatrix';
 import { ShipsView } from '@/components/ShipsView';
 import { SiegeTab } from './tabs/SiegeTab';
@@ -642,4 +642,5 @@ function TabButton({
     </button>
   );
 }
+
 

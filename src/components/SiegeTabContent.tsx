@@ -180,3 +180,4 @@ export function SiegeTabContent({ groupId, characters, userId }: SiegeTabContent
     </div>
   );
 }
+

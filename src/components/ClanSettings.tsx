@@ -452,3 +452,4 @@ export function ClanSettings({
     </div>
   );
 }
+

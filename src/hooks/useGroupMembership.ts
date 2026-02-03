@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserRole, applyToGroup, getGroupMembership } from '@/lib/auth';
-import { ClanRole } from '@/lib/permissions';
+import { GroupRole } from '@/lib/permissions';
 
 interface ClanMember {
   id: string;
@@ -33,7 +33,7 @@ interface UseClanMembershipReturn {
   apply: () => Promise<void>;
   acceptMember: (membershipId: string) => Promise<void>;
   rejectMember: (membershipId: string) => Promise<void>;
-  updateRole: (membershipId: string, role: ClanRole) => Promise<void>;
+  updateRole: (membershipId: string, role: GroupRole) => Promise<void>;
   updateRank: (membershipId: string, rank: string | null) => Promise<void>;
   removeMember: (membershipId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -284,7 +284,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     await refresh();
   };
 
-  const updateRole = async (membershipId: string, role: ClanRole) => {
+  const updateRole = async (membershipId: string, role: GroupRole) => {
     const { error } = await supabase
       .from('group_members')
       .update({ role })
@@ -335,3 +335,4 @@ export function useGroupMembership(groupId: string | null, userId: string | null
     canManageRoles,
   };
 }
+

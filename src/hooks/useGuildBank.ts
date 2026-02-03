@@ -419,3 +419,4 @@ export function useGuildBank(groupId: string | null): UseGuildBankReturn {
     refresh: fetchData,
   };
 }
+

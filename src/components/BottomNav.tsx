@@ -84,3 +84,4 @@ export function BottomNav({ activeTab, onTabChange, canManage, gameSlug = 'aoc' 
     </nav>
   );
 }
+

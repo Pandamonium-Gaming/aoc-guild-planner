@@ -21,3 +21,4 @@ export const STARCITIZEN_CONFIG = {
 } as const;
 
 export type StarctizenConfig = typeof STARCITIZEN_CONFIG;
+

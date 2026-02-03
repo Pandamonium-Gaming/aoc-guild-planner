@@ -4,7 +4,7 @@ import { CharacterFiltersBar, filterCharacters, DEFAULT_FILTERS } from "@/compon
 import { CharacterCard } from "@/components/MemberCard";
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { useAuthContext } from '@/components/AuthProvider';
-import { roleHasPermission, ClanRole } from '@/lib/permissions';
+import { roleHasPermission, GroupRole } from '@/lib/permissions';
 import { canEditCharacter, canDeleteCharacter, canOfficerManageUser } from '@/lib/character-permissions';
 import { CharacterWithProfessions } from "@/lib/types";
 import { useState } from "react";
@@ -43,7 +43,7 @@ export function CharactersTab({
     if (!user) return false;
 
     // First check basic permission
-    if (!canEditCharacter(userRole as ClanRole, character.user_id, user.id)) {
+    if (!canEditCharacter(userRole as GroupRole, character.user_id, user.id)) {
       return false;
     }
 
@@ -52,7 +52,7 @@ export function CharactersTab({
       const targetCharacters = characters.filter(c => c.user_id === character.user_id);
       const targetUser = clanMembership.members.find(m => m.id === character.user_id);
       
-      if (targetUser && !canOfficerManageUser(userRole as ClanRole, targetUser.role as ClanRole)) {
+      if (targetUser && !canOfficerManageUser(userRole as GroupRole, targetUser.role as GroupRole)) {
         return false;
       }
     }
@@ -65,7 +65,7 @@ export function CharactersTab({
     if (!user) return false;
 
     // First check basic permission
-    if (!canDeleteCharacter(userRole as ClanRole, character.user_id, user.id)) {
+    if (!canDeleteCharacter(userRole as GroupRole, character.user_id, user.id)) {
       return false;
     }
 
@@ -73,7 +73,7 @@ export function CharactersTab({
     if (userRole === 'officer' && character.user_id !== user.id) {
       const targetUser = clanMembership.members.find(m => m.id === character.user_id);
       
-      if (targetUser && !canOfficerManageUser(userRole as ClanRole, targetUser.role as ClanRole)) {
+      if (targetUser && !canOfficerManageUser(userRole as GroupRole, targetUser.role as GroupRole)) {
         return false;
       }
     }
@@ -136,3 +136,4 @@ export function CharactersTab({
     </div>
   );
 }
+

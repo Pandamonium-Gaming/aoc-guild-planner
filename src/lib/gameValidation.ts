@@ -72,3 +72,4 @@ export async function initializeClanWithGame(
     console.debug('User game tracking info:', err);
   }
 }
+

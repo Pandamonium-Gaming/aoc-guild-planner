@@ -236,3 +236,4 @@ export function getArchetypeInfo(archetypeId: ArchetypeId) {
 // Level constants
 export const MAX_LEVEL = 50;
 export const SECONDARY_ARCHETYPE_LEVEL = 25;
+

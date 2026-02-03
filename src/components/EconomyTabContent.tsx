@@ -136,3 +136,4 @@ export function EconomyTabContent({ groupId, isOfficer }: EconomyTabContentProps
     </div>
   );
 }
+

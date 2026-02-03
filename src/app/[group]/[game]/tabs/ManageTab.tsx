@@ -1,5 +1,5 @@
 import { Clock, Users } from 'lucide-react';
-import { ROLE_CONFIG, ClanRole } from '@/lib/permissions';
+import { ROLE_CONFIG, GroupRole } from '@/lib/permissions';
 import { getGameConfig } from '@/config';
 
 interface ManageTabProps {
@@ -21,11 +21,11 @@ interface ManageTabProps {
   }>;
   onAccept: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
-  onUpdateRole?: (id: string, role: ClanRole) => Promise<void>;
+  onUpdateRole?: (id: string, role: GroupRole) => Promise<void>;
   onUpdateRank?: (id: string, rank: string | null) => Promise<void>;
   onRemove?: (id: string) => Promise<void>;
   currentUserId: string;
-  currentUserRole: ClanRole;
+  currentUserRole: GroupRole;
   gameSlug?: string;
   t: (key: string) => string;
 }
@@ -139,9 +139,9 @@ export function ManageTab({
                     "rounded-lg",
                     "border",
                     (() => {
-                      const validRole = (role: string | null): role is ClanRole =>
+                      const validRole = (role: string | null): role is GroupRole =>
                         role !== null && Object.prototype.hasOwnProperty.call(ROLE_CONFIG, role);
-                      const roleKey: ClanRole = validRole(member.role) ? member.role : 'member';
+                      const roleKey: GroupRole = validRole(member.role) ? member.role : 'member';
                       return ROLE_CONFIG[roleKey].borderColor;
                     })(),
                     "transition-all",
@@ -156,9 +156,9 @@ export function ManageTab({
                   <div className="flex items-center gap-3">
                     {/* Colored dot for role */}
                     {(() => {
-                      const validRole = (role: string | null): role is ClanRole =>
+                      const validRole = (role: string | null): role is GroupRole =>
                         role !== null && Object.prototype.hasOwnProperty.call(ROLE_CONFIG, role);
-                      const roleKey: ClanRole = validRole(member.role) ? member.role : 'member';
+                      const roleKey: GroupRole = validRole(member.role) ? member.role : 'member';
                       const config = ROLE_CONFIG[roleKey];
                       return <span className={config.color}>{String.fromCharCode(9679)}</span>;
                     })()}
@@ -175,14 +175,14 @@ export function ManageTab({
                       <span className="text-white">
                         {member.user?.display_name || member.user?.discord_username || 'Unknown'}
                       </span>
-                      <span className={`ml-2 text-sm ${ROLE_CONFIG[member.role as ClanRole]?.color || 'text-slate-400'}`}> {member.role}{member.is_creator && ' (creator)'}</span>
+                      <span className={`ml-2 text-sm ${ROLE_CONFIG[member.role as GroupRole]?.color || 'text-slate-400'}`}> {member.role}{member.is_creator && ' (creator)'}</span>
                     </div>
                   </div>
                   {onUpdateRole && member.user_id !== currentUserId && (
                     <div className="flex items-center gap-2">
                       <select
                         value={member.role || 'member'}
-                        onChange={(e) => onUpdateRole(member.id, e.target.value as ClanRole)}
+                        onChange={(e) => onUpdateRole(member.id, e.target.value as GroupRole)}
                         className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-white text-sm cursor-pointer"
                         title={t('members.changeRole')}
                       >

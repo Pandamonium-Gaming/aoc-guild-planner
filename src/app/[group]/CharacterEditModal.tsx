@@ -28,3 +28,4 @@ export function CharacterEditModal({ editingCharacter, onSubmit, onCancel }: Cha
     />
   );
 }
+

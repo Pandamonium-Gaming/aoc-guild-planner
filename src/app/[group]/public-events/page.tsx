@@ -41,3 +41,4 @@ export default async function PublicGroupEventsPage(props: PageProps) {
     </main>
   );
 }
+

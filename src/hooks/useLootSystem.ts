@@ -424,3 +424,4 @@ export function useLootSystem(groupId: string | null): UseLootSystemReturn {
     refresh: fetchData,
   };
 }
+

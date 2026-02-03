@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Clan, CharacterWithProfessions, RankLevel, Race, Archetype } from '@/lib/types';
 import { canEditCharacter, canDeleteCharacter, canOfficerManageUser } from '@/lib/character-permissions';
-import { ClanRole } from '@/lib/permissions';
+import { GroupRole } from '@/lib/permissions';
 
 // Character data for creating/updating
 export interface CharacterData {
@@ -189,7 +189,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const userRole = (membershipData?.role || 'member') as ClanRole;
+    const userRole = (membershipData?.role || 'member') as GroupRole;
 
     // Check if user can edit this character
     if (!canEditCharacter(userRole, character.user_id, user.id)) {
@@ -202,7 +202,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
           .eq('user_id', character.user_id)
           .maybeSingle();
 
-        const targetRole = (targetMembership?.role || 'member') as ClanRole;
+        const targetRole = (targetMembership?.role || 'member') as GroupRole;
         
         if (!canOfficerManageUser(userRole, targetRole)) {
           throw new Error('Officers can only manage characters owned by members, not other officers or admins');
@@ -274,7 +274,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const userRole = (membershipData?.role || 'member') as ClanRole;
+    const userRole = (membershipData?.role || 'member') as GroupRole;
 
     // Check if user can delete this character
     if (!canDeleteCharacter(userRole, character.user_id, user.id)) {
@@ -287,7 +287,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
           .eq('user_id', character.user_id)
           .maybeSingle();
 
-        const targetRole = (targetMembership?.role || 'member') as ClanRole;
+        const targetRole = (targetMembership?.role || 'member') as GroupRole;
         
         if (!canOfficerManageUser(userRole, targetRole)) {
           throw new Error('Officers can only manage characters owned by members, not other officers or admins');
@@ -418,3 +418,4 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
     deleteMember,
   };
 }
+

@@ -51,3 +51,4 @@ export function LandingClanForm({ clanName, setClanName, user }: LandingClanForm
     </form>
   );
 }
+

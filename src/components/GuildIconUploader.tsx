@@ -106,3 +106,4 @@ export function GuildIconUploader({ groupId, currentUrl, onUploaded }: GuildIcon
     </div>
   );
 }
+

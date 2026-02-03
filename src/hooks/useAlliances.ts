@@ -231,3 +231,4 @@ export function useAlliances(groupId: string | null): UseAlliancesReturn {
     refresh: fetchData,
   };
 }
+

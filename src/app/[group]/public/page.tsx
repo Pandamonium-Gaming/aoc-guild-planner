@@ -212,3 +212,4 @@ export default function PublicGroupPage({ params }: { params: Promise<{ group: s
     </div>
   );
 }
+

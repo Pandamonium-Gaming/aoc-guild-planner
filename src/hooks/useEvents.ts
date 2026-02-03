@@ -392,3 +392,4 @@ export function useEvents(groupId: string | null, userId: string | null, gameSlu
     refresh: fetchData,
   };
 }
+

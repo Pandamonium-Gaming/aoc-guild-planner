@@ -213,3 +213,4 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer, gameSlu
     </div>
   );
 }
+

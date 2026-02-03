@@ -27,3 +27,4 @@ export const GAME_TAB_CUSTOMIZATION: Record<string, Partial<Record<Tab, string>>
     matrix: 'Ships', // Matrix shows ships for SC
   },
 };
+

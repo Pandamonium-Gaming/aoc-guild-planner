@@ -44,3 +44,4 @@ export function ClanTabNav({ canManage, onTabChange, initialTab = 'characters', 
     />
   );
 }
+

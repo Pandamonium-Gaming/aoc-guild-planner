@@ -307,3 +307,4 @@ export function CharacterCard({
 
 // Legacy alias for backward compatibility
 export { CharacterCard as MemberCard };
+

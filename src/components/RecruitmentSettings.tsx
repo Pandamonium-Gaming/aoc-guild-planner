@@ -356,3 +356,4 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
     </div>
   );
 }
+

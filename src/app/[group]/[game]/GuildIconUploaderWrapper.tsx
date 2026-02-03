@@ -21,3 +21,4 @@ export function GuildIconUploaderWrapper({ groupId, currentUrl, onIconChange }: 
     />
   );
 }
+

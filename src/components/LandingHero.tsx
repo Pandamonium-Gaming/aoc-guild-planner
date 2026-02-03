@@ -55,3 +55,4 @@ export function LandingHero() {
     </div>
   );
 }
+

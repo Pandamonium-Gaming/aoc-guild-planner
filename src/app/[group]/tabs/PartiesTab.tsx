@@ -36,3 +36,4 @@ export function PartiesTab({ groupId, characters, userId, canManage }: PartiesTa
     />
   );
 }
+

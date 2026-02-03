@@ -37,3 +37,4 @@ export function AchievementsTab({ groupId, isOfficer }: AchievementsTabProps) {
     </div>
   );
 }
+

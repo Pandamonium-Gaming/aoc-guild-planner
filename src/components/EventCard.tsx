@@ -902,3 +902,4 @@ export function EventCard({
     </div>
   );
 }
+

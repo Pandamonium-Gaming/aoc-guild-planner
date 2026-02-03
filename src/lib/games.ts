@@ -32,3 +32,4 @@ export function hasFeature(gameId: GameId, feature: string): boolean {
   const game = getGame(gameId);
   return game.features[feature] ?? false;
 }
+

@@ -54,3 +54,4 @@ export async function removeGameFromGroup(groupId: string, gameSlug: string): Pr
     return false;
   }
 }
+

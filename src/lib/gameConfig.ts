@@ -35,3 +35,4 @@ export function getGameFeatures(gameId: GameId): Record<string, boolean> {
   const config = gameId === 'aoc' ? AOC_CONFIG : STARCITIZEN_CONFIG;
   return config.features;
 }
+

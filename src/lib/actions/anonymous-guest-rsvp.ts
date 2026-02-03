@@ -56,3 +56,4 @@ export async function submitAnonymousGuestRsvp(input: AnonymousGuestRsvpInput) {
     return { error: err instanceof Error ? err.message : 'Unknown error occurred' };
   }
 }
+

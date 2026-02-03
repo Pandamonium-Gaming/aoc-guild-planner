@@ -179,3 +179,4 @@ export function useFreeholds(groupId: string | null): UseFreeholdsReturn {
     refresh: fetchData,
   };
 }
+

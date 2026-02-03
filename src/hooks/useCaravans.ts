@@ -240,3 +240,4 @@ export function useCaravans(groupId: string | null): UseCaravansReturn {
     refresh: fetchData,
   };
 }
+

@@ -65,3 +65,4 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
 export function Footer() {
   return null;
 }
+
