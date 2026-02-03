@@ -34,12 +34,12 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer, gameSlu
   const pathname = usePathname();
 
   // Filter sub-tabs based on game
-  const allowedSubTabs: MoreSubTab[] = gameSlug === 'star-citizen'
+  const allowedSubTabs: MoreSubTab[] = gameSlug === 'starcitizen'
     ? ['ships'] // Only ships for Star Citizen
     : ['parties', 'siege', 'achievements', 'builds', 'alliances']; // AoC tabs
 
   // Always initialize with default for the game
-  const defaultSubTab = gameSlug === 'star-citizen' ? 'ships' : 'parties';
+  const defaultSubTab = gameSlug === 'starcitizen' ? 'ships' : 'parties';
   const [subTab, setSubTab] = useState<MoreSubTab>(defaultSubTab);
 
   // Sync state with URL parameter on mount and when searchParams changes
@@ -101,7 +101,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer, gameSlu
     { id: 'achievements' as const, icon: Trophy, label: t('achievements.title'), games: ['aoc'] },
     { id: 'builds' as const, icon: Hammer, label: t('builds.title'), games: ['aoc'] },
     { id: 'alliances' as const, icon: Handshake, label: t('alliance.title'), games: ['aoc'] },
-    { id: 'ships' as const, icon: Rocket, label: t('ships.overview'), games: ['star-citizen'] },
+    { id: 'ships' as const, icon: Rocket, label: t('ships.overview'), games: ['starcitizen'] },
   ];
 
   // Filter tabs based on current game

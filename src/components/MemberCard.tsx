@@ -290,7 +290,7 @@ export function CharacterCard({
       )}
 
       {/* Expanded content - Non-profession content for Star Citizen */}
-      {isExpanded && gameSlug === 'star-citizen' && (
+      {isExpanded && gameSlug === 'starcitizen' && (
         <div className="border-t border-slate-800 p-4 space-y-4">
           {/* Debug info for editability - only show if window.DEBUG_PERMISSIONS is true */}
           {typeof window !== 'undefined' && window.DEBUG_PERMISSIONS && (

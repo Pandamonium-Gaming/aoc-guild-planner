@@ -36,7 +36,7 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
             rel="noopener noreferrer"
             className="text-orange-400 hover:text-orange-300 transition-colors inline-flex items-center gap-1"
           >
-            Iván González Espí
+            <span>Pandamonium Gaming</span>
             <svg
               className="w-3 h-3"
               fill="currentColor"
@@ -51,7 +51,8 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
             </svg>
           </a>
           <span className="mx-1">©</span>
-          <span>{new Date().getFullYear()} Todos los derechos reservados</span>
+          <span>{new Date().getFullYear()} Some Rights Reserved</span>
+          <span>Based on <a href="https://github.com/igonzalezespi/aoc-guild-profession-planner" target="_blank" rel="noopener noreferrer">AoC Guild Profession Planner</a> by Iván González Espí</span>
         </div>
         <div className="text-[9px] md:text-[10px] text-slate-500 hidden md:block">
           <span title={BUILD_TIMESTAMP}>Build: {buildDate}</span>

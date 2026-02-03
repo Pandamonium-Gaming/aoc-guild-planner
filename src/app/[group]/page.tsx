@@ -17,7 +17,8 @@ import { InlineFooter } from '@/components/Footer';
 // All available games that can be added to a group
 const ALL_AVAILABLE_GAMES = [
   { slug: 'aoc', name: 'Ashes of Creation', icon: '⚔️' },
-  { slug: 'star-citizen', name: 'Star Citizen', icon: '🚀' },
+  { slug: 'starcitizen', name: 'Star Citizen', icon: '🚀' },
+  { slug: 'ror', name: 'Return of Reckoning', icon: '⚔️' },
   // { slug: 'bdo', name: 'Black Desert Online', icon: '🗡️' },
 ];
 
