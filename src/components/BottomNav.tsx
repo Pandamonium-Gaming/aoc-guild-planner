@@ -67,7 +67,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
   const NAV_ITEMS: { tab: Tab; icon: React.ElementType; labelKey: string; requiresManage?: boolean }[] = [
     { tab: 'characters', icon: Users, labelKey: 'nav.characters' },
     { tab: 'events', icon: Calendar, labelKey: 'nav.events' },
-    { tab: 'matrix', icon: Grid3X3, labelKey: gameSlug === 'star-citizen' ? 'nav.ships' : 'nav.matrix' },
+    { tab: 'matrix', icon: Grid3X3, labelKey: gameSlug === 'star-citizen' ? 'nav.fleet' : 'nav.matrix' },
     { tab: 'manage', icon: Settings, labelKey: 'nav.manage', requiresManage: true },
   ];
   
@@ -83,7 +83,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
   // Add Ships Overview for Star Citizen
   if (gameSlug === 'star-citizen') {
     visibleMoreItems = [
-      { tab: 'ships' as Tab, icon: Ship, labelKey: 'nav.ships' },
+      { tab: 'ships' as Tab, icon: Ship, labelKey: 'nav.guild-ships' },
       ...visibleMoreItems,
     ];
   }
