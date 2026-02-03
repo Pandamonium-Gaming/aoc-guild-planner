@@ -50,7 +50,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
     switch (tab) {
       case 'characters': return `${basePath}/characters`;
       case 'events': return `${basePath}/events`;
-      case 'matrix': return gameSlug === 'star-citizen' ? `${basePath}/hangar` : `${basePath}/matrix`;
+      case 'matrix': return gameSlug === 'starcitizen' ? `${basePath}/hangar` : `${basePath}/matrix`;
       case 'parties': return `${basePath}/parties`;
       case 'siege': return `${basePath}/siege`;
       case 'achievements': return `${basePath}/achievements`;
@@ -67,7 +67,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
   const NAV_ITEMS: { tab: Tab; icon: React.ElementType; labelKey: string; requiresManage?: boolean }[] = [
     { tab: 'characters', icon: Users, labelKey: 'nav.characters' },
     { tab: 'events', icon: Calendar, labelKey: 'nav.events' },
-    { tab: 'matrix', icon: Grid3X3, labelKey: gameSlug === 'star-citizen' ? 'nav.fleet' : 'nav.matrix' },
+    { tab: 'matrix', icon: Grid3X3, labelKey: gameSlug === 'starcitizen' ? 'nav.fleet' : 'nav.matrix' },
     { tab: 'manage', icon: Settings, labelKey: 'nav.manage', requiresManage: true },
   ];
   
@@ -81,7 +81,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
   // Check if any more items are visible (not excluded)
   let visibleMoreItems = MORE_ITEMS.filter(item => !excludedTabs.includes(item.tab));
   // Add Ships Overview for Star Citizen
-  if (gameSlug === 'star-citizen') {
+  if (gameSlug === 'starcitizen') {
     visibleMoreItems = [
       { tab: 'ships' as Tab, icon: Ship, labelKey: 'nav.guild-ships' },
       ...visibleMoreItems,

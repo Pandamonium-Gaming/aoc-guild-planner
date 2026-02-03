@@ -20,7 +20,7 @@ export default function MatrixPage({ params }: { params: Promise<{ group: string
 
   return (
     <GameLayout params={params} activeTab="matrix">
-      {gameSlug === 'star-citizen' ? (
+      {gameSlug === 'starcitizen' ? (
         <ShipsView
           characters={characters}
           userId={user.id}

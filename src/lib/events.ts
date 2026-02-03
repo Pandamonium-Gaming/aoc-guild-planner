@@ -336,7 +336,7 @@ export function utcToLocal(isoDate: string): string {
  * Get event types for a specific game
  */
 export function getEventTypesForGame(gameSlug: string): Record<string, { name: string; icon: string; color: string; description: string }> {
-  if (gameSlug === 'star-citizen') {
+  if (gameSlug === 'starcitizen') {
     return {
       missions: EVENT_TYPES.missions,
       salvaging: EVENT_TYPES.salvaging,

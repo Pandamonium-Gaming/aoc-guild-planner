@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 // Map pages that only exist in specific games to their equivalents in other games
 const pageEquivalencyMap: Record<string, Record<string, string>> = {
-  'star-citizen': {
+  'starcitizen': {
     'matrix': 'matrix',      // Both games have matrix
     'fleet': 'matrix',       // AoC doesn't have fleet, use matrix
     'ships': 'matrix',       // AoC doesn't have ships, use matrix
@@ -13,6 +13,11 @@ const pageEquivalencyMap: Record<string, Record<string, string>> = {
     'matrix': 'matrix',      // Both games have matrix
     'fleet': 'fleet',        // AoC doesn't have fleet, go back to characters
     'ships': 'characters',   // AoC doesn't have ships, go to characters
+  },
+  'ror': {
+    'matrix': 'characters',  // RoR doesn't have matrix, go to characters
+    'fleet': 'characters',   // RoR doesn't have fleet, go to characters
+    'ships': 'characters',   // RoR doesn't have ships, go to characters
   },
 };
 

@@ -145,7 +145,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   };
 
   const getWelcomeEmbed = (discordUsername: string) => {
-    if (gameSlug === 'star-citizen') {
+    if (gameSlug === 'starcitizen') {
       const checklist = [
         '✅ Register your main character in the planner',
         '✅ Set your preferred role (Pilot, Engineer, Medic, etc.)',
@@ -244,7 +244,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
         .eq('id', groupIdForWebhook)
         .maybeSingle();
       webhookUrl = group.data?.group_welcome_webhook_url || group.data?.group_webhook_url;
-      welcomeEnabled = gameSlug === 'star-citizen' 
+      welcomeEnabled = gameSlug === 'starcitizen' 
         ? group.data?.sc_welcome_enabled ?? true
         : group.data?.aoc_welcome_enabled ?? true;
     } catch (e) {
