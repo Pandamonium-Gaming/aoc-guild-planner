@@ -368,9 +368,13 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
                                           {manufacturerLogo && (
-                                            <img src={manufacturerLogo} alt={shipData.manufacturer} className="h-7 w-auto brightness-0 invert opacity-100 drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" title={shipData.manufacturer} />
+                                            <div className="flex h-8 w-8 items-center justify-center">
+                                              <img src={manufacturerLogo} alt={shipData.manufacturer} className="h-8 w-8 object-contain brightness-0 invert opacity-100" title={shipData.manufacturer} />
+                                            </div>
                                           )}
-                                          <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          <div className="flex flex-col leading-tight">
+                                            <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-2">
                                           <div className={`p-1.5 rounded ${roleColor}`}>
@@ -439,9 +443,13 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
                                           {manufacturerLogo && (
-                                            <img src={manufacturerLogo} alt={shipData.manufacturer} className="h-7 w-auto brightness-0 invert opacity-100 drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" title={shipData.manufacturer} />
+                                            <div className="flex h-8 w-8 items-center justify-center">
+                                              <img src={manufacturerLogo} alt={shipData.manufacturer} className="h-8 w-8 object-contain brightness-0 invert opacity-100" title={shipData.manufacturer} />
+                                            </div>
                                           )}
-                                          <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          <div className="flex flex-col leading-tight">
+                                            <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-2">
                                           <div className={`p-1.5 rounded ${roleColor}`}>
