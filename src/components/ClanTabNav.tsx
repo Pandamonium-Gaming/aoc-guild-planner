@@ -25,7 +25,7 @@ export function ClanTabNav({ canManage, initialTab = 'characters', gameSlug = 'a
     if (pathname.includes('/achievements')) return 'achievements';
     if (pathname.includes('/alliances')) return 'alliances';
     if (pathname.includes('/builds')) return 'builds';
-    if (pathname.includes('/ships') || pathname.includes('/fleet')) return 'matrix'; // Reuse matrix slot for ships
+    if (pathname.includes('/ships') || pathname.includes('/hangar')) return 'matrix'; // Reuse matrix slot for ships/hangar
     if (pathname.includes('/more')) return 'more';
     return initialTab;
   };

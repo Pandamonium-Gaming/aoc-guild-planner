@@ -52,7 +52,7 @@
     "events": "Eventos",
     "parties": "Grupos",
     "matrix": "Matriz",
-    "fleet": "Flota",
+    "fleet": "Mi Hangar",
     "ships": "Naves del Gremio",
     "guild-ships": "Naves del Gremio",
     "manage": "Gestionar",
@@ -721,7 +721,8 @@
     "noActivityData": "Sin Datos de Actividad",
     "noActivityDesc": "El seguimiento de actividad aparecerá aquí cuando los miembros empiecen a participar."
   },  "fleet": {
-    "title": "Gestión de Flota",
+    "title": "Mi Hangar",
+    "titlePlural": "Mis Hangares",
     "subtitle": "Gestionar naves por personaje",
     "addShip": "Añadir Nave",
     "totalShips": "Naves Totales",

@@ -287,7 +287,9 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
         <div className="flex items-center gap-3">
           <Ship className="w-6 h-6 text-cyan-400" />
           <div>
-            <h2 className="text-2xl font-bold text-white">{t('fleet.title')}</h2>
+            <h2 className="text-2xl font-bold text-white">
+              {playerCharacters.length > 1 ? t('fleet.titlePlural') : t('fleet.title')}
+            </h2>
             <p className="text-sm text-slate-400">{t('fleet.subtitle')}</p>
           </div>
         </div>
@@ -420,6 +422,10 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                               {ships.filter(s => {
                                 const shipData = getShipData(s.ship_id);
                                 return shipData && shipData.size !== 'vehicle';
+                              }).sort((a, b) => {
+                                const shipA = getShipData(a.ship_id);
+                                const shipB = getShipData(b.ship_id);
+                                return (shipA?.name || '').localeCompare(shipB?.name || '');
                               }).map(ship => {
                                 const shipData = getShipData(ship.ship_id);
                                 if (!shipData) return null;
@@ -516,8 +522,10 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                               {ships.filter(s => {
                                 const shipData = getShipData(s.ship_id);
-                                return shipData && shipData.size === 'vehicle';
-                              }).map((ship) => {
+                                return shipData && shipData.size === 'vehicle';                              }).sort((a, b) => {
+                                const shipA = getShipData(a.ship_id);
+                                const shipB = getShipData(b.ship_id);
+                                return (shipA?.name || '').localeCompare(shipB?.name || '');                              }).map((ship) => {
                                 const shipData = getShipData(ship.ship_id);
                                 if (!shipData) return null;
 

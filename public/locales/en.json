@@ -52,7 +52,7 @@
     "events": "Events",
     "parties": "Parties",
     "matrix": "Matrix",
-    "fleet": "Fleet",
+    "fleet": "My Hangar",
     "ships": "Guild Ships",
     "guild-ships": "Guild Ships",
     "manage": "Manage",
@@ -725,7 +725,8 @@
     "noActivityDesc": "Activity tracking will appear here once members start participating."
   },
   "fleet": {
-    "title": "Fleet Management",
+    "title": "My Hangar",
+    "titlePlural": "My Hangars",
     "subtitle": "Manage ships by character",
     "addShip": "Add Ship",
     "totalShips": "Total Ships",
