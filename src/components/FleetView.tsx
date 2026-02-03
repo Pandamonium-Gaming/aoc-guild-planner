@@ -406,7 +406,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                     <h4 className="font-semibold text-white mb-4">{char.name}</h4>
                     
                     {ships.length === 0 ? (
-                      <p className="text-slate-400 text-sm">No ships added yet</p>
+                      <p className="text-slate-400 text-sm">{t('fleet.noShipsYet')}</p>
                     ) : (
                       <div className="space-y-6">
                         {/* Ships Section */}
@@ -415,7 +415,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                           return shipData && shipData.size !== 'vehicle';
                         }).length > 0 && (
                           <div className="space-y-3">
-                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ships</h5>
+                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('fleet.shipsSection')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                               {ships.filter(s => {
                                 const shipData = getShipData(s.ship_id);
@@ -614,7 +614,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
       {Object.values(characterShips).every(ships => ships.length === 0) && !showAddForm && (
         <div className="text-center py-12">
           <Ship className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400">No ships in the fleet yet</p>
+          <p className="text-slate-400">{t('fleet.noShips')}</p>
           {canManage && (
             <button
               onClick={() => setShowAddForm(true)}
