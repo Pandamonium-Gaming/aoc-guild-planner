@@ -79,7 +79,7 @@ export function SiegeRosterView({
   return (
     <div className="bg-slate-800/50 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className={`p-4 border-b border-slate-700 ${typeConfig.isDefense ? 'bg-blue-500/10' : 'bg-red-500/10'}`}>
+      <div className={`p-4 border-b border-slate-700 ${typeConfig.isDefence ? 'bg-blue-500/10' : 'bg-red-500/10'}`}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">

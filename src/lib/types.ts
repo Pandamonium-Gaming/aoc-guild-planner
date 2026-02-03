@@ -291,11 +291,11 @@ export type RosterStatus = 'signed_up' | 'confirmed' | 'checked_in' | 'no_show';
 export type SiegeResult = 'victory' | 'defeat' | 'draw' | null;
 
 // Siege type configuration
-export const SIEGE_TYPE_CONFIG: Record<SiegeType, { label: string; icon: string; color: string; isDefense: boolean }> = {
-  castle_attack: { label: 'Castle Attack', icon: '🏰', color: 'text-red-400', isDefense: false },
-  castle_defense: { label: 'Castle Defense', icon: '🛡️', color: 'text-blue-400', isDefense: true },
-  node_attack: { label: 'Node Attack', icon: '⚔️', color: 'text-orange-400', isDefense: false },
-  node_defense: { label: 'Node Defense', icon: '🏛️', color: 'text-green-400', isDefense: true },
+export const SIEGE_TYPE_CONFIG: Record<SiegeType, { label: string; icon: string; color: string; isDefence: boolean }> = {
+  castle_attack: { label: 'Castle Attack', icon: '🏰', color: 'text-red-400', isDefence: false },
+  castle_defense: { label: 'Castle Defence', icon: '🛡️', color: 'text-blue-400', isDefence: true },
+  node_attack: { label: 'Node Attack', icon: '⚔️', color: 'text-orange-400', isDefence: false },
+  node_defense: { label: 'Node Defence', icon: '🏛️', color: 'text-green-400', isDefence: true },
 };
 
 // Siege role configuration
