@@ -63,7 +63,7 @@
   "auth": {
     "signInWithDiscord": "Sign in with Discord",
     "signingIn": "Signing in...",
-    "signInDescription": "Sign in with your Discord account to manage your guild's profession matrix, create events, and organize parties.",
+    "signInDescription": "Sign in with your Discord account to manage your guild's profession matrix, create events, and organise parties.",
     "welcome": "Welcome to Guild Planner",
     "pleaseSignIn": "Please sign in to access settings",
     "goToLogin": "Go to Login",
@@ -457,7 +457,7 @@
     },
     "createEvent": "Create Event",
     "noUpcoming": "No Upcoming Sieges",
-    "noUpcomingDesc": "Create a siege event to organize your clan."
+    "noUpcomingDesc": "Create a siege event to organise your clan."
   },
   "loot": {
     "title": "Loot & DKP",
