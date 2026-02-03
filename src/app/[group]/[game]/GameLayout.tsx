@@ -127,7 +127,10 @@ export function GameLayout({ params, children, activeTab }: GameLayoutProps) {
     );
   }
 
-  const enabledGames = [{ slug: gameSlug, name: gameSlug === 'aoc' ? 'Ashes of Creation' : 'Star Citizen', icon: gameSlug === 'aoc' ? '⚔️' : '🚀' }];
+  const enabledGames = [
+    { slug: 'aoc', name: 'Ashes of Creation', icon: '⚔️' },
+    { slug: 'star-citizen', name: 'Star Citizen', icon: '🚀' },
+  ];
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
