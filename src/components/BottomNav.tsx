@@ -35,7 +35,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
     switch (tab) {
       case 'characters': return `${basePath}/characters`;
       case 'events': return `${basePath}/events`;
-      case 'matrix': return gameSlug === 'star-citizen' ? `${basePath}/ships` : `${basePath}/matrix`;
+      case 'matrix': return gameSlug === 'star-citizen' ? `${basePath}/fleet` : `${basePath}/matrix`;
       case 'parties': return `${basePath}/parties`;
       case 'siege': return `${basePath}/siege`;
       case 'achievements': return `${basePath}/achievements`;
