@@ -13,7 +13,7 @@ import {
   RaceId,
   ArchetypeId
 } from '@/lib/characters';
-import { ROR_FACTIONS, ROR_CLASSES, getClassesByFaction } from '@/games/returnofreckooning/config';
+import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG, getClassesByFaction, RORRole } from '@/games/returnofreckooning/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
 import ShipSelector from './ShipSelector';
@@ -301,12 +301,11 @@ export function CharacterForm({
                           ror_faction: factionId,
                           ror_class: null
                         })}
-                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all cursor-pointer ${
+                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all cursor-pointer border-2 ${
                           isSelected
-                            ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-white'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? `${faction.borderColor} ${faction.bgColor} ${faction.color}`
+                            : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:border-slate-500'
                         }`}
-                        style={isSelected ? { backgroundColor: faction.color } : undefined}
                       >
                         {faction.name}
                       </button>
@@ -318,24 +317,43 @@ export function CharacterForm({
               {formData.ror_faction && (
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">Class *</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {getClassesByFaction(formData.ror_faction as any).map((rorClass) => {
-                      const isSelected = formData.ror_class === rorClass.id;
-                      const factionColor = formData.ror_faction ? ROR_FACTIONS[formData.ror_faction as keyof typeof ROR_FACTIONS]?.color : undefined;
+                  <div className="space-y-3">
+                    {/* Group classes by role */}
+                    {Object.entries(
+                      getClassesByFaction(formData.ror_faction as any).reduce((acc, rorClass) => {
+                        if (!acc[rorClass.role]) acc[rorClass.role] = [];
+                        acc[rorClass.role].push(rorClass);
+                        return acc;
+                      }, {} as Record<RORRole, typeof ROR_CLASSES>)
+                    ).map(([role, classes]) => {
+                      const roleConfig = ROR_ROLE_CONFIG[role as RORRole];
                       return (
-                        <button
-                          key={rorClass.id}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, ror_class: rorClass.id })}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-center ${
-                            isSelected
-                              ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-white'
-                              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                          }`}
-                          style={isSelected && factionColor ? { backgroundColor: factionColor } : undefined}
-                        >
-                          {rorClass.name}
-                        </button>
+                        <div key={role} className="bg-slate-800/30 rounded-lg p-3">
+                          <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${roleConfig.color}`}>
+                            <span className="text-lg">{roleConfig.icon}</span>
+                            <span>{roleConfig.label}</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {classes.map((rorClass) => {
+                              const isSelected = formData.ror_class === rorClass.id;
+                              const faction = ROR_FACTIONS[formData.ror_faction as keyof typeof ROR_FACTIONS];
+                              return (
+                                <button
+                                  key={rorClass.id}
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, ror_class: rorClass.id })}
+                                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-left border ${
+                                    isSelected
+                                      ? `${faction.borderColor} ${faction.bgColor} ${faction.color} border-2`
+                                      : 'border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:border-slate-500'
+                                  }`}
+                                >
+                                  {rorClass.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
