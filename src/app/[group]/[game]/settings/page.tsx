@@ -53,7 +53,7 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
       <div className="space-y-6">
         {membership.role === 'admin' && group && (
           <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Guild Icon</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Group Icon</h3>
             <GuildIconUploaderWrapper
               groupId={group.id}
               currentUrl={guildIconUrl}

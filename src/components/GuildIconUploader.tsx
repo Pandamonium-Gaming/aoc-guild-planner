@@ -46,7 +46,7 @@ export function GuildIconUploader({ groupId, currentUrl, onUploaded }: GuildIcon
     setPreviewUrl(localUrl);
 
     if (!user || !session) {
-      setError('You must be logged in to upload a guild icon.');
+      setError('You must be logged in to upload a group icon.');
       return;
     }
     setUploading(true);
@@ -78,7 +78,7 @@ export function GuildIconUploader({ groupId, currentUrl, onUploaded }: GuildIcon
         {(previewUrl || iconUrl) && (
           <img
             src={previewUrl || iconUrl}
-            alt="Guild Icon Preview"
+            alt="Group Icon Preview"
             className="w-16 h-16 rounded-full border border-slate-700"
             style={{ objectFit: 'cover' }}
           />

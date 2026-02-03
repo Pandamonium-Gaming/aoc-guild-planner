@@ -1,7 +1,7 @@
 
 "use client";
 import { AchievementsTab } from './tabs/AchievementsTab';
-import { ClanHeader } from './ClanHeader';
+import { GroupHeader } from './GroupHeader';
 import { ManageTab } from './tabs/ManageTab';
 import { GuildIconUploaderWrapper } from './GuildIconUploaderWrapper';
 import { BuildsTab } from './tabs/BuildsTab';

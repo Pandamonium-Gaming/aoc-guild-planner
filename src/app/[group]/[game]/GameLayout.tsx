@@ -11,7 +11,7 @@ import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { ClanLoadingScreen } from '@/components/ClanLoadingScreen';
 import { ClanErrorScreen } from '@/components/ClanErrorScreen';
 import { ClanLoginScreen } from '@/components/ClanLoginScreen';
-import { ClanHeader } from './ClanHeader';
+import { GroupHeader } from './GroupHeader';
 import { ClanTabNav } from '@/components/ClanTabNav';
 import { InlineFooter } from '@/components/Footer';
 import { Users, Clock, UserPlus, Loader2 } from 'lucide-react';
@@ -134,7 +134,7 @@ export function GameLayout({ params, children, activeTab }: GameLayoutProps) {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <ClanHeader
+      <GroupHeader
         clanName={group?.name || ''}
         groupSlug={groupSlug}
         gameSlug={gameSlug}

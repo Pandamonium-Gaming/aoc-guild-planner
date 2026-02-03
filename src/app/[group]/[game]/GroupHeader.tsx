@@ -27,7 +27,7 @@ function getPageForGame(currentPath: string, targetGame: string): string {
   return equivalentPage;
 }
 
-interface ClanHeaderProps {
+interface GroupHeaderProps {
   clanName: string;
   groupSlug: string;
   gameSlug: string;
@@ -39,7 +39,7 @@ interface ClanHeaderProps {
   guildIconUrl?: string;
 }
 
-export function ClanHeader({
+export function GroupHeader({
   clanName,
   groupSlug,
   gameSlug,
@@ -49,7 +49,7 @@ export function ClanHeader({
   displayName,
   onSignOut,
   guildIconUrl,
-}: ClanHeaderProps) {
+}: GroupHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -74,23 +74,29 @@ export function ClanHeader({
               <Home className="w-5 h-5 md:w-5 md:h-5" />
             </Link>
             {guildIconUrl && (
-              <img src={guildIconUrl} alt="Guild Icon" className="w-10 h-10 rounded-full border border-slate-700 bg-slate-800" />
+              <img src={guildIconUrl} alt="Group Icon" className="w-10 h-10 rounded-full border border-slate-700 bg-slate-800" />
             )}
-            <div>
-              <h1 className="font-display text-base md:text-xl font-semibold text-white">
-                {clanName || groupSlug}
-              </h1>
-              <p className="text-slate-500 text-xs md:text-sm hidden sm:block">
-                {characterCount} characters •
-                <span className={`ml-1 ${
-                  role === 'admin' ? 'text-orange-400' :
-                  role === 'officer' ? 'text-purple-400' :
-                  'text-cyan-400'
-                }`}>
-                  {role}
-                </span>
-              </p>
-            </div>
+            <Link
+              href="/"
+              className="hover:opacity-80 transition-opacity cursor-pointer"
+              title="Return to game selection"
+            >
+              <div>
+                <h1 className="font-display text-base md:text-xl font-semibold text-white hover:text-cyan-400">
+                  {clanName || groupSlug}
+                </h1>
+                <p className="text-slate-500 text-xs md:text-sm hidden sm:block">
+                  {characterCount} characters •
+                  <span className={`ml-1 ${
+                    role === 'admin' ? 'text-orange-400' :
+                    role === 'officer' ? 'text-purple-400' :
+                    'text-cyan-400'
+                  }`}>
+                    {role}
+                  </span>
+                </p>
+              </div>
+            </Link>
 
             {/* Game Switcher */}
             {enabledGames.length > 1 && (
