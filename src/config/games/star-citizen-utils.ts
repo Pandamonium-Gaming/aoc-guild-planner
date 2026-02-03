@@ -18,9 +18,11 @@ export function getManufacturerLogo(manufacturerName: string): string | null {
   const manufacturer = manufacturersData.manufacturers.find(
     m => m.name === manufacturerName
   );
-  if (!manufacturer?.logoFile) return null;
+  // Prefer multicolor logos for better visibility
+  const logoFile = manufacturer?.multicolorFile || manufacturer?.logoFile;
+  if (!logoFile) return null;
 
-  return `${manufacturersData.localBase}${manufacturer.logoFile}`;
+  return `${manufacturersData.localBase}${logoFile}`;
 }
 
 /**

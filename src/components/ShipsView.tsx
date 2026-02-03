@@ -371,7 +371,7 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                             <img 
                                               src={manufacturerLogo} 
                                               alt={shipData.manufacturer}
-                                              className="h-4 w-auto opacity-90 brightness-0 invert drop-shadow-sm"
+                                              className="h-5 w-auto"
                                               title={shipData.manufacturer}
                                             />
                                           )}
@@ -447,7 +447,7 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
                                             <img 
                                               src={manufacturerLogo} 
                                               alt={shipData.manufacturer}
-                                              className="h-4 w-auto opacity-90 brightness-0 invert drop-shadow-sm"
+                                              className="h-5 w-auto"
                                               title={shipData.manufacturer}
                                             />
                                           )}
