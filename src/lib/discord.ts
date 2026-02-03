@@ -6,6 +6,13 @@
  */
 
 import { Event, Announcement, EVENT_TYPES } from './events';
+import {
+  getGameEventsWebhookUrl,
+  getGameWebhookUrl,
+  getGameEventsRoleId,
+  getGameAnnouncementRoleId,
+  GameId,
+} from './discordConfig';
 
 interface DiscordEmbed {
   title?: string;
@@ -302,4 +309,69 @@ export async function notifyEventReminder(
     }],
   });
 }
+
+/**
+ * Game-Specific Notification Wrappers
+ * These functions automatically look up the right webhook and role for a game
+ */
+
+/**
+ * Send notification for a new event with automatic game-specific webhook/role lookup
+ */
+export async function notifyNewEventForGame(
+  gameSlug: GameId,
+  groupData: any,
+  event: Event,
+  clanName: string,
+  clanSlug: string
+): Promise<{ success: boolean; error?: string }> {
+  const webhookUrl = getGameEventsWebhookUrl(gameSlug, groupData);
+  const roleId = getGameEventsRoleId(gameSlug, groupData);
+
+  if (!webhookUrl) {
+    return { success: false, error: `No Discord webhook configured for ${gameSlug}` };
+  }
+
+  return notifyNewEvent(webhookUrl, event, clanName, clanSlug, roleId);
+}
+
+/**
+ * Send announcement with automatic game-specific webhook/role lookup
+ */
+export async function notifyAnnouncementForGame(
+  gameSlug: GameId,
+  groupData: any,
+  announcement: Announcement,
+  clanName: string,
+  clanSlug: string
+): Promise<{ success: boolean; error?: string }> {
+  const webhookUrl = getGameWebhookUrl(gameSlug, groupData);
+  const roleId = getGameAnnouncementRoleId(gameSlug, groupData);
+
+  if (!webhookUrl) {
+    return { success: false, error: `No Discord webhook configured for ${gameSlug}` };
+  }
+
+  return notifyAnnouncement(webhookUrl, announcement, clanName, clanSlug, roleId);
+}
+
+/**
+ * Send event reminder with automatic game-specific webhook lookup
+ */
+export async function notifyEventReminderForGame(
+  gameSlug: GameId,
+  groupData: any,
+  event: Event,
+  clanName: string,
+  minutesUntil: number
+): Promise<{ success: boolean; error?: string }> {
+  const webhookUrl = getGameEventsWebhookUrl(gameSlug, groupData);
+
+  if (!webhookUrl) {
+    return { success: false, error: `No Discord webhook configured for ${gameSlug}` };
+  }
+
+  return notifyEventReminder(webhookUrl, event, clanName, minutesUntil);
+}
+
 

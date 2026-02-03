@@ -1,6 +1,8 @@
 "use client";
 import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from './ui/Skeleton';
+import { getAllGames } from '@/lib/games';
+import { GAME_DISCORD_COLUMNS, GameId } from '@/lib/discordConfig';
 
 import { useState } from 'react';
 import { Webhook, Bell, BellOff, Check, AlertCircle, Loader2 } from 'lucide-react';
@@ -17,11 +19,17 @@ interface ClanSettingsProps {
   currentAocEventsWebhookUrl?: string;
   currentScWebhookUrl?: string;
   currentScEventsWebhookUrl?: string;
+  currentRorWebhookUrl?: string;
+  currentRorEventsWebhookUrl?: string;
   notifyOnEvents?: boolean;
   notifyOnAnnouncements?: boolean;
   announcementRoleId?: string;
+  aocAnnouncementRoleId?: string;
+  aocEventsRoleId?: string;
   scAnnouncementRoleId?: string;
   scEventsRoleId?: string;
+  rorAnnouncementRoleId?: string;
+  rorEventsRoleId?: string;
   aocWelcomeEnabled?: boolean;
   scWelcomeEnabled?: boolean;
   onUpdate?: () => void;
@@ -36,37 +44,77 @@ export function ClanSettings({
   currentAocEventsWebhookUrl = '',
   currentScWebhookUrl = '',
   currentScEventsWebhookUrl = '',
+  currentRorWebhookUrl = '',
+  currentRorEventsWebhookUrl = '',
   notifyOnEvents = true,
   notifyOnAnnouncements = true,
   announcementRoleId = '',
+  aocAnnouncementRoleId = '',
+  aocEventsRoleId = '',
   scAnnouncementRoleId = '',
   scEventsRoleId = '',
+  rorAnnouncementRoleId = '',
+  rorEventsRoleId = '',
   aocWelcomeEnabled = true,
   scWelcomeEnabled = true,
   onUpdate,
 }: ClanSettingsProps) {
   const { loading } = usePermissions(groupId);
+  const games = getAllGames();
+
   // Legacy webhook support
   const [webhookUrl, setWebhookUrl] = useState(currentWebhookUrl);
   const [welcomeWebhookUrl, setWelcomeWebhookUrl] = useState(currentWelcomeWebhookUrl);
-  // Game-specific webhooks
-  const [aocWebhookUrl, setAocWebhookUrl] = useState(currentAocWebhookUrl);
-  const [aocEventsWebhookUrl, setAocEventsWebhookUrl] = useState(currentAocEventsWebhookUrl);
-  const [scWebhookUrl, setScWebhookUrl] = useState(currentScWebhookUrl);
-  const [scEventsWebhookUrl, setScEventsWebhookUrl] = useState(currentScEventsWebhookUrl);
+
+  // Game-specific webhooks and roles
+  const [gameConfig, setGameConfig] = useState<
+    Record<GameId, {
+      webhookUrl: string;
+      eventsWebhookUrl: string;
+      announcementRoleId: string;
+      eventsRoleId: string;
+    }>
+  >({
+    aoc: {
+      webhookUrl: currentAocWebhookUrl,
+      eventsWebhookUrl: currentAocEventsWebhookUrl,
+      announcementRoleId: aocAnnouncementRoleId || announcementRoleId,
+      eventsRoleId: aocEventsRoleId,
+    },
+    starcitizen: {
+      webhookUrl: currentScWebhookUrl,
+      eventsWebhookUrl: currentScEventsWebhookUrl,
+      announcementRoleId: scAnnouncementRoleId,
+      eventsRoleId: scEventsRoleId,
+    },
+    ror: {
+      webhookUrl: currentRorWebhookUrl,
+      eventsWebhookUrl: currentRorEventsWebhookUrl,
+      announcementRoleId: rorAnnouncementRoleId,
+      eventsRoleId: rorEventsRoleId,
+    },
+  });
+
   const [eventsEnabled, setEventsEnabled] = useState(notifyOnEvents);
   const [announcementsEnabled, setAnnouncementsEnabled] = useState(notifyOnAnnouncements);
-  const [roleId, setRoleId] = useState(announcementRoleId);
-  const [scAnnouncementRole, setScAnnouncementRole] = useState(scAnnouncementRoleId);
-  const [scEventsRole, setScEventsRole] = useState(scEventsRoleId);
   const [aocWelcomeEnabledState, setAocWelcomeEnabledState] = useState(aocWelcomeEnabled);
   const [scWelcomeEnabledState, setScWelcomeEnabledState] = useState(scWelcomeEnabled);
   const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
+  const [testing, setTesting] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string; game?: string } | null>(null);
   const { t } = useLanguage();
+
+  const updateGameConfig = (gameId: GameId, field: string, value: string) => {
+    setGameConfig(prev => ({
+      ...prev,
+      [gameId]: {
+        ...prev[gameId],
+        [field]: value,
+      },
+    }));
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -75,23 +123,30 @@ export function ClanSettings({
     setTestResult(null);
 
     try {
+      const updateData: Record<string, any> = {
+        group_webhook_url: webhookUrl.trim() || null,
+        group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
+        notify_on_events: eventsEnabled,
+        notify_on_announcements: announcementsEnabled,
+        aoc_welcome_enabled: aocWelcomeEnabledState,
+        sc_welcome_enabled: scWelcomeEnabledState,
+      };
+
+      // Add game-specific webhooks and roles
+      Object.entries(gameConfig).forEach(([gameId, config]) => {
+        const columns = GAME_DISCORD_COLUMNS[gameId as GameId];
+        updateData[columns.webhookUrl] = config.webhookUrl.trim() || null;
+        updateData[columns.eventsWebhookUrl] = config.eventsWebhookUrl.trim() || null;
+        updateData[columns.announcementRoleId] = config.announcementRoleId.trim() || null;
+        updateData[columns.eventsRoleId] = config.eventsRoleId.trim() || null;
+      });
+
+      // Legacy support: sync AoC role to old column
+      updateData.discord_announcement_role_id = gameConfig.aoc.announcementRoleId.trim() || null;
+
       const { error: updateError } = await supabase
         .from('groups')
-        .update({
-          group_webhook_url: webhookUrl.trim() || null,
-          group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
-          aoc_webhook_url: aocWebhookUrl.trim() || null,
-          aoc_events_webhook_url: aocEventsWebhookUrl.trim() || null,
-          sc_webhook_url: scWebhookUrl.trim() || null,
-          sc_events_webhook_url: scEventsWebhookUrl.trim() || null,
-          notify_on_events: eventsEnabled,
-          notify_on_announcements: announcementsEnabled,
-          discord_announcement_role_id: roleId.trim() || null,
-          sc_announcement_role_id: scAnnouncementRole.trim() || null,
-          sc_events_role_id: scEventsRole.trim() || null,
-          aoc_welcome_enabled: aocWelcomeEnabledState,
-          sc_welcome_enabled: scWelcomeEnabledState,
-        })
+        .update(updateData)
         .eq('id', groupId)
         .select();
 
@@ -107,30 +162,34 @@ export function ClanSettings({
     }
   };
 
-  const handleTest = async () => {
-    if (!webhookUrl.trim()) {
-      setTestResult({ success: false, message: 'Please enter a webhook URL first' });
+  const handleTest = async (gameId: GameId) => {
+    const webhookToTest = gameConfig[gameId].eventsWebhookUrl || gameConfig[gameId].webhookUrl;
+    
+    if (!webhookToTest.trim()) {
+      setTestResult({ success: false, message: `Please enter a webhook URL for ${gameId} first`, game: gameId });
       return;
     }
 
-    setTesting(true);
+    setTesting(gameId);
     setTestResult(null);
 
     try {
-      const result = await testDiscordWebhook(webhookUrl.trim());
+      const result = await testDiscordWebhook(webhookToTest.trim());
       setTestResult({
         success: result.success,
         message: result.success 
-          ? 'Webhook test successful! Check your Discord channel.' 
+          ? `Webhook test successful for ${gameId}! Check your Discord channel.` 
           : result.error || 'Test failed',
+        game: gameId,
       });
     } catch (err) {
       setTestResult({
         success: false,
         message: err instanceof Error ? err.message : 'Test failed',
+        game: gameId,
       });
     } finally {
-      setTesting(false);
+      setTesting(null);
     }
   };
 
@@ -138,6 +197,16 @@ export function ClanSettings({
     return !url || 
       url.startsWith('https://discord.com/api/webhooks/') || 
       url.startsWith('https://discordapp.com/api/webhooks/');
+  };
+
+  const getGameName = (gameId: GameId) => {
+    const game = games.find(g => g.id === gameId);
+    return game?.name || gameId;
+  };
+
+  const getGameIcon = (gameId: GameId) => {
+    const game = games.find(g => g.id === gameId);
+    return game?.icon || '⚙️';
   };
 
   return (
@@ -201,170 +270,146 @@ export function ClanSettings({
         </p>
       </div>
 
-      {/* Game-specific section header */}
-      <div className="border-t border-slate-700 pt-6">
+      {/* Game-Specific Configuration Sections */}
+      <div className="border-t border-slate-700 pt-6 space-y-8">
         <h4 className="text-base font-semibold text-slate-300 mb-4">
-          {gameSlug === 'starcitizen' ? '🚀 Star Citizen Settings' : gameSlug === 'ror' ? '⚔️ Return of Reckoning Settings' : gameSlug === 'aoc' ? '⚔️ Ashes of Creation Settings' : '⚙️ Game Settings'}
+          Game-Specific Discord Webhooks & Roles
         </h4>
-      </div>
 
-      {/* Game-specific announcement role ID */}
-      <div>
-        <label htmlFor="discord-game-role-id" className="block text-sm font-medium text-slate-300 mb-2">
-          {gameSlug === 'starcitizen' ? 'Star Citizen Announcement Role ID' : 'AoC Announcement Role ID'} (Optional)
-        </label>
-        <input
-          id="discord-game-role-id"
-          type="text"
-          value={gameSlug === 'starcitizen' ? scAnnouncementRole : roleId}
-          onChange={(e) => gameSlug === 'starcitizen' ? setScAnnouncementRole(e.target.value.replace(/[^0-9]/g, '')) : setRoleId(e.target.value.replace(/[^0-9]/g, ''))}
-          placeholder="123456789012345678"
-          className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <p className="text-xs text-slate-500 mt-1">
-          {gameSlug === 'starcitizen' 
-            ? 'Enter the numeric Discord Role ID to ping when posting Star Citizen announcements.'
-            : 'Enter the numeric Discord Role ID to ping when posting AoC announcements. Right-click a role > Copy ID (Developer Mode must be enabled).'
-          }
-        </p>
-      </div>
+        {games.map((game) => (
+          <div key={game.id} className="bg-slate-800/30 border border-slate-700 rounded-lg p-4 space-y-4">
+            <h5 className="font-semibold text-slate-200">
+              {getGameIcon(game.id as GameId)} {game.name}
+            </h5>
 
-      {gameSlug === 'starcitizen' && (
-        <>
-          {/* Star Citizen Events Role ID */}
-          <div>
-            <label htmlFor="sc-events-role-id" className="block text-sm font-medium text-slate-300 mb-2">
-              Star Citizen Events Role ID (Optional)
-            </label>
-            <input
-              id="sc-events-role-id"
-              type="text"
-              value={scEventsRole}
-              onChange={(e) => setScEventsRole(e.target.value.replace(/[^0-9]/g, ''))}
-              placeholder="123456789012345678"
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <p className="text-xs text-slate-500 mt-1">
-              Enter the numeric Discord Role ID to ping when posting Star Citizen events.
-            </p>
-          </div>
-        </>
-      )}
-
-      {/* Welcome Messages Toggle */}
-      <div className="border-t border-slate-700 pt-4">
-        <label className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg cursor-pointer hover:bg-slate-800 transition-colors">
-          <div className="flex items-center gap-3">
-            {gameSlug === 'starcitizen' ? scWelcomeEnabledState : aocWelcomeEnabledState ? (
-              <Bell size={18} className="text-green-400" />
-            ) : (
-              <BellOff size={18} className="text-slate-500" />
-            )}
+            {/* General Webhook */}
             <div>
-              <span className="text-white text-sm font-medium">
-                {gameSlug === 'starcitizen' ? '🚀 Welcome Squadron Members' : '🎉 Welcome Guild Members'}
-              </span>
-              <p className="text-xs text-slate-500">
-                {gameSlug === 'starcitizen' 
-                  ? 'Send welcome messages to new squadron members'
-                  : 'Send welcome messages to new guild members'
-                }
+              <label htmlFor={`webhook-${game.id}`} className="block text-sm font-medium text-slate-300 mb-2">
+                General Webhook URL
+              </label>
+              <input
+                id={`webhook-${game.id}`}
+                type="url"
+                value={gameConfig[game.id as GameId].webhookUrl}
+                onChange={(e) => updateGameConfig(game.id as GameId, 'webhookUrl', e.target.value)}
+                placeholder="https://discord.com/api/webhooks/..."
+                className={`w-full px-3 py-2 bg-slate-800 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  gameConfig[game.id as GameId].webhookUrl && !isValidWebhookUrl(gameConfig[game.id as GameId].webhookUrl) 
+                    ? 'border-red-500' 
+                    : 'border-slate-600'
+                }`}
+              />
+              {gameConfig[game.id as GameId].webhookUrl && !isValidWebhookUrl(gameConfig[game.id as GameId].webhookUrl) && (
+                <p className="text-xs text-red-400 mt-1">Invalid Discord webhook URL</p>
+              )}
+              <p className="text-xs text-slate-500 mt-1">
+                Used for announcements and other general messages
               </p>
             </div>
+
+            {/* Events Webhook */}
+            <div>
+              <label htmlFor={`events-webhook-${game.id}`} className="block text-sm font-medium text-slate-300 mb-2">
+                Events Webhook URL (Optional)
+              </label>
+              <input
+                id={`events-webhook-${game.id}`}
+                type="url"
+                value={gameConfig[game.id as GameId].eventsWebhookUrl}
+                onChange={(e) => updateGameConfig(game.id as GameId, 'eventsWebhookUrl', e.target.value)}
+                placeholder="https://discord.com/api/webhooks/... (leave empty to use general webhook)"
+                className={`w-full px-3 py-2 bg-slate-800 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  gameConfig[game.id as GameId].eventsWebhookUrl && !isValidWebhookUrl(gameConfig[game.id as GameId].eventsWebhookUrl) 
+                    ? 'border-red-500' 
+                    : 'border-slate-600'
+                }`}
+              />
+              {gameConfig[game.id as GameId].eventsWebhookUrl && !isValidWebhookUrl(gameConfig[game.id as GameId].eventsWebhookUrl) && (
+                <p className="text-xs text-red-400 mt-1">Invalid Discord webhook URL</p>
+              )}
+              <p className="text-xs text-slate-500 mt-1">
+                If set, event notifications will be sent to this webhook instead of the general one
+              </p>
+            </div>
+
+            {/* Announcement Role */}
+            <div>
+              <label htmlFor={`announcement-role-${game.id}`} className="block text-sm font-medium text-slate-300 mb-2">
+                Announcement Role ID (Optional)
+              </label>
+              <input
+                id={`announcement-role-${game.id}`}
+                type="text"
+                value={gameConfig[game.id as GameId].announcementRoleId}
+                onChange={(e) => updateGameConfig(game.id as GameId, 'announcementRoleId', e.target.value.replace(/[^0-9]/g, ''))}
+                placeholder="123456789012345678"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Role to ping when posting announcements. Right-click role in Discord {'>'}  Copy ID (Developer Mode required)
+              </p>
+            </div>
+
+            {/* Events Role */}
+            <div>
+              <label htmlFor={`events-role-${game.id}`} className="block text-sm font-medium text-slate-300 mb-2">
+                Events Role ID (Optional)
+              </label>
+              <input
+                id={`events-role-${game.id}`}
+                type="text"
+                value={gameConfig[game.id as GameId].eventsRoleId}
+                onChange={(e) => updateGameConfig(game.id as GameId, 'eventsRoleId', e.target.value.replace(/[^0-9]/g, ''))}
+                placeholder="123456789012345678"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Role to ping when creating or reminding about events
+              </p>
+            </div>
+
+            {/* Test Button */}
+            {(gameConfig[game.id as GameId].eventsWebhookUrl || gameConfig[game.id as GameId].webhookUrl) && 
+             (isValidWebhookUrl(gameConfig[game.id as GameId].eventsWebhookUrl) || isValidWebhookUrl(gameConfig[game.id as GameId].webhookUrl)) && (
+              <button
+                onClick={() => handleTest(game.id as GameId)}
+                disabled={testing === game.id}
+                className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors disabled:opacity-50 cursor-pointer border border-purple-500/30 text-sm"
+              >
+                {testing === game.id ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <Webhook size={14} />
+                    Test Webhook
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Test Result for this game */}
+            {testResult?.game === game.id && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg ${
+                testResult.success 
+                  ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
+                  : 'bg-red-500/10 border border-red-500/30 text-red-400'
+              }`}>
+                {testResult.success ? <Check size={16} /> : <AlertCircle size={16} />}
+                <span className="text-sm">{testResult.message}</span>
+              </div>
+            )}
           </div>
-          <input
-            type="checkbox"
-            checked={gameSlug === 'starcitizen' ? scWelcomeEnabledState : aocWelcomeEnabledState}
-            onChange={(e) => gameSlug === 'starcitizen' ? setScWelcomeEnabledState(e.target.checked) : setAocWelcomeEnabledState(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-purple-500 focus:ring-purple-500 cursor-pointer"
-          />
-        </label>
+        ))}
       </div>
 
-      {/* Announcement Role ID - HIDDEN SECTION */}
-      {gameSlug === 'aoc' && (
-        <div style={{ display: 'none' }}>
-          <label htmlFor="discord-role-id-legacy" className="block text-sm font-medium text-slate-300 mb-2">
-            Announcement Role ID (AoC) (Optional)
-          </label>
-          <input
-            id="discord-role-id-legacy"
-            type="text"
-            value={roleId}
-            onChange={(e) => setRoleId(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder="123456789012345678"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <p className="text-xs text-slate-500 mt-1">
-            Enter the numeric Discord Role ID to ping when posting AoC announcements. Right-click a role {'>'} Copy ID (Developer Mode must be enabled).
-          </p>
-        </div>
-      )}
-
-      {gameSlug === 'star-citizen' && (
-        <div style={{ display: 'none' }}>
-          <label htmlFor="sc-announcement-role-id-legacy" className="block text-sm font-medium text-slate-300 mb-2">
-            Star Citizen Announcement Role ID (Optional)
-          </label>
-          <input
-            id="sc-announcement-role-id-legacy"
-            type="text"
-            value={scAnnouncementRole}
-            onChange={(e) => setScAnnouncementRole(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder="123456789012345678"
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <p className="text-xs text-slate-500 mt-1">
-            Enter the numeric Discord Role ID to ping when posting Star Citizen announcements.
-          </p>
-        </div>
-      )}
-
-      {/* Announcement Role ID */}
-      <div style={{ display: 'none' }}>
-        <label htmlFor="discord-role-id" className="block text-sm font-medium text-slate-300 mb-2">
-          Announcement Role ID (AoC) (Optional)
-        </label>
-        <input
-          id="discord-role-id"
-          type="text"
-          value={roleId}
-          onChange={(e) => setRoleId(e.target.value.replace(/[^0-9]/g, ''))}
-          placeholder="123456789012345678"
-          className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <p className="text-xs text-slate-500 mt-1">
-          Enter the numeric Discord Role ID to ping when posting AoC announcements. Right-click a role {'>'} Copy ID (Developer Mode must be enabled).
-        </p>
-      </div>
-
-
-      {/* Test button */}
-      {webhookUrl && isValidWebhookUrl(webhookUrl) && (
-        <button
-          onClick={handleTest}
-          disabled={testing}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors disabled:opacity-50 cursor-pointer border border-purple-500/30"
-        >
-          {testing ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              {t('discord.testing')}
-            </>
-          ) : (
-            <>
-              <Webhook size={16} />
-              {t('discord.testWebhook')}
-            </>
-          )}
-        </button>
-      )}
-
-      {/* Test result */}
-      {testResult && (
+      {/* Test result for legacy webhook */}
+      {testResult && testResult.game === undefined && (
         <div className={`flex items-start gap-2 p-3 rounded-lg ${
           testResult.success 
-            ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
+            ? 'bg-green-500/10 border border-green-500/30 text-green-400'
             : 'bg-red-500/10 border border-red-500/30 text-red-400'
         }`}>
           {testResult.success ? <Check size={16} /> : <AlertCircle size={16} />}
