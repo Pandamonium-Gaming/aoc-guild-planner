@@ -205,7 +205,7 @@ export function MoreTabContent({ groupId, userId, characters, isOfficer, gameSlu
 
       {subTab === 'ships' && (
         <ShipsView
-          characters={characters}
+          characters={[]}
           userId={userId}
           canManage={isOfficer}
           groupId={groupId}
