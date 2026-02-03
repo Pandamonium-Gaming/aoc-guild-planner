@@ -22,8 +22,11 @@ export function ClanTabNav({ canManage, initialTab = 'characters', gameSlug = 'a
     if (pathname.includes('/manage') || pathname.includes('/settings')) return 'manage';
     if (pathname.includes('/siege')) return 'siege';
     if (pathname.includes('/economy')) return 'economy';
+    if (pathname.includes('/achievements')) return 'achievements';
+    if (pathname.includes('/alliances')) return 'alliances';
+    if (pathname.includes('/builds')) return 'builds';
     if (pathname.includes('/ships') || pathname.includes('/fleet')) return 'matrix'; // Reuse matrix slot for ships
-    if (pathname.includes('/more') || pathname.includes('/builds') || pathname.includes('/achievements') || pathname.includes('/alliances')) return 'more';
+    if (pathname.includes('/more')) return 'more';
     return initialTab;
   };
 
