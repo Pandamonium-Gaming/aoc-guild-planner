@@ -3,7 +3,7 @@
 
 export type ClanRole = 'admin' | 'officer' | 'member' | 'trial' | 'pending';
 
-export type PermissionCategory = 'characters' | 'guild_bank' | 'events' | 'parties' | 'siege' | 'announcements' | 'recruitment' | 'settings';
+export type PermissionCategory = 'characters' | 'guild_bank' | 'events' | 'parties' | 'siege' | 'ships' | 'announcements' | 'recruitment' | 'settings';
 
 export interface Permission {
   id: string;
@@ -174,6 +174,38 @@ export const PERMISSIONS = {
     description: 'Create new siege events'
   },
 
+  // Ships (Star Citizen)
+  'ships_create': {
+    id: 'ships_create',
+    category: 'ships' as PermissionCategory,
+    name: 'Add Ships',
+    description: 'Add ships to characters'
+  },
+  'ships_edit_own': {
+    id: 'ships_edit_own',
+    category: 'ships' as PermissionCategory,
+    name: 'Edit Own Ships',
+    description: 'Edit ships on your own characters'
+  },
+  'ships_edit_any': {
+    id: 'ships_edit_any',
+    category: 'ships' as PermissionCategory,
+    name: 'Edit Any Ships',
+    description: 'Edit ships on any character'
+  },
+  'ships_delete_own': {
+    id: 'ships_delete_own',
+    category: 'ships' as PermissionCategory,
+    name: 'Delete Own Ships',
+    description: 'Delete ships from your own characters'
+  },
+  'ships_delete_any': {
+    id: 'ships_delete_any',
+    category: 'ships' as PermissionCategory,
+    name: 'Delete Any Ships',
+    description: 'Delete ships from any character'
+  },
+
   // Announcements
   'announcements_create': {
     id: 'announcements_create',
@@ -292,6 +324,10 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<ClanRole, Set<string>> = {
     // Siege
     'siege_create_event',
     'siege_edit_rosters',
+    // Ships
+    'ships_create',
+    'ships_edit_own',
+    'ships_delete_own',
     // Announcements
     'announcements_create',
   ]),
@@ -299,6 +335,10 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<ClanRole, Set<string>> = {
   trial: new Set([
     // Characters
     'characters_create',
+    // Ships
+    'ships_create',
+    'ships_edit_own',
+    'ships_delete_own',
     // Events
     // Can RSVP but not create
     // Guild Bank - read only

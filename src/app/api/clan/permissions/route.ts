@@ -49,6 +49,11 @@ export type PermissionOverrides = {
   siege_view_rosters: boolean;
   siege_edit_rosters: boolean;
   siege_create_event: boolean;
+  ships_create: boolean;
+  ships_edit_own: boolean;
+  ships_edit_any: boolean;
+  ships_delete_own: boolean;
+  ships_delete_any: boolean;
   announcements_create: boolean;
   announcements_edit: boolean;
   announcements_delete: boolean;
