@@ -212,6 +212,89 @@ const { data } = await supabase
 const userClans = await getUserClansForGame(userId, 'starcitizen');
 ```
 
+## Discord Integration
+
+Each game has independent Discord webhook and role configuration in the database, allowing guilds to send game-specific notifications to separate Discord channels.
+
+### Database Columns
+
+For each game, the following columns are available in the `groups` table:
+
+```sql
+-- General webhooks for announcements
+aoc_webhook_url TEXT
+sc_webhook_url TEXT
+ror_webhook_url TEXT
+
+-- Event-specific webhooks (optional, falls back to general webhook)
+aoc_events_webhook_url TEXT
+sc_events_webhook_url TEXT
+ror_events_webhook_url TEXT
+
+-- Role IDs for announcements
+aoc_announcement_role_id TEXT
+sc_announcement_role_id TEXT
+ror_announcement_role_id TEXT
+
+-- Role IDs for events
+aoc_events_role_id TEXT
+sc_events_role_id TEXT
+ror_events_role_id TEXT
+```
+
+When adding a new game, add corresponding columns (see [ADDING\_NEW\_GAMES.md](ADDING_NEW_GAMES.md) for migration details).
+
+### Configuration Utilities
+
+The `src/lib/discordConfig.ts` module provides helper functions:
+
+```typescript
+import {
+  getGameWebhookUrl,
+  getGameEventsWebhookUrl,
+  getGameAnnouncementRoleId,
+  getGameEventsRoleId,
+  getGameDiscordConfig,
+} from '@/lib/discordConfig';
+
+// Get all Discord config for a game
+const config = getGameDiscordConfig('ror', groupData);
+// Returns: { webhookUrl, eventsWebhookUrl, announcementRoleId, eventsRoleId }
+
+// Get individual values
+const webhook = getGameWebhookUrl('ror', groupData);
+const role = getGameEventsRoleId('ror', groupData);
+```
+
+### Sending Notifications
+
+Use the game-specific wrapper functions in `src/lib/discord.ts`:
+
+```typescript
+// Automatic webhook and role lookup
+await notifyNewEventForGame('ror', groupData, event, clanName, clanSlug);
+await notifyAnnouncementForGame('ror', groupData, announcement, clanName, clanSlug);
+await notifyEventReminderForGame('ror', groupData, event, clanName, minutesUntil);
+```
+
+These functions automatically:
+
+1. Look up the correct webhook URL for the game
+2. Look up the correct role ID for the game
+3. Send the notification with the game-specific configuration
+4. Return success/error status
+
+### Settings UI
+
+Guild admins configure per-game Discord webhooks and roles in the **Settings** tab. The `ClanSettings.tsx` component:
+
+* **Automatically detects all games** from the registry
+* **Dynamically generates** a configuration card for each game
+* **Provides test buttons** for each game's webhook independently
+* **Handles fallback logic** (uses general webhook if events webhook not set)
+
+No component changes needed when adding a new game - it automatically appears in settings!
+
 ## Future Considerations
 
 * **Route structure**: Consider implementing `src/app/[game]/[clan]` dynamic routes

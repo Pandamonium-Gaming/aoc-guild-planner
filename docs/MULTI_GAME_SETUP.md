@@ -149,19 +149,78 @@ src/
 │   ├── games.ts
 │   ├── gameConfig.ts
 │   ├── gameTracking.ts
-│   └── gameValidation.ts
+│   ├── gameValidation.ts
+│   └── discordConfig.ts         # ← Game-specific Discord configuration
 │
 ├── contexts/
 │   └── GameContext.tsx
 │
 ├── components/
 │   ├── GameSelector.tsx
-│   └── GameSwitcher.tsx
+│   ├── GameSwitcher.tsx
+│   └── ClanSettings.tsx          # ← Now manages per-game Discord webhooks/roles
 │
 └── app/
     ├── layout.tsx (updated)
     └── page.tsx (updated)
 ```
+
+## Discord Integration (Multi-Game Support)
+
+Guild admins can now configure separate Discord channels and roles for each game:
+
+### Database Setup
+
+Each game has dedicated Discord columns in the `groups` table:
+
+```
+aoc_webhook_url              - General announcements webhook
+aoc_events_webhook_url       - Event notifications webhook
+aoc_announcement_role_id     - Role to mention for announcements
+aoc_events_role_id           - Role to mention for events
+
+starcitizen_webhook_url      - (same pattern for Star Citizen)
+starcitizen_events_webhook_url
+starcitizen_announcement_role_id
+starcitizen_events_role_id
+
+ror_webhook_url              - (same pattern for Return of Reckoning)
+ror_events_webhook_url
+ror_announcement_role_id
+ror_events_role_id
+```
+
+### Configuration Files
+
+New utility module for managing per-game Discord configuration:
+
+* **`src/lib/discordConfig.ts`** - Helper functions for webhook/role lookup
+  * `getGameWebhookUrl(gameId, groupData)` - Get general webhook
+  * `getGameEventsWebhookUrl(gameId, groupData)` - Get events webhook (with fallback)
+  * `getGameAnnouncementRoleId(gameId, groupData)` - Get announcement role
+  * `getGameEventsRoleId(gameId, groupData)` - Get events role
+  * `GAME_DISCORD_COLUMNS` - Mapping of game IDs to database columns
+
+### Updated Discord Functions
+
+The `src/lib/discord.ts` now includes game-specific wrapper functions:
+
+* **`notifyNewEventForGame(gameId, groupData, event, ...)`** - Send event notification to correct channel
+* **`notifyAnnouncementForGame(gameId, groupData, announcement, ...)`** - Send announcement to correct channel
+* **`notifyEventReminderForGame(gameId, groupData, event, ...)`** - Send reminder to correct channel
+
+Each function automatically looks up the game-specific webhook and role IDs.
+
+### Settings UI
+
+The **ClanSettings.tsx** component now:
+
+* Dynamically generates webhook/role input sections for **all games** in the registry
+* Shows test buttons for each game independently
+* Handles fallback logic (uses general webhook if events webhook not set)
+* Saves per-game configurations to database automatically
+
+No component changes needed when adding a new game!
 
 ## Testing the Implementation
 
@@ -179,6 +238,8 @@ src/
 
 * `src/app/layout.tsx` - Added GameProvider
 * `src/app/page.tsx` - Added GameSelector logic and GameSwitcher component
+* `src/components/ClanSettings.tsx` - Updated to manage per-game Discord webhooks/roles
+* `src/lib/discord.ts` - Added game-specific wrapper functions
 
 ## Files Created
 
@@ -186,12 +247,19 @@ src/
 * `src/games/starcitizen/config/index.ts`
 * `src/games/starcitizen/config/ships.json`
 * `src/games/starcitizen/config/roles.json`
+* `src/games/ror/config/index.ts` - RoR faction/class configuration
 * `src/lib/games.ts`
 * `src/lib/gameConfig.ts`
 * `src/lib/gameTracking.ts`
 * `src/lib/gameValidation.ts`
+* `src/lib/discordConfig.ts` - Per-game Discord configuration utilities
 * `src/contexts/GameContext.tsx`
 * `src/components/GameSelector.tsx`
 * `src/components/GameSwitcher.tsx`
+* `src/components/DynamicFavicon.tsx` - Guild icon as favicon
 * `supabase/migrations/034_add_game_support.sql`
+* `supabase/migrations/059_ror_game_constraints.sql`
+* `supabase/migrations/060_standardize_starcitizen_slug.sql`
+* `supabase/migrations/061_ror_event_role_requirements.sql`
+* `supabase/migrations/062_ror_discord_webhooks_and_roles.sql`
 * `docs/MULTI_GAME_ARCHITECTURE.md`

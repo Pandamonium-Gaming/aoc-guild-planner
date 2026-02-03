@@ -44,6 +44,18 @@ Before you start implementing, answer these questions about your game:
    * Examples: Filter by class, faction, archetype, profession
    * Affects the CharacterFilters component
 
+### Discord Integration
+
+1. **Will this game have Discord notifications?**
+   * If yes, each game gets separate webhook URLs and role IDs in the database
+   * Guilds can configure per-game Discord channels
+   * Each game can have separate channels for announcements vs. events
+
+2. **Does the game need role requirements for events?**
+   * Examples: AoC uses 5-role system (Tank, Cleric, Bard, Ranged DPS, Melee DPS)
+   * RoR uses 3-role system (Tank, Healer, DPS) with 2/2/2 default composition
+   * This affects the EventForm component and database schema
+
 ## Step-by-Step Implementation
 
 ### Step 1: Create Game Configuration Files
@@ -324,6 +336,101 @@ export const NEWWORLD_CONFIG: GameConfig = {
 **`en.json` & `es.json`**: Add newworld translation section
 
 Done! New World is now available in your guild planner.
+
+***
+
+## Discord Configuration
+
+### Overview
+
+Each game can have independent Discord webhook URLs and role IDs for:
+
+* **General notifications** - Announcements, welcome messages, etc.
+* **Event notifications** - New events, reminders, updates (optional - can use general webhook)
+* **Announcement role** - Optional role mention for announcements (e.g., `@announcements`)
+* **Events role** - Optional role mention for events (e.g., `@events`)
+
+This allows guilds to:
+
+* Send AoC announcements to one channel and RoR announcements to another
+* Mention different roles per game (important when managing multiple communities)
+* Have separate event channels and reminders per game
+
+### Adding Discord Support for a New Game
+
+#### 1. Add Database Columns (in a migration)
+
+If your game doesn't already have Discord columns in the `groups` table:
+
+```sql
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS {game_slug}_webhook_url TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS {game_slug}_events_webhook_url TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS {game_slug}_announcement_role_id TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS {game_slug}_events_role_id TEXT;
+```
+
+Example for a hypothetical "Wow" game:
+
+```sql
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS wow_webhook_url TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS wow_events_webhook_url TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS wow_announcement_role_id TEXT;
+ALTER TABLE groups ADD COLUMN IF NOT EXISTS wow_events_role_id TEXT;
+```
+
+#### 2. Update Discord Configuration Helper
+
+In `src/lib/discordConfig.ts`, update the `GAME_DISCORD_COLUMNS` mapping:
+
+```typescript
+export const GAME_DISCORD_COLUMNS: Record<GameId, {
+  webhookUrl: string;
+  eventsWebhookUrl: string;
+  announcementRoleId: string;
+  eventsRoleId: string;
+}> = {
+  // ... existing games
+  wow: {
+    webhookUrl: 'wow_webhook_url',
+    eventsWebhookUrl: 'wow_events_webhook_url',
+    announcementRoleId: 'wow_announcement_role_id',
+    eventsRoleId: 'wow_events_role_id',
+  },
+};
+```
+
+The helper functions automatically support your new game once you add this mapping:
+
+* `getGameWebhookUrl(gameId, groupData)` - Returns the general webhook
+* `getGameEventsWebhookUrl(gameId, groupData)` - Returns events webhook (falls back to general)
+* `getGameAnnouncementRoleId(gameId, groupData)` - Returns announcement role ID
+* `getGameEventsRoleId(gameId, groupData)` - Returns events role ID
+
+#### 3. Use in Event/Announcement Handlers
+
+When sending Discord notifications, use the game-specific wrapper functions:
+
+```typescript
+// Old way (still works):
+await notifyNewEvent(webhookUrl, event, clanName, clanSlug, roleId);
+
+// New way (automatic per-game lookup):
+await notifyNewEventForGame('wow', groupData, event, clanName, clanSlug);
+await notifyAnnouncementForGame('wow', groupData, announcement, clanName, clanSlug);
+await notifyEventReminderForGame('wow', groupData, event, clanName, minutesUntil);
+```
+
+#### 4. Settings Page Updates (Automatic)
+
+The `ClanSettings.tsx` component automatically displays webhook and role configuration sections for all games in your registry. Once you add your new game to `GAMES`, guild admins will see a configuration card for it with fields for:
+
+* General webhook URL
+* Events webhook URL
+* Announcement role ID
+* Events role ID
+* Test button for each game
+
+No additional component changes needed!
 
 ***
 
