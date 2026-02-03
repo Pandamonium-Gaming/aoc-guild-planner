@@ -1,0 +1,101 @@
+{
+  "lastUpdated": "2026-02-03T11:15:24.570Z",
+  "source": "https://robertsspaceindustries.com/ship-matrix",
+  "manufacturers": [
+    {
+      "name": "Aegis Dynamics",
+      "logo": "https://robertsspaceindustries.com/media/z4ioxeze11o3hr/logo/Aegis_Logo.png",
+      "code": "AEGS"
+    },
+    {
+      "name": "Anvil Aerospace",
+      "logo": "https://robertsspaceindustries.com/media/txhzevx6s17m4r/logo/Anvil_Logo.png",
+      "code": "ANVL"
+    },
+    {
+      "name": "Aopoa",
+      "logo": "https://robertsspaceindustries.com/media/m7xgd8eghus4ar/logo/Aopoa_Logo.png",
+      "code": "XNAA"
+    },
+    {
+      "name": "Argo Astronautics",
+      "logo": "https://robertsspaceindustries.com/media/mfvgeneqcc7khr/logo/ARGO_Logo.png",
+      "code": "ARGO"
+    },
+    {
+      "name": "Banu",
+      "logo": "https://robertsspaceindustries.com/media/oqf2g7g7t3ttar/logo/Banu_Logo.png",
+      "code": "BANU"
+    },
+    {
+      "name": "Consolidated Outland",
+      "logo": "https://robertsspaceindustries.com/media/5ubymzqrfp20gr/logo/CO_Logo.png",
+      "code": "CNOU"
+    },
+    {
+      "name": "Crusader Industries",
+      "logo": "https://robertsspaceindustries.com/media/qcdj1phfyctc6r/logo/Crusader_Logo.png",
+      "code": "CRUS"
+    },
+    {
+      "name": "Drake Interplanetary",
+      "logo": "https://robertsspaceindustries.com/media/2g62ywllvk2f1r/logo/Drake_logo.png",
+      "code": "DRAK"
+    },
+    {
+      "name": "Esperia",
+      "logo": "https://robertsspaceindustries.com/media/kkad2w34u0ejir/logo/Esperia_Logo.png",
+      "code": "ESPR"
+    },
+    {
+      "name": "Gatac Manufacture",
+      "logo": "https://robertsspaceindustries.com/media/2wifj4j8q1mdpr/logo/Gatac_Logo.png",
+      "code": "GAMA"
+    },
+    {
+      "name": "Grey's Market",
+      "logo": "https://cdn.robertsspaceindustries.com/orion-v3/logoratios/greysmarket_monochrome_completed_2_1-43d53201.svg",
+      "code": "GREY"
+    },
+    {
+      "name": "Greycat Industrial",
+      "logo": "https://robertsspaceindustries.com/media/k8vsj8oo0e6iir/logo/Greycat_Logo.png",
+      "code": "GRIN"
+    },
+    {
+      "name": "Kruger Intergalactic",
+      "logo": "https://robertsspaceindustries.com/media/7duwvqqr0s5p3r/logo/Kruger_logo.png",
+      "code": "KRIG"
+    },
+    {
+      "name": "MISC",
+      "logo": "https://robertsspaceindustries.com/media/0bfruuxq5n1mor/logo/MISC_Logo.png",
+      "code": "MISC"
+    },
+    {
+      "name": "Mirai",
+      "logo": "https://robertsspaceindustries.com/media/epkp1tquy1xrir/logo/Mirai_logo.png",
+      "code": "MRAI"
+    },
+    {
+      "name": "Origin Jumpworks",
+      "logo": "https://robertsspaceindustries.com/media/h0pqev5c00j70r/logo/ORIG_Logo.png",
+      "code": "ORIG"
+    },
+    {
+      "name": "Roberts Space Industries",
+      "logo": "https://robertsspaceindustries.com/media/c5v6y3t8e5yphr/logo/RSI_Logo.png",
+      "code": "RSI"
+    },
+    {
+      "name": "Tumbril",
+      "logo": "https://robertsspaceindustries.com/media/g49sf4h2yvdrer/logo/Tumbril_Logo.png",
+      "code": "TMBL"
+    },
+    {
+      "name": "Vanduul",
+      "logo": "https://robertsspaceindustries.com/media/s6a5p3z7ek5lar/logo/Vanduul_Logo.png",
+      "code": "VNCL"
+    }
+  ]
+}

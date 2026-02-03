@@ -9,6 +9,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
+import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
 
 interface ShipData {
   id: string;
@@ -445,6 +446,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 const isConcept = shipData.productionStatus !== 'flight-ready';
                                 const RoleIcon = getRoleIcon(shipData.role);
                                 const roleColor = getRoleColor(shipData.role);
+                                const manufacturerLogo = getManufacturerLogo(shipData.manufacturer);
 
                                 return (
                                   <div key={ship.id} className="flex items-start gap-3 border border-slate-700 rounded-lg p-3 bg-slate-800/50">
@@ -453,16 +455,26 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                     </div>
                                     <div className="flex-1">
                                       <div className="flex items-start justify-between mb-2">
-                                        <div>
+                                        <div className="flex-1">
                                           <div className="flex items-center gap-2">
                                             <h5 className="font-semibold text-white">{shipData.name}</h5>
                                             {isConcept && (
                                               <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
                                             )}
                                           </div>
-                                          <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          <div className="flex items-center gap-2 mt-1">
+                                            {manufacturerLogo && (
+                                              <img 
+                                                src={manufacturerLogo} 
+                                                alt={shipData.manufacturer}
+                                                className="h-3 w-auto opacity-60"
+                                                title={shipData.manufacturer}
+                                              />
+                                            )}
+                                            <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                          </div>
                                         </div>
-                                        <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
+                                        <span className={`text-xs px-2 py-1 rounded border ${ownershipColor} whitespace-nowrap ml-2`}>
                                           {ownershipLabel}
                                         </span>
                                       </div>
@@ -532,6 +544,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 const isConcept = shipData.productionStatus !== 'flight-ready';
                                 const RoleIcon = getRoleIcon(shipData.role);
                                 const roleColor = getRoleColor(shipData.role);
+                                const manufacturerLogo = getManufacturerLogo(shipData.manufacturer);
 
                                 return (
                                   <div
@@ -544,16 +557,26 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                       </div>
                                       <div className="flex-1">
                                         <div className="flex items-start justify-between mb-2">
-                                          <div>
+                                          <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                               <h5 className="font-semibold text-white">{shipData.name}</h5>
                                               {isConcept && (
                                                 <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
                                               )}
                                             </div>
-                                            <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                              {manufacturerLogo && (
+                                                <img 
+                                                  src={manufacturerLogo} 
+                                                  alt={shipData.manufacturer}
+                                                  className="h-3 w-auto opacity-60"
+                                                  title={shipData.manufacturer}
+                                                />
+                                              )}
+                                              <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
+                                            </div>
                                           </div>
-                                          <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
+                                          <span className={`text-xs px-2 py-1 rounded border ${ownershipColor} whitespace-nowrap ml-2`}>
                                             {ownershipLabel}
                                           </span>
                                         </div>

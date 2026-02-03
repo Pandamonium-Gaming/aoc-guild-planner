@@ -9,6 +9,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
+import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
 
 interface ShipData {
   id: string;
