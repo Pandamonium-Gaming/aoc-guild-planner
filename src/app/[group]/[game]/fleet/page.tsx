@@ -16,11 +16,11 @@ export default function FleetPage({ params }: { params: Promise<{ group: string;
   const canManage = membership?.role === 'admin' || membership?.role === 'officer';
 
   if (!group || !user) {
-    return <GameLayout params={params} activeTab="fleet"><div /></GameLayout>;
+    return <GameLayout params={params} activeTab="matrix"><div /></GameLayout>;
   }
 
   return (
-    <GameLayout params={params} activeTab="fleet">
+    <GameLayout params={params} activeTab="matrix">
       <FleetView
         characters={characters}
         userId={user.id}

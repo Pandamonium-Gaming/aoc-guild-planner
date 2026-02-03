@@ -1,6 +1,7 @@
 'use client';
 
 import { use, ReactNode } from 'react';
+import { Tab } from '@/components/tabs';
 import Link from 'next/link';
 import { useAuthContext } from '@/components/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,7 +18,7 @@ import { Users, Clock, UserPlus, Loader2 } from 'lucide-react';
 interface GameLayoutProps {
   params: Promise<{ group: string; game: string }>;
   children: ReactNode;
-  activeTab: string;
+  activeTab: Tab;
 }
 
 export function GameLayout({ params, children, activeTab }: GameLayoutProps) {
@@ -110,7 +111,16 @@ export function GameLayout({ params, children, activeTab }: GameLayoutProps) {
   }
 
   if (groupError) {
-    return <ClanErrorScreen error={groupError} />;
+    return (
+      <ClanErrorScreen 
+        title={t('group.errorLoading')}
+        message={t('group.connectionErrorMessage')}
+        error={groupError}
+        retryLabel={t('common.retryConnection')}
+        onRetry={() => window.location.reload()}
+        homeLabel={t('common.returnHome')}
+      />
+    );
   }
 
   const enabledGames = [{ slug: gameSlug, name: gameSlug === 'aoc' ? 'Ashes of Creation' : 'Star Citizen', icon: gameSlug === 'aoc' ? '⚔️' : '🚀' }];
