@@ -448,8 +448,8 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 const manufacturerLogo = getManufacturerLogo(shipData.manufacturer);
 
                                 return (
-                                  <div key={ship.id} className="flex items-start gap-3 border border-slate-700 rounded-lg p-3 bg-slate-800/50">
-                                    <div className={`p-2 rounded-lg ${roleColor}`}>
+                                  <div key={ship.id} className="flex items-center gap-3 border border-slate-700 rounded-lg p-3 bg-slate-800/50">
+                                    <div className={`p-2 rounded-lg ${roleColor} flex-shrink-0`}>
                                       <RoleIcon className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1">
@@ -462,11 +462,11 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                             )}
                                           </div>
                                           {manufacturerLogo && (
-                                            <div className="mt-3 flex w-full items-center justify-center">
+                                            <div className="mt-3 flex items-center justify-center">
                                               <img 
                                                 src={manufacturerLogo} 
                                                 alt={shipData.manufacturer}
-                                                className="h-20 w-auto object-contain brightness-0 invert opacity-100 mx-auto"
+                                                className="h-16 w-auto object-contain brightness-0 invert opacity-100"
                                                 title={shipData.manufacturer}
                                               />
                                             </div>
@@ -549,10 +549,10 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 return (
                                   <div
                                     key={ship.id}
-                                    className="flex items-start justify-between p-3 bg-slate-800 border border-slate-700 rounded-lg"
+                                    className="flex items-center justify-between p-3 bg-slate-800 border border-slate-700 rounded-lg"
                                   >
                                     <div className="flex items-center gap-3 flex-1">
-                                      <div className={`p-2 rounded-lg ${roleColor}`}>
+                                      <div className={`p-2 rounded-lg ${roleColor} flex-shrink-0`}>
                                         <RoleIcon className="w-5 h-5" />
                                       </div>
                                       <div className="flex-1">
@@ -565,11 +565,11 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                               )}
                                             </div>
                                             {manufacturerLogo && (
-                                              <div className="mt-3 flex w-full items-center justify-center">
+                                              <div className="mt-3 flex items-center justify-center">
                                                 <img 
                                                   src={manufacturerLogo} 
                                                   alt={shipData.manufacturer}
-                                                  className="h-20 w-auto object-contain brightness-0 invert opacity-100 mx-auto"
+                                                  className="h-16 w-auto object-contain brightness-0 invert opacity-100"
                                                   title={shipData.manufacturer}
                                                 />
                                               </div>
