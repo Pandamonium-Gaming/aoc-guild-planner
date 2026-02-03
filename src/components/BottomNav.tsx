@@ -42,6 +42,7 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
       case 'alliances': return `${basePath}/alliances`;
       case 'builds': return `${basePath}/builds`;
       case 'economy': return `${basePath}/economy`;
+      case 'more': return `${basePath}/more`;
       case 'manage': return `${basePath}/settings`;
       default: return `${basePath}/characters`;
     }
@@ -63,7 +64,10 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
 
   // Check if any more items are visible (not excluded)
   const visibleMoreItems = MORE_ITEMS.filter(item => !excludedTabs.includes(item.tab));
-  const isMoreItemActive = visibleMoreItems.some(item => item.tab === activeTab);
+  const isMoreItemActive = visibleMoreItems.some(item => item.tab === activeTab) || activeTab === 'more';
+  
+  // For games without specific more items, navigate to /more page directly
+  const hasMoreDropdown = visibleMoreItems.length > 0;
   
   return (
     <nav 
@@ -116,8 +120,8 @@ export function BottomNav({ activeTab, canManage, gameSlug = 'aoc', groupSlug }:
           );
         })}
 
-        {/* "More" menu button for grouped items */}
-        {visibleMoreItems.length > 0 && (
+        {/* "More" menu button - only show if there are dropdown items */}
+        {hasMoreDropdown && (
           <div className="relative flex-1">
             <button
               onClick={() => setShowMoreMenu(!showMoreMenu)}
