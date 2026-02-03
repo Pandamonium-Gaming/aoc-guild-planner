@@ -33,7 +33,7 @@ export function GameLayout({ params, children, activeTab }: GameLayoutProps) {
     group,
     loading: groupLoading,
     error: groupError,
-  } = useGroupData(groupSlug);
+  } = useGroupData(groupSlug, gameSlug);
 
   const {
     membership,
