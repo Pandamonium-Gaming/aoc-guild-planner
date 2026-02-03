@@ -978,5 +978,44 @@
       "name": "Delete Any Ship",
       "description": "Delete ships from any character"
     }
+  },
+  "ror": {
+    "factions": {
+      "order": "Order",
+      "destruction": "Destruction"
+    },
+    "roles": {
+      "tank": "Tank",
+      "melee-dps": "Melee DPS",
+      "skirmish-dps": "Skirmish DPS",
+      "ranged-dps": "Ranged DPS",
+      "healer": "Healer"
+    },
+    "classes": {
+      "ironbreaker": "Ironbreaker",
+      "slayer": "Slayer",
+      "runepriest": "Runepriest",
+      "engineer": "Engineer",
+      "knight-blazing-sun": "Knight of the Blazing Sun",
+      "witch-hunter": "Witch Hunter",
+      "warrior-priest": "Warrior Priest",
+      "bright-wizard": "Bright Wizard",
+      "swordmaster": "Swordmaster",
+      "white-lion": "White Lion",
+      "archmage": "Archmage",
+      "shadow-warrior": "Shadow Warrior",
+      "black-orc": "Black Orc",
+      "choppa": "Choppa",
+      "shaman": "Shaman",
+      "squig-herder": "Squig Herder",
+      "chosen": "Chosen",
+      "marauder": "Marauder",
+      "zealot": "Zealot",
+      "magus": "Magus",
+      "black-guard": "Black Guard",
+      "witch-elf": "Witch Elf",
+      "disciple-khaine": "Disciple of Khaine",
+      "sorceress": "Sorceress"
+    }
   }
 }

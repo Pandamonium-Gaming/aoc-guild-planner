@@ -21,6 +21,7 @@ export type Tab = typeof TAB_LIST[number];
 // Tabs to hide for specific games
 export const GAME_TAB_EXCLUSIONS: Record<string, Tab[]> = {
   'star-citizen': ['economy', 'achievements', 'alliances', 'builds', 'parties', 'siege'],
+  'ror': ['economy', 'matrix', 'achievements', 'builds', 'siege', 'fleet', 'ships'],
 };
 
 // Tab icons and purposes for different games
