@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Ship, Plus, Trash2, Loader2, AlertCircle,
+  Ship, Loader2, AlertCircle,
   Sword, Shield, Package, Wrench, Search, Rocket, Heart,
   Zap, Users, Plane, Target, Radio, Pickaxe, Boxes, Truck
 } from 'lucide-react';
@@ -98,12 +98,6 @@ function normalizeRole(role: string): string {
   return role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 }
 
-// Title case the size attribute
-function formatSize(size: string): string {
-  if (size === 'vehicle') return 'Vehicle';
-  return size.charAt(0).toUpperCase() + size.slice(1);
-}
-
 // Get icon component for ship role
 function getRoleIcon(role: string) {
   const roleLower = role.toLowerCase();
@@ -151,11 +145,6 @@ function getRoleColor(role: string) {
 export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewProps) {
   const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [selectedShip, setSelectedShip] = useState<string | null>(null);
-  const [ownershipType, setOwnershipType] = useState<'pledged' | 'in-game' | 'loaner'>('pledged');
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load character ships
@@ -208,60 +197,6 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
     return shipsData.ships.find(s => s.id === shipId);
   };
 
-  const handleAddShip = async () => {
-    if (!selectedCharacter || !selectedShip) {
-      setError('Please select a character and ship');
-      return;
-    }
-
-    setSaving(true);
-    setError(null);
-
-    try {
-      const { error: insertError } = await supabase
-        .from('character_ships')
-        .insert({
-          character_id: selectedCharacter,
-          ship_id: selectedShip,
-          ownership_type: ownershipType,
-        });
-
-      if (insertError) throw insertError;
-
-      // Reload ships
-      await loadCharacterShips();
-      setShowAddForm(false);
-      setSelectedCharacter(null);
-      setSelectedShip(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add ship');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteShip = async (shipId: string) => {
-    if (!confirm('Remove this ship?')) return;
-
-    setError(null);
-    try {
-      const { error: deleteError } = await supabase
-        .from('character_ships')
-        .delete()
-        .eq('id', shipId);
-
-      if (deleteError) {
-        console.error('Error deleting ship:', deleteError);
-        throw deleteError;
-      }
-
-      await loadCharacterShips();
-    } catch (err) {
-      console.error('Failed to delete ship:', err);
-      setError(err instanceof Error ? err.message : 'Failed to delete ship');
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -277,7 +212,7 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Ship className="w-6 h-6 text-cyan-400" />
-            <h2 className="text-2xl font-bold text-white">Fleet</h2>
+            <h2 className="text-2xl font-bold text-white">Ships Overview</h2>
           </div>
         </div>
         <div className="flex items-start gap-2 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
@@ -293,14 +228,24 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
     );
   }
 
-  const playerCharacters = characters.filter(c => c.user_id === userId);
-  const allCharactersByOwner = characters.reduce((acc, char) => {
-    if (!acc[char.user_id || 'unknown']) {
-      acc[char.user_id || 'unknown'] = [];
+  // Group all ships by role for overview
+  const allShips = Object.values(characterShips).flat();
+  const shipsByRole = allShips.reduce((acc, ship) => {
+    const shipData = getShipData(ship.ship_id);
+    if (!shipData) return acc;
+    
+    const role = normalizeRole(shipData.role);
+    if (!acc[role]) {
+      acc[role] = [];
     }
-    acc[char.user_id || 'unknown'].push(char);
+    acc[role].push({ ship, shipData });
     return acc;
-  }, {} as Record<string, CharacterWithProfessions[]>);
+  }, {} as Record<string, Array<{ ship: CharacterShip; shipData: ShipData }>>);
+
+  // Sort roles by ship count
+  const sortedRoles = Object.keys(shipsByRole).sort((a, b) => 
+    shipsByRole[b].length - shipsByRole[a].length
+  );
 
   return (
     <div className="space-y-6">
@@ -308,17 +253,15 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Ship className="w-6 h-6 text-cyan-400" />
-          <h2 className="text-2xl font-bold text-white">Fleet</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Ships Overview</h2>
+            <p className="text-sm text-slate-400">Guild-wide fleet summary</p>
+          </div>
         </div>
-        {canManage && (
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            Add Ship
-          </button>
-        )}
+        <div className="text-right">
+          <div className="text-2xl font-bold text-cyan-400">{allShips.length}</div>
+          <div className="text-xs text-slate-400">Total Ships</div>
+        </div>
       </div>
 
       {/* Error */}
@@ -329,311 +272,119 @@ export function ShipsView({ characters, userId, canManage, groupId }: ShipsViewP
         </div>
       )}
 
-      {/* Add Ship Form */}
-      {showAddForm && canManage && (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Add Ship</h3>
-
-          {/* Character Select */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Character
-            </label>
-            <select
-              value={selectedCharacter || ''}
-              onChange={(e) => setSelectedCharacter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            >
-              <option value="">Select a character...</option>
-              {playerCharacters.map(char => (
-                <option key={char.id} value={char.id}>
-                  {char.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Ship Select */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Ship
-            </label>
-            <select
-              value={selectedShip || ''}
-              onChange={(e) => setSelectedShip(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            >
-              <option value="">Select a ship...</option>
-              {shipsData.ships.map(ship => (
-                <option key={ship.id} value={ship.id}>
-                  {ship.name} ({ship.manufacturer}) - {ship.role}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Ownership Type */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Ownership Type
-            </label>
-            <select
-              value={ownershipType}
-              onChange={(e) => setOwnershipType(e.target.value as 'pledged' | 'in-game' | 'loaner')}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            >
-              <option value="pledged">Pledged</option>
-              <option value="in-game">In-Game Purchase</option>
-              <option value="loaner">Loaner</option>
-            </select>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleAddShip}
-              disabled={saving || !selectedCharacter || !selectedShip}
-              className="flex-1 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-white rounded-lg transition-colors cursor-pointer"
-            >
-              {saving ? (
-                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-              ) : (
-                'Add Ship'
-              )}
-            </button>
-            <button
-              onClick={() => {
-                setShowAddForm(false);
-                setSelectedCharacter(null);
-                setSelectedShip(null);
-              }}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Ships by Character Owner */}
-      <div className="space-y-6">
-        {Object.entries(allCharactersByOwner).map(([ownerUserId, chars]) => {
-          const ownerName = ownerUserId === userId ? 'Your Characters' : chars[0]?.user_id ? `${chars[0].user_id}'s Characters` : 'Unassigned Characters';
-          
-          return (
-            <div key={ownerUserId} className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-300">{ownerName}</h3>
-              
-              {chars.map(char => {
-                const ships = characterShips[char.id] || [];
-                return (
-                  <div key={char.id} className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
-                    <h4 className="font-semibold text-white mb-4">{char.name}</h4>
-                    
-                    {ships.length === 0 ? (
-                      <p className="text-slate-400 text-sm">No ships added yet</p>
-                    ) : (
-                      <div className="space-y-6">
-                        {/* Ships Section */}
-                        {ships.filter(s => {
-                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
-                          return shipData && shipData.size !== 'vehicle';
-                        }).length > 0 && (
-                          <div className="space-y-3">
-                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ships</h5>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {ships.filter(s => {
-                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
-                          return shipData && shipData.size !== 'vehicle';
-                        }).map(ship => {
-                          const shipData = getShipData(ship.ship_id);
-                          if (!shipData) return null;
-
-                          const ownershipColor = {
-                            'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
-                            'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-                            'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-                          }[ship.ownership_type];
-
-                          const ownershipLabel = {
-                            'pledged': 'Pledged',
-                            'in-game': 'In-Game',
-                            'loaner': 'Loaner',
-                          }[ship.ownership_type];
-
-                          // Check if ship is concept from ship data
-                          const isConcept = shipData.productionStatus !== 'flight-ready';
-                          const RoleIcon = getRoleIcon(shipData.role);
-                          const roleColor = getRoleColor(shipData.role);
-
-                          return (
-                            <div key={ship.id} className="flex items-start gap-3 border border-slate-700 rounded-lg p-3 bg-slate-800/50">
-                              <div className={`p-2 rounded-lg ${roleColor}`}>
-                                <RoleIcon className="w-5 h-5" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <h5 className="font-semibold text-white">{shipData.name}</h5>
-                                      {isConcept && (
-                                        <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
-                                      )}
-                                    </div>
-                                    <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
-                                  </div>
-                                  <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
-                                    {ownershipLabel}
-                                  </span>
-                                </div>
-                              
-                                <div className="space-y-1 text-xs">
-                                  <div className="flex justify-between">
-                                    <span className="text-slate-400">Role:</span>
-                                    <span>{normalizeRole(shipData.role)}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-slate-400">Size:</span>
-                                    <span>{formatSize(shipData.size)}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-slate-400">Crew:</span>
-                                    <span>{shipData.crew.min}-{shipData.crew.max}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-slate-400">Cargo:</span>
-                                    <span>{shipData.cargo} SCU</span>
-                                  </div>
-                                </div>
-                              </div>
-                              {canManage && ownerUserId === userId && (
-                                <button
-                                  onClick={() => handleDeleteShip(ship.id)}
-                                  className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
-                                  title="Remove ship"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Ground Vehicles Section */}
-                        {ships.filter(s => {
-                          const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
-                          return shipData && shipData.size === 'vehicle';
-                        }).length > 0 && (
-                          <div className="space-y-3">
-                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ground Vehicles</h5>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {ships.filter(s => {
-                              const shipData = (shipsData.ships as ShipData[]).find(sd => sd.id === s.ship_id);
-                              return shipData && shipData.size === 'vehicle';
-                            }).map((ship) => {
-                          const shipData = (shipsData.ships as ShipData[]).find(s => s.id === ship.ship_id);
-                          if (!shipData) return null;
-
-                          const ownershipColor = {
-                            'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
-                            'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-                            'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-                          }[ship.ownership_type];
-
-                          const ownershipLabel = {
-                            'pledged': 'Pledged',
-                            'in-game': 'In-Game',
-                            'loaner': 'Loaner',
-                          }[ship.ownership_type];
-
-                          const isConcept = shipData.productionStatus !== 'flight-ready';
-                          const RoleIcon = getRoleIcon(shipData.role);
-                          const roleColor = getRoleColor(shipData.role);
-
-                          return (
-                            <div
-                              key={ship.id}
-                              className="flex items-start justify-between p-3 bg-slate-800 border border-slate-700 rounded-lg"
-                            >
-                              <div className="flex items-center gap-3 flex-1">
-                                <div className={`p-2 rounded-lg ${roleColor}`}>
-                                  <RoleIcon className="w-5 h-5" />
-                                </div>
-                                <div className="flex-1">
-                              <div className="flex items-start justify-between mb-2">
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <h5 className="font-semibold text-white">{shipData.name}</h5>
-                                    {isConcept && (
-                                      <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
-                                    )}
-                                  </div>
-                                  <p className="text-xs text-slate-400">{shipData.manufacturer}</p>
-                                </div>
-                                <span className={`text-xs px-2 py-1 rounded border ${ownershipColor}`}>
-                                  {ownershipLabel}
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                  <span className="text-slate-400">Role:</span>
-                                  <span className="ml-1 text-white">{normalizeRole(shipData.role)}</span>
-                                </div>
-                                <div>
-                                  <span className="text-slate-400">Crew:</span>
-                                  <span className="ml-1 text-white">
-                                    {shipData.crew.min === shipData.crew.max
-                                      ? shipData.crew.min
-                                      : `${shipData.crew.min}-${shipData.crew.max}`}
-                                  </span>
-                                </div>
-                              </div>
-                              </div>
-                              </div>
-                              {canManage && (
-                                <button
-                                  onClick={() => handleDeleteShip(ship.id)}
-                                  className="ml-2 p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
-                                  title="Remove vehicle"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Empty State */}
-      {Object.values(characterShips).every(ships => ships.length === 0) && !showAddForm && (
+      {/* Ships grouped by Role */}
+      {allShips.length === 0 ? (
         <div className="text-center py-12">
           <Ship className="w-12 h-12 text-slate-600 mx-auto mb-4" />
           <p className="text-slate-400">No ships in the fleet yet</p>
-          {canManage && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors cursor-pointer"
-            >
-              Add the first ship
-            </button>
-          )}
+          <p className="text-sm text-slate-500 mt-2">Ships will appear here once members add them to their characters</p>
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {sortedRoles.map(role => {
+            const roleShips = shipsByRole[role];
+            const RoleIcon = getRoleIcon(role);
+            const roleColor = getRoleColor(role);
+            
+            // Count by ownership type
+            const pledgedCount = roleShips.filter(s => s.ship.ownership_type === 'pledged').length;
+            const inGameCount = roleShips.filter(s => s.ship.ownership_type === 'in-game').length;
+            const loanerCount = roleShips.filter(s => s.ship.ownership_type === 'loaner').length;
+            
+            // Group by manufacturer within this role
+            const byManufacturer = roleShips.reduce((acc, { shipData }) => {
+              if (!acc[shipData.manufacturer]) {
+                acc[shipData.manufacturer] = 0;
+              }
+              acc[shipData.manufacturer]++;
+              return acc;
+            }, {} as Record<string, number>);
+            
+            const manufacturers = Object.entries(byManufacturer)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 5); // Top 5 manufacturers
+
+            return (
+              <div key={role} className="bg-slate-900/50 border border-slate-700 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-3 rounded-lg ${roleColor}`}>
+                      <RoleIcon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{role}</h3>
+                      <p className="text-sm text-slate-400">{roleShips.length} ship{roleShips.length !== 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 text-xs">
+                    {pledgedCount > 0 && (
+                      <div className="px-2 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded">
+                        {pledgedCount} Pledged
+                      </div>
+                    )}
+                    {inGameCount > 0 && (
+                      <div className="px-2 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded">
+                        {inGameCount} In-Game
+                      </div>
+                    )}
+                    {loanerCount > 0 && (
+                      <div className="px-2 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded">
+                        {loanerCount} Loaner
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Top Manufacturers */}
+                {manufacturers.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-4">
+                    {manufacturers.map(([manufacturer, count]) => (
+                      <div key={manufacturer} className="p-2 bg-slate-800/50 rounded text-center">
+                        <div className="text-xs text-slate-400 truncate" title={manufacturer}>
+                          {manufacturer}
+                        </div>
+                        <div className="text-sm font-semibold text-white">{count}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Ship List */}
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+                    View all ships
+                  </summary>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {roleShips.map(({ ship, shipData }) => {
+                      const character = characters.find(c => c.id === ship.character_id);
+                      const isConcept = shipData.productionStatus !== 'flight-ready';
+                      
+                      return (
+                        <div key={ship.id} className="p-2 bg-slate-800 border border-slate-700 rounded text-xs">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-white truncate" title={shipData.name}>
+                              {shipData.name}
+                            </span>
+                            {isConcept && (
+                              <span className="text-[10px] px-1 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">
+                                Concept
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-slate-400 truncate" title={`${shipData.manufacturer} - ${character?.name || 'Unknown'}`}>
+                            {shipData.manufacturer} • {character?.name || 'Unknown'}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </details>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
-
