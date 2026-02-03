@@ -7,45 +7,49 @@ This guide walks through the process of adding a new game to the multi-game arch
 Before you start implementing, answer these questions about your game:
 
 ### Basic Identity
+
 1. **What is the game name?** (e.g., "Ashes of Creation", "Star Citizen", "Return of Reckoning")
 2. **What is the game slug/ID?** (e.g., "aoc", "starcitizen", "ror" - used in URLs and code)
 3. **What is a short description?** (e.g., "View members, events, and manage guild operations")
 
 ### Structural Organization
-4. **What are the main organizational units for characters?** 
-   - Examples: Professions (AoC), nothing special (Star Citizen), Factions + Classes (RoR)
-   - This determines your config structure
 
-5. **What roles/specializations exist?** 
-   - Examples: Tank, DPS, Healer (RoR), Ship Role (Star Citizen)
-   - Helps define character filtering and party composition
+4. **What are the main organizational units for characters?**
+   * Examples: Professions (AoC), nothing special (Star Citizen), Factions + Classes (RoR)
+   * This determines your config structure
+
+5. **What roles/specializations exist?**
+   * Examples: Tank, DPS, Healer (RoR), Ship Role (Star Citizen)
+   * Helps define character filtering and party composition
 
 6. **Does the game have faction systems?**
-   - If yes, list them and their color schemes (e.g., Order=#blue, Destruction=#red)
-   - This affects character creation and filtering
+   * If yes, list them and their color schemes (e.g., Order=#blue, Destruction=#red)
+   * This affects character creation and filtering
 
 ### Feature Management
+
 7. **Which tabs should be available for this game?**
-   - Available tabs: economy, matrix, achievements, builds, siege, fleet, ships, characters, events, settings
-   - Exclude tabs that don't make sense for your game
+   * Available tabs: economy, matrix, achievements, builds, siege, fleet, ships, characters, events, settings
+   * Exclude tabs that don't make sense for your game
 
 8. **Are there any game-specific tab names?**
-   - Example: Star Citizen shows "My Hangar" instead of "Fleet"
-   - Use GAME_TAB_CUSTOMIZATION for this
+   * Example: Star Citizen shows "My Hangar" instead of "Fleet"
+   * Use GAME\_TAB\_CUSTOMIZATION for this
 
 9. **What's the default party composition?**
-   - Examples: AoC uses 1-2-2 (1 Tank, 2 Melee DPS, 2 Ranged DPS)
-   - RoR uses 2-2-2 (2 Tank, 2 Melee DPS, 2 Ranged DPS + Healer as support)
+   * Examples: AoC uses 1-2-2 (1 Tank, 2 Melee DPS, 2 Ranged DPS)
+   * RoR uses 2-2-2 (2 Tank, 2 Melee DPS, 2 Ranged DPS + Healer as support)
 
 10. **Are there game-specific character filters needed?**
-    - Examples: Filter by class, faction, archetype, profession
-    - Affects the CharacterFilters component
+    * Examples: Filter by class, faction, archetype, profession
+    * Affects the CharacterFilters component
 
 ## Step-by-Step Implementation
 
 ### Step 1: Create Game Configuration Files
 
 Create the directory structure for your game:
+
 ```
 src/games/{GAME_SLUG}/config/
 ├── index.ts          # Core config (enums, constants, utilities)
@@ -55,12 +59,14 @@ src/games/{GAME_SLUG}/config/
 **File: `src/games/{GAME_SLUG}/config/index.ts`**
 
 This file should export:
-- **Enums/Types**: Faction, Class, Role types (if applicable)
-- **Constants**: Arrays of factions/classes/roles with metadata
-- **Color Schemes**: Colors for factions, roles, or specializations
-- **Utility Functions**: Getters and filters for your domain model
+
+* **Enums/Types**: Faction, Class, Role types (if applicable)
+* **Constants**: Arrays of factions/classes/roles with metadata
+* **Color Schemes**: Colors for factions, roles, or specializations
+* **Utility Functions**: Getters and filters for your domain model
 
 Example structure (from Return of Reckoning):
+
 ```typescript
 // Types
 export type RORFaction = 'order' | 'destruction';
@@ -90,6 +96,7 @@ export function getClassesByFaction(faction: RORFaction) {
 **File: `src/games/{GAME_SLUG}/config/game.ts`**
 
 This file exports the game configuration for registration:
+
 ```typescript
 import { GameConfig } from '@/lib/games';
 import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG } from './index';
@@ -110,23 +117,26 @@ export const {GAME_SLUG_UPPERCASE}_CONFIG: GameConfig = {
 };
 ```
 
----
+***
 
 ### Step 2: Register the Game
 
 **File: `src/lib/games.ts`**
 
 1. Add the game slug to the `GameId` type:
+
 ```typescript
 export type GameId = 'aoc' | 'starcitizen' | 'ror' | '{GAME_SLUG}';
 ```
 
 2. Import your game config:
+
 ```typescript
 import { {GAME_SLUG_UPPERCASE}_CONFIG } from '@/games/{GAME_SLUG}/config/game';
 ```
 
 3. Add it to the `GAMES` object:
+
 ```typescript
 export const GAMES: Record<GameId, GameConfig> = {
   aoc: AOC_CONFIG,
@@ -136,7 +146,7 @@ export const GAMES: Record<GameId, GameConfig> = {
 };
 ```
 
----
+***
 
 ### Step 3: Configure Tab Visibility
 
@@ -156,6 +166,7 @@ export const GAME_TAB_EXCLUSIONS: Record<GameId, Tab[]> = {
 **Available Tabs**: `economy`, `matrix`, `achievements`, `builds`, `siege`, `fleet`, `ships`, `characters`, `events`, `settings`
 
 If you want custom tab names, add to `GAME_TAB_CUSTOMIZATION`:
+
 ```typescript
 export const GAME_TAB_CUSTOMIZATION: Record<GameId, Partial<Record<Tab, string>>> = {
   starcitizen: {
@@ -168,7 +179,7 @@ export const GAME_TAB_CUSTOMIZATION: Record<GameId, Partial<Record<Tab, string>>
 };
 ```
 
----
+***
 
 ### Step 4: Add Translations
 
@@ -197,26 +208,27 @@ Add a section for your game with all UI strings:
 ```
 
 **Required Translation Keys**:
-- Game name and description (in game list)
-- Role/class names (for filtering and display)
-- Tab names (if customized)
-- Feature-specific labels
 
----
+* Game name and description (in game list)
+* Role/class names (for filtering and display)
+* Tab names (if customized)
+* Feature-specific labels
+
+***
 
 ### Step 5: Create Game-Specific Components (Optional)
 
 If your game needs custom UI for character creation, party management, or other features:
 
 1. Create components in `src/components/` prefixed with your game slug
-   - Example: `RORCharacterForm.tsx`, `RORPartyBuilder.tsx`
+   * Example: `RORCharacterForm.tsx`, `RORPartyBuilder.tsx`
 
 2. Create game-specific hooks if needed
-   - Example: `useRORFactions()`, `useRORClasses()`
+   * Example: `useRORFactions()`, `useRORClasses()`
 
 3. Update character creation and management pages to use game-specific variants
 
----
+***
 
 ### Step 6: Update Navigation (If Needed)
 
@@ -241,29 +253,30 @@ const getGameRoute = (gameSlug: string) => {
 };
 ```
 
----
+***
 
 ## Checklist for Adding a New Game
 
-- [ ] Game slug and name decided
-- [ ] Game config files created (`index.ts` and `game.ts`)
-- [ ] Game registered in `src/lib/games.ts`
-- [ ] Tab exclusions configured in `src/config/tabs.ts`
-- [ ] Translations added to `en.json` and `es.json`
-- [ ] Game appears in GameSelector
-- [ ] Test game navigation and tab visibility
-- [ ] Create game-specific components if needed
-- [ ] Update character creation form if needed
-- [ ] Add game icon/emoji
-- [ ] Documentation updated in README.md
+* \[ ] Game slug and name decided
+* \[ ] Game config files created (`index.ts` and `game.ts`)
+* \[ ] Game registered in `src/lib/games.ts`
+* \[ ] Tab exclusions configured in `src/config/tabs.ts`
+* \[ ] Translations added to `en.json` and `es.json`
+* \[ ] Game appears in GameSelector
+* \[ ] Test game navigation and tab visibility
+* \[ ] Create game-specific components if needed
+* \[ ] Update character creation form if needed
+* \[ ] Add game icon/emoji
+* \[ ] Documentation updated in README.md
 
----
+***
 
 ## Example: Adding "New World" (MMO)
 
 Here's a quick example of adding a hypothetical MMO called "New World":
 
 ### Pre-Planning Answers:
+
 1. Name: "New World"
 2. Slug: "newworld"
 3. Description: "Manage your settlement and trading company"
@@ -278,6 +291,7 @@ Here's a quick example of adding a hypothetical MMO called "New World":
 ### Implementation (Abbreviated):
 
 **`src/games/newworld/config/index.ts`**:
+
 ```typescript
 export const NW_FACTIONS = {
   marauders: { name: 'Marauders', color: '#DC2626' },
@@ -292,6 +306,7 @@ export const NW_CLASSES = [
 ```
 
 **`src/games/newworld/config/game.ts`**:
+
 ```typescript
 export const NEWWORLD_CONFIG: GameConfig = {
   id: 'newworld',
@@ -310,7 +325,7 @@ export const NEWWORLD_CONFIG: GameConfig = {
 
 Done! New World is now available in your guild planner.
 
----
+***
 
 ## Tips & Best Practices
 
@@ -319,14 +334,15 @@ Done! New World is now available in your guild planner.
 3. **Test tab visibility**: Verify excluded tabs don't appear in the UI
 4. **Consider performance**: Large class/faction arrays should use memoization
 5. **Document game-specific features**: Add comments in config about unique mechanics
-6. **Use consistent naming**: Keep slug names lowercase and simple (good: "newworld", bad: "NewWorld_Game")
+6. **Use consistent naming**: Keep slug names lowercase and simple (good: "newworld", bad: "NewWorld\_Game")
 7. **Plan for growth**: Structure configs to support future features (items, dungeons, etc.)
 
----
+***
 
 ## Questions?
 
 If you need to add game-specific features beyond the scope of this guide:
-- Check existing game configs for patterns
-- Look at component imports to understand the dependency structure
-- Review the GameConfig type definition in `src/lib/games.ts`
+
+* Check existing game configs for patterns
+* Look at component imports to understand the dependency structure
+* Review the GameConfig type definition in `src/lib/games.ts`

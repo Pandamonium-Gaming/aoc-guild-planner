@@ -13,6 +13,7 @@ import {
   RaceId,
   ArchetypeId
 } from '@/lib/characters';
+import { ROR_FACTIONS, ROR_CLASSES, getClassesByFaction } from '@/games/returnofreckooning/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
 import ShipSelector from './ShipSelector';
@@ -26,6 +27,8 @@ interface CharacterFormData {
   is_main: boolean;
   preferred_role?: string | null;
   rank?: string | null;
+  ror_faction?: string | null;
+  ror_class?: string | null;
   ships?: Array<{
     ship_id: string;
     ownership_type: 'owned-pledge' | 'owned-auec' | 'concept-pledge' | 'loaner';
@@ -62,6 +65,8 @@ export function CharacterForm({
     is_main: initialData?.is_main || false,
     preferred_role: initialData?.preferred_role || null,
     rank: initialData?.rank || null,
+    ror_faction: (initialData as any)?.ror_faction || null,
+    ror_class: (initialData as any)?.ror_class || null,
     ships: initialData?.ships || [],
     vehicles: initialData?.vehicles || [],
   });
@@ -72,7 +77,8 @@ export function CharacterForm({
   const { t } = useLanguage();
 
   const isAoC = gameSlug === 'aoc';
-  const isStarCitizen = gameSlug === 'star-citizen';
+  const isStarCitizen = gameSlug === 'starcitizen';
+  const isRoR = gameSlug === 'ror';
   const gameConfig = getGameConfig(gameSlug);
   const gameRoles = (gameConfig as any)?.roles || [];
   const gameRanks = (gameConfig as any)?.ranks || [];
@@ -86,6 +92,11 @@ export function CharacterForm({
     
     if (isAoC && (!formData.race || !formData.primary_archetype)) {
       setError('Race and Primary Archetype are required for Ashes of Creation');
+      return;
+    }
+    
+    if (isRoR && (!formData.ror_faction || !formData.ror_class)) {
+      setError('Faction and Class are required for Return of Reckoning');
       return;
     }
     
@@ -271,6 +282,64 @@ export function CharacterForm({
                   </span>
                 </div>
               </div>
+            </>
+          )}
+
+          {isRoR && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Faction *</label>
+                <div className="flex gap-3">
+                  {Object.entries(ROR_FACTIONS).map(([factionId, faction]) => {
+                    const isSelected = formData.ror_faction === factionId;
+                    return (
+                      <button
+                        key={factionId}
+                        type="button"
+                        onClick={() => setFormData({ 
+                          ...formData, 
+                          ror_faction: factionId,
+                          ror_class: null
+                        })}
+                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all cursor-pointer ${
+                          isSelected
+                            ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-white'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        }`}
+                        style={isSelected ? { backgroundColor: faction.color } : undefined}
+                      >
+                        {faction.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {formData.ror_faction && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Class *</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {getClassesByFaction(formData.ror_faction as any).map((rorClass) => {
+                      const isSelected = formData.ror_class === rorClass.id;
+                      return (
+                        <button
+                          key={rorClass.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, ror_class: rorClass.id })}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-center ${
+                            isSelected
+                              ? 'ring-2 ring-offset-2 ring-offset-slate-900 text-white'
+                              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                          }`}
+                          style={isSelected ? { backgroundColor: ROR_FACTIONS[formData.ror_faction as any].color } : undefined}
+                        >
+                          {rorClass.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </>
           )}
 
