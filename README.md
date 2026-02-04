@@ -36,7 +36,7 @@ See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 
 ## Tech Stack
 
-* [Next.js 15](https://nextjs.org/) - React framework
+* [Next.js 16](https://nextjs.org/) - React framework
 * [Tailwind CSS](https://tailwindcss.com/) - Styling
 * [Supabase](https://supabase.com/) - Database & real-time sync
 * [Lucide React](https://lucide.dev/) - Icons
