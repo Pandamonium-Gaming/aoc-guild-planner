@@ -25,7 +25,7 @@ interface GameLayoutProps {
   characterCount?: number;
 }
 
-export function GameLayout({ params, children, activeTab, characterCount = 0 }: GameLayoutProps) {
+export function GameLayout({ params, children, activeTab, characterCount }: GameLayoutProps) {
   const { group: groupSlug, game: gameSlug } = use(params);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,6 +34,7 @@ export function GameLayout({ params, children, activeTab, characterCount = 0 }: 
 
   const {
     group,
+    characters,
     loading: groupLoading,
     error: groupError,
   } = useGroupData(groupSlug, gameSlug);
@@ -136,6 +137,8 @@ export function GameLayout({ params, children, activeTab, characterCount = 0 }: 
     icon: game.icon
   }));
 
+  const resolvedCharacterCount = characterCount ?? characters.length;
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <DynamicFavicon iconUrl={guildIconUrl} />
@@ -144,7 +147,7 @@ export function GameLayout({ params, children, activeTab, characterCount = 0 }: 
         groupSlug={groupSlug}
         gameSlug={gameSlug}
         enabledGames={enabledGames}
-        characterCount={characterCount}
+        characterCount={resolvedCharacterCount}
         role={membership.role || ''}
         displayName={displayName}
         onSignOut={signOut}
