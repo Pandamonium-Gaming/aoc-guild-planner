@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Home, Settings, LogOut } from 'lucide-react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 // Map pages that only exist in specific games to their equivalents in other games
 const pageEquivalencyMap: Record<string, Record<string, string>> = {
@@ -57,12 +57,9 @@ export function GroupHeader({
 }: GroupHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentTab = searchParams?.get('tab') || 'characters';
-  
   const handleGameSwitch = (targetGameSlug: string) => {
     const equivalentPage = getPageForGame(pathname || '', targetGameSlug);
-    router.push(`/${groupSlug}/${targetGameSlug}/${equivalentPage}?tab=${currentTab}`);
+    router.push(`/${groupSlug}/${targetGameSlug}/${equivalentPage}`);
   };
   
   return (

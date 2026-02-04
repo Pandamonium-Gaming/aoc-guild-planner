@@ -135,7 +135,7 @@ export function EventCard({
 
   // Copy event link to clipboard
   const copyEventLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?tab=events#event-${event.id}`;
+    const url = `${window.location.origin}${window.location.pathname}#event-${event.id}`;
     navigator.clipboard.writeText(url);
     showToast('success', 'Event link copied to clipboard!');
   };

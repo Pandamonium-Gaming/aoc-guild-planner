@@ -136,7 +136,7 @@ export async function notifyNewEvent(
   
   // Build direct link to event
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
-  const eventUrl = `${baseUrl}/${clanSlug}?tab=events#event-${event.id}`;
+  const eventUrl = `${baseUrl}/${clanSlug}/events#event-${event.id}`;
   
   // Build content with role ping if provided
   let content = '🆕 **New Event Created!**';
@@ -253,7 +253,7 @@ export async function notifyAnnouncement(
 
   // Build direct link to announcement
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
-  const announcementUrl = `${baseUrl}/${clanSlug}?tab=events#announcement-${announcement.id}`;
+  const announcementUrl = `${baseUrl}/${clanSlug}/events#announcement-${announcement.id}`;
 
   return sendDiscordWebhook(webhookUrl, {
     content,

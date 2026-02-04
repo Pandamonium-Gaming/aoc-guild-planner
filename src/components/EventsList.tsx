@@ -69,7 +69,7 @@ export function EventsList({
 
   // Copy announcement link to clipboard
   const copyAnnouncementLink = async (announcementId: string) => {
-    const url = `${window.location.origin}${window.location.pathname}?tab=events#announcement-${announcementId}`;
+    const url = `${window.location.origin}${window.location.pathname}#announcement-${announcementId}`;
     try {
       await navigator.clipboard.writeText(url);
       showToast('success', 'Link copied to clipboard!');
