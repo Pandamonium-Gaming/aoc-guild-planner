@@ -51,9 +51,11 @@
 4. Go to **OAuth2** → **General**
 5. Copy **Client ID** and **Client Secret**
 6. Add redirect URI:
-   ```
+
+   ```text
    https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback
    ```
+
    (Replace YOUR\_PROJECT\_ID with your Supabase project ID)
 
 ### Enable Discord in Supabase
@@ -82,11 +84,12 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 1. In Vercel project → **Settings** → **Environment Variables**
 2. Add these variables for all environments:
 
-| Name                            | Value                                                  |
-| ------------------------------- | ------------------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase URL                                      |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your anon key                                          |
-| `NEXT_PUBLIC_SITE_URL`          | Your Vercel URL (e.g., https://aoc-planner.vercel.app) |
+| Name                            | Value                              |
+| ------------------------------- | ---------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase URL                  |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your anon key                      |
+| `NEXT_PUBLIC_SITE_URL`          | Your Vercel URL (e.g.,             |
+|                                 | <https://aoc-planner.vercel.app>)  |
 
 ***
 
@@ -131,7 +134,7 @@ After initial setup:
 
 ## Authentication Flow
 
-```
+```text
 User visits /my-clan
        ↓
 Not logged in? → Redirect to /login → Discord OAuth

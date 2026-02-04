@@ -1,0 +1,26 @@
+-- Add subscriber tier support to Star Citizen characters
+-- Allows tracking subscriber status and auto-assigning ships
+
+ALTER TABLE members ADD COLUMN IF NOT EXISTS subscriber_tier VARCHAR(50);
+-- Values: NULL, 'centurion', 'imperator'
+
+-- Track when subscriber status was set/changed
+ALTER TABLE members ADD COLUMN IF NOT EXISTS subscriber_since TIMESTAMPTZ;
+
+-- Track which month's ships the character has
+-- Useful for syncing when new months arrive
+ALTER TABLE members ADD COLUMN IF NOT EXISTS subscriber_ships_month VARCHAR(7);
+-- Format: 'YYYY-MM' e.g., '2026-01'
+
+-- Create index for efficient subscriber queries
+CREATE INDEX IF NOT EXISTS idx_members_subscriber_tier 
+  ON members(subscriber_tier) 
+  WHERE subscriber_tier IS NOT NULL;
+
+-- Add comments for clarity
+COMMENT ON COLUMN members.subscriber_tier IS 'Subscriber tier: centurion or imperator. NULL if not a subscriber.';
+COMMENT ON COLUMN members.subscriber_since IS 'When the subscriber tier was first set.';
+COMMENT ON COLUMN members.subscriber_ships_month IS 'Which month (YYYY-MM) of subscriber ships have been added.';
+
+-- Track this migration
+INSERT INTO migration_history (filename) VALUES ('063_add_star_citizen_subscriber_support.sql') ON CONFLICT DO NOTHING;

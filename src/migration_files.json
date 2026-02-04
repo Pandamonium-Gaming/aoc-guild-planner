@@ -60,5 +60,6 @@
   "059_add_ror_to_games.sql",
   "060_standardize_starcitizen_slug.sql",
   "061_ror_event_role_requirements.sql",
-  "062_ror_discord_webhooks_and_roles.sql"
+  "062_ror_discord_webhooks_and_roles.sql",
+  "063_add_star_citizen_subscriber_support.sql"
 ]
