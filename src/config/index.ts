@@ -30,6 +30,7 @@ export function getGameConfig(gameSlug: string) {
   switch (gameSlug) {
     case 'aoc':
       return aocConfig;
+    case 'starcitizen':
     case 'star-citizen':
       return starCitizenConfig;
     default:
