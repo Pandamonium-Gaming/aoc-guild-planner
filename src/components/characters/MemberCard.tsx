@@ -10,7 +10,6 @@ import { RACES, ARCHETYPES, getClassName, RaceId, ArchetypeId } from '@/lib/char
 import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG, RORRole } from '@/games/returnofreckooning/config';
 import { ProfessionSelector } from '@/components/game-specific/ProfessionSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
-import starcitizen from '@/games/starcitizen/config/roles.json';
 import { getGameConfig } from '@/config';
 
 interface CharacterCardProps {
@@ -62,9 +61,10 @@ export function CharacterCard({
   const subscriberTier = character.subscriber_tier || null;
   const subscriberSince = character.subscriber_since ? new Date(character.subscriber_since) : null;
 
-  // Get game config for Star Citizen ranks
+  // Get game config for Star Citizen ranks/roles
   const gameConfig = gameSlug ? getGameConfig(gameSlug) : null;
   const gameRanks = (gameConfig as any)?.ranks || [];
+  const gameRoles = (gameConfig as any)?.roles || [];
   
   // Get Star Citizen rank name from ID
   const scRankName = character.rank && gameSlug === 'starcitizen'
@@ -75,7 +75,7 @@ export function CharacterCard({
   const scRoleNames = character.preferred_role && character.preferred_role.length > 0
     ? character.preferred_role
         .map(roleId => {
-          const role = starcitizen.pilot_roles.find(r => r.id === roleId);
+          const role = gameRoles.find((r: any) => r.id === roleId);
           return role ? role.name : null;
         })
         .filter(Boolean)
@@ -190,7 +190,7 @@ export function CharacterCard({
                         backgroundColor: SUBSCRIBER_COLORS[subscriberTier].bg,
                       }}
                     >
-                      <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                      <div className="w-7 h-7 flex items-center justify-center flex-shrink-0">
                         {subscriberTier === 'centurion' ? <CenturionStarSVG /> : <ImperatorStarSVG />}
                       </div>
                       <span className="leading-none">{SUBSCRIBER_TIERS[subscriberTier].label}</span>
