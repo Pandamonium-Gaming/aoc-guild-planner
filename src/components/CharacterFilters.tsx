@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Search, X, Filter, ChevronDown } from 'lucide-react';
 import { RACES, ARCHETYPES, RaceId, ArchetypeId } from '@/lib/characters';
+import { getClassById, ROR_CLASSES, ROR_ROLE_CONFIG } from '@/games/returnofreckooning/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface CharacterFilters {
@@ -17,8 +18,8 @@ export interface CharacterFilters {
   subscriberTier: string | ''; // subscriber_tier (centurion | imperator)
   // Return of Reckoning filters
   rorFaction: string | ''; // ror_faction
-  rorClass: string | ''; // ror_class
-  rorRole: string | ''; // role/title
+  rorClass: string | ''; // ror_class (e.g., 'ironbreaker', 'black-orc')
+  rorRole: string | ''; // ror role derived from class (e.g., 'tank', 'healer')
   // Universal filters
   characterType: 'all' | 'main' | 'alt'; // filter by main/alt characters
 }
@@ -242,14 +243,17 @@ export function CharacterFiltersBar({
           {gameSlug === 'ror' && (
             <div>
               <label htmlFor="filter-ror-class" className="text-xs text-slate-400 mb-1 block">Class</label>
-              <input
+              <select
                 id="filter-ror-class"
-                type="text"
                 value={filters.rorClass}
                 onChange={(e) => onChange({ ...filters, rorClass: e.target.value })}
-                placeholder="Filter by class..."
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">All Classes</option>
+                {ROR_CLASSES.map((rorClass) => (
+                  <option key={rorClass.id} value={rorClass.id}>{rorClass.name}</option>
+                ))}
+              </select>
             </div>
           )}
 
@@ -257,14 +261,17 @@ export function CharacterFiltersBar({
           {gameSlug === 'ror' && (
             <div>
               <label htmlFor="filter-ror-role" className="text-xs text-slate-400 mb-1 block">Role</label>
-              <input
+              <select
                 id="filter-ror-role"
-                type="text"
                 value={filters.rorRole}
                 onChange={(e) => onChange({ ...filters, rorRole: e.target.value })}
-                placeholder="Filter by role..."
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">All Roles</option>
+                {Object.entries(ROR_ROLE_CONFIG).map(([roleKey, roleConfig]) => (
+                  <option key={roleKey} value={roleKey}>{roleConfig.label}</option>
+                ))}
+              </select>
             </div>
           )}
 
@@ -411,9 +418,12 @@ export function filterCharacters<T extends {
       return false;
     }
 
-    // Return of Reckoning role/rank filter
-    if (filters.rorRole && char.rank !== filters.rorRole) {
-      return false;
+    // Return of Reckoning role filter - derive from class
+    if (filters.rorRole && char.ror_class) {
+      const rorClass = getClassById(char.ror_class);
+      if (!rorClass || rorClass.role !== filters.rorRole) {
+        return false;
+      }
     }
 
     // Character type filter (main/alt)
