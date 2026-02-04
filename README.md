@@ -6,21 +6,21 @@ A comprehensive guild management and planning tool supporting multiple MMOs.
 
 ## Supported Games
 
-- **Ashes of Creation** - Track all 22 professions (Gathering → Processing → Crafting)
-- **Star Citizen** - Manage squadrons and ship hangars
-- **Return of Reckoning** - Coordinate warband activities
+* **Ashes of Creation** - Track all 22 professions (Gathering → Processing → Crafting)
+* **Star Citizen** - Manage squadrons and ship hangars
+* **Return of Reckoning** - Coordinate warband activities
 
 ## Features
 
-- 🎮 Multi-game support with game-specific features
-- 👥 Guild/Squadron/Warband management with role-based permissions
-- 📊 Guild coverage matrix (AoC) and fleet overview (Star Citizen)
-- 🛢️ Guild bank, caravan, and economy tracking
-- 📅 Event scheduling with RSVP system
-- 🔐 Customizable role-based permissions per group
-- ⚙️ Discord integration for notifications and recruitment
-- ☁️ Cloud persistence - data syncs across all devices
-- 🔗 URL-based routing - share group pages with easy access
+* 🎮 Multi-game support with game-specific features
+* 👥 Guild/Squadron/Warband management with role-based permissions
+* 📊 Guild coverage matrix (AoC) and fleet overview (Star Citizen)
+* 🛢️ Guild bank, caravan, and economy tracking
+* 📅 Event scheduling with RSVP system
+* 🔐 Customizable role-based permissions per group
+* ⚙️ Discord integration for notifications and recruitment
+* ☁️ Cloud persistence - data syncs across all devices
+* 🔗 URL-based routing - share group pages with easy access
 
 ## Quick Start
 
@@ -36,11 +36,11 @@ See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 
 ## Tech Stack
 
-- [Next.js 15](https://nextjs.org/) - React framework
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Supabase](https://supabase.com/) - Database & real-time sync
-- [Lucide React](https://lucide.dev/) - Icons
-- [Vercel](https://vercel.com/) - Hosting
+* [Next.js 15](https://nextjs.org/) - React framework
+* [Tailwind CSS](https://tailwindcss.com/) - Styling
+* [Supabase](https://supabase.com/) - Database & real-time sync
+* [Lucide React](https://lucide.dev/) - Icons
+* [Vercel](https://vercel.com/) - Hosting
 
 ## License
 
