@@ -11,6 +11,8 @@ import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
 import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SUBSCRIBER_COLORS } from '@/games/starcitizen/config/subscriber-ships';
+import { CenturionSVG, ImperatorSVG } from './SubscriberIcons';
 
 interface ShipData {
   id: string;
@@ -32,6 +34,7 @@ interface CharacterShip {
   character_id: string;
   ship_id: string;
   ownership_type: 'pledged' | 'in-game' | 'loaner';
+  notes?: string | null;
   created_at: string;
 }
 
@@ -128,6 +131,45 @@ function getRoleColor(role: string) {
   if (roleLower.includes('starter') || roleLower.includes('generalist')) return 'text-cyan-400 bg-cyan-500/10';
   if (roleLower.includes('military') || roleLower.includes('vehicle')) return 'text-lime-400 bg-lime-500/10';
   return 'text-slate-400 bg-slate-500/10';
+}
+
+// Detect if ship is a subscriber perk based on notes
+function getOwnershipBadge(ship: CharacterShip) {
+  if (ship.ownership_type === 'loaner' && ship.notes?.includes('subscriber')) {
+    // Extract tier from notes like "centurion subscriber perk (2026-01)"
+    const match = ship.notes.match(/(centurion|imperator)\s+subscriber/i);
+    if (match) {
+      const tier = match[1].toLowerCase() as 'centurion' | 'imperator';
+      const colors = SUBSCRIBER_COLORS[tier];
+      return {
+        label: tier.charAt(0).toUpperCase() + tier.slice(1),
+        bgColor: colors.bg,
+        borderColor: colors.border,
+        textColor: colors.primary,
+        isBadge: true,
+      };
+    }
+  }
+
+  const ownershipColor = {
+    'pledged': { bgColor: 'bg-green-500/10', borderColor: 'border-green-500/30', textColor: 'text-green-400' },
+    'in-game': { bgColor: 'bg-cyan-500/10', borderColor: 'border-cyan-500/30', textColor: 'text-cyan-400' },
+    'loaner': { bgColor: 'bg-blue-500/10', borderColor: 'border-blue-500/30', textColor: 'text-blue-400' },
+  }[ship.ownership_type];
+
+  const ownershipLabel = {
+    'pledged': 'Pledged',
+    'in-game': 'In-Game',
+    'loaner': 'Loaner',
+  }[ship.ownership_type];
+
+  return {
+    label: ownershipLabel,
+    bgColor: ownershipColor.bgColor,
+    borderColor: ownershipColor.borderColor,
+    textColor: ownershipColor.textColor,
+    isBadge: false,
+  };
 }
 
 export function FleetView({ characters, userId, canManage, groupId }: FleetViewProps) {
@@ -435,18 +477,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 const shipData = getShipData(ship.ship_id);
                                 if (!shipData) return null;
 
-                                const ownershipColor = {
-                                  'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
-                                  'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-                                  'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-                                }[ship.ownership_type];
-
-                                const ownershipLabel = {
-                                  'pledged': 'Pledged',
-                                  'in-game': 'In-Game',
-                                  'loaner': 'Loaner',
-                                }[ship.ownership_type];
-
+                                const badge = getOwnershipBadge(ship);
                                 const isConcept = shipData.productionStatus !== 'flight-ready';
                                 const RoleIcon = getRoleIcon(shipData.role);
                                 const roleColor = getRoleColor(shipData.role);
@@ -477,8 +508,25 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                             </div>
                                           )}
                                         </div>
-                                        <span className={`text-xs px-2 py-1 rounded border ${ownershipColor} whitespace-nowrap ml-2`}>
-                                          {ownershipLabel}
+                                        <span 
+                                          className={`text-xs px-2 py-1 rounded border whitespace-nowrap ml-2 flex items-center gap-1 ${badge.textColor} border-current`}
+                                          style={badge.isBadge ? {
+                                            backgroundColor: badge.bgColor,
+                                            borderColor: badge.borderColor,
+                                            color: badge.textColor,
+                                          } : undefined}
+                                        >
+                                          {badge.label === 'Centurion' && (
+                                            <div className="w-5 h-2.5">
+                                              <CenturionSVG />
+                                            </div>
+                                          )}
+                                          {badge.label === 'Imperator' && (
+                                            <div className="w-5 h-2.5">
+                                              <ImperatorSVG />
+                                            </div>
+                                          )}
+                                          {badge.label}
                                         </span>
                                       </div>
                                     
@@ -534,18 +582,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                 const shipData = getShipData(ship.ship_id);
                                 if (!shipData) return null;
 
-                                const ownershipColor = {
-                                  'pledged': 'bg-green-500/10 border-green-500/30 text-green-400',
-                                  'in-game': 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-                                  'loaner': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-                                }[ship.ownership_type];
-
-                                const ownershipLabel = {
-                                  'pledged': 'Pledged',
-                                  'in-game': 'In-Game',
-                                  'loaner': 'Loaner',
-                                }[ship.ownership_type];
-
+                                const badge = getOwnershipBadge(ship);
                                 const isConcept = shipData.productionStatus !== 'flight-ready';
                                 const RoleIcon = getRoleIcon(shipData.role);
                                 const roleColor = getRoleColor(shipData.role);
@@ -580,8 +617,25 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                               </div>
                                             )}
                                           </div>
-                                          <span className={`text-xs px-2 py-1 rounded border ${ownershipColor} whitespace-nowrap ml-2`}>
-                                            {ownershipLabel}
+                                          <span 
+                                            className={`text-xs px-2 py-1 rounded border whitespace-nowrap ml-2 flex items-center gap-1 ${badge.textColor} border-current`}
+                                            style={badge.isBadge ? {
+                                              backgroundColor: badge.bgColor,
+                                              borderColor: badge.borderColor,
+                                              color: badge.textColor,
+                                            } : undefined}
+                                          >
+                                            {badge.label === 'Centurion' && (
+                                              <div className="w-5 h-2.5">
+                                                <CenturionSVG />
+                                              </div>
+                                            )}
+                                            {badge.label === 'Imperator' && (
+                                              <div className="w-5 h-2.5">
+                                                <ImperatorSVG />
+                                              </div>
+                                            )}
+                                            {badge.label}
                                           </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2 text-xs">

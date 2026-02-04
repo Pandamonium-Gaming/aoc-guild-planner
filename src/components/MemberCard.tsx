@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Trash2, Edit2, Check, X, AlertTriangle, Star } from 'lucide-react';
 import { CharacterWithProfessions, RankLevel, RANK_COLORS } from '@/lib/types';
 import { SUBSCRIBER_COLORS, SUBSCRIBER_TIERS } from '@/games/starcitizen/config/subscriber-ships';
+import { CenturionSVG, ImperatorSVG } from './SubscriberIcons';
 import { getRankSummary, checkRankLimits, PROFESSIONS_BY_TIER, TIER_CONFIG } from '@/lib/professions';
 import { RACES, ARCHETYPES, getClassName, RaceId, ArchetypeId } from '@/lib/characters';
 import { ProfessionSelector } from './ProfessionSelector';
@@ -155,14 +156,17 @@ export function CharacterCard({
                   )}
                   {gameSlug === 'starcitizen' && subscriberTier && (
                     <span
-                      className="text-xs px-2 py-0.5 rounded border"
+                      className="text-xs px-2 py-0.5 rounded border flex items-center gap-1"
                       style={{
                         borderColor: SUBSCRIBER_COLORS[subscriberTier].primary,
                         color: SUBSCRIBER_COLORS[subscriberTier].primary,
                         backgroundColor: SUBSCRIBER_COLORS[subscriberTier].bg,
                       }}
                     >
-                      {SUBSCRIBER_TIERS[subscriberTier].icon} {SUBSCRIBER_TIERS[subscriberTier].label}
+                      <div className="w-4 h-2">
+                        {subscriberTier === 'centurion' ? <CenturionSVG /> : <ImperatorSVG />}
+                      </div>
+                      {SUBSCRIBER_TIERS[subscriberTier].label}
                     </span>
                   )}
                 </div>

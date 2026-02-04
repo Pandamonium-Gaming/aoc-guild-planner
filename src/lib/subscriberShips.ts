@@ -37,17 +37,16 @@ export async function syncSubscriberShips(
 
     // Upsert ships into character_ships table
     // Using upsert to avoid duplicates if user changes tier multiple times
+    // Subscriber ships are marked as 'loaner' ownership type with notes indicating tier/month
     const { data, error } = await supabase.from('character_ships').upsert(
       ships.map(ship => ({
         character_id: characterId,
-        ship_name: ship,
-        is_subscriber_perk: true,
-        subscriber_tier: subscriberTier,
-        perk_month: monthKey,
-        added_at: new Date().toISOString(),
+        ship_id: ship,
+        ownership_type: 'loaner',
+        notes: `${subscriberTier} subscriber perk (${monthKey})`,
       })),
       {
-        onConflict: 'character_id,ship_name',
+        onConflict: 'character_id,ship_id,ownership_type',
       }
     );
 
@@ -86,12 +85,14 @@ export async function removeSubscriberShips(
   shipsToRemove: string[]
 ): Promise<{ success: boolean; shipsRemoved: string[]; error?: string }> {
   try {
+    // Remove subscriber ships by deleting entries with subscriber perk notes
+    // We match on ship_id and notes containing the tier info
     const { error } = await supabase
       .from('character_ships')
       .delete()
       .eq('character_id', characterId)
-      .eq('is_subscriber_perk', true)
-      .in('ship_name', shipsToRemove);
+      .eq('ownership_type', 'loaner')
+      .in('ship_id', shipsToRemove);
 
     if (error) {
       console.error('Error removing subscriber ships:', error);

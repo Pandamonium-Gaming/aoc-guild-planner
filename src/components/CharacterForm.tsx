@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
 import ShipSelector from './ShipSelector';
 import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS } from '@/games/starcitizen/config/subscriber-ships';
+import { CenturionSVG, ImperatorSVG } from './SubscriberIcons';
 
 interface CharacterFormData {
   name: string;
@@ -439,7 +440,9 @@ export function CharacterForm({
                     } : undefined}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span>{SUBSCRIBER_TIERS.centurion.icon}</span>
+                      <div className="w-8 h-4">
+                        <CenturionSVG />
+                      </div>
                       <span className="text-xs">{SUBSCRIBER_TIERS.centurion.label}</span>
                     </div>
                   </button>
@@ -460,7 +463,9 @@ export function CharacterForm({
                     } : undefined}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span>{SUBSCRIBER_TIERS.imperator.icon}</span>
+                      <div className="w-8 h-4">
+                        <ImperatorSVG />
+                      </div>
                       <span className="text-xs">{SUBSCRIBER_TIERS.imperator.label}</span>
                     </div>
                   </button>

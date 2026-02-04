@@ -49,7 +49,8 @@ export const SUBSCRIBER_TIERS = {
     shipsPerMonth: 1,
     flairPerMonth: 1,
     insurance: '12 months',
-    icon: '🥉', // Bronze medal
+    svgViewBox: '0 0 156 78',
+    svgColor: '#54ADF7',
   },
   imperator: {
     label: 'Imperator',
@@ -57,7 +58,8 @@ export const SUBSCRIBER_TIERS = {
     shipsPerMonth: 2,
     flairPerMonth: 2,
     insurance: '24 months',
-    icon: '🥈', // Silver medal
+    svgViewBox: '0 0 156 78',
+    svgColor: '#DBAF70',
   },
 } as const;
 
