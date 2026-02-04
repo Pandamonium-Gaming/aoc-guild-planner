@@ -522,27 +522,15 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                       <RoleIcon className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1">
-                                      <div className="flex items-start justify-between mb-2">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-2">
-                                            <h5 className="font-semibold text-white">{shipData.name}</h5>
-                                            {isConcept && (
-                                              <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
-                                            )}
-                                          </div>
-                                          {manufacturerLogo && (
-                                            <div className="mt-3 flex items-center justify-center">
-                                              <img 
-                                                src={manufacturerLogo} 
-                                                alt={shipData.manufacturer}
-                                                className="h-16 w-auto object-contain brightness-0 invert opacity-100"
-                                                title={shipData.manufacturer}
-                                              />
-                                            </div>
+                                      <div className="flex items-center justify-between gap-2 mb-2">
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                          <h5 className="font-semibold text-white truncate">{shipData.name}</h5>
+                                          {isConcept && (
+                                            <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded flex-shrink-0">Concept</span>
                                           )}
                                         </div>
                                         <span 
-                                          className={`text-xs px-3 py-1.5 rounded border whitespace-nowrap ml-2 flex items-center gap-1.5 font-semibold ${badge.textColor} border-current ${
+                                          className={`text-xs px-3 py-1.5 rounded border whitespace-nowrap flex items-center gap-1.5 font-semibold flex-shrink-0 ${badge.textColor} border-current ${
                                             badge.isBadge ? 'shadow-lg shadow-yellow-500/20 ring-1 ring-offset-0 ring-current' : ''
                                           }`}
                                           style={badge.isBadge ? {
@@ -564,23 +552,33 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                           {badge.label}
                                         </span>
                                       </div>
+                                      {manufacturerLogo && (
+                                        <div className="mb-2 flex items-center justify-center">
+                                          <img 
+                                            src={manufacturerLogo} 
+                                            alt={shipData.manufacturer}
+                                            className="h-16 w-auto object-contain brightness-0 invert opacity-100"
+                                            title={shipData.manufacturer}
+                                          />
+                                        </div>
+                                      )}
                                     
                                       <div className="space-y-1 text-xs">
                                         <div className="flex justify-between">
                                           <span className="text-slate-400">{t('fleet.role')}:</span>
-                                          <span>{normalizeRole(shipData.role)}</span>
+                                          <span className="text-white">{normalizeRole(shipData.role)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-slate-400">{t('fleet.size')}:</span>
-                                          <span>{formatSize(shipData.size)}</span>
+                                          <span className="text-white">{formatSize(shipData.size)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-slate-400">{t('fleet.crew')}:</span>
-                                          <span>{shipData.crew.min}-{shipData.crew.max}</span>
+                                          <span className="text-white">{shipData.crew.min}-{shipData.crew.max}</span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-slate-400">{t('fleet.cargo')}:</span>
-                                          <span>{shipData.cargo} SCU</span>
+                                          <span className="text-white">{shipData.cargo} SCU</span>
                                         </div>
                                       </div>
                                     </div>
@@ -633,73 +631,69 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                         : 'border border-slate-700 bg-slate-800/50'
                                     }`}
                                   >
-                                    <div className="flex items-center gap-3 flex-1">
-                                      <div className={`p-2 rounded-lg ${roleColor} flex-shrink-0`}>
-                                        <RoleIcon className="w-5 h-5" />
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-start justify-between mb-2">
-                                          <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                              <h5 className="font-semibold text-white">{shipData.name}</h5>
-                                              {isConcept && (
-                                                <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded">Concept</span>
-                                              )}
-                                            </div>
-                                            {manufacturerLogo && (
-                                              <div className="mt-3 flex items-center justify-center">
-                                                <img 
-                                                  src={manufacturerLogo} 
-                                                  alt={shipData.manufacturer}
-                                                  className="h-16 w-auto object-contain brightness-0 invert opacity-100"
-                                                  title={shipData.manufacturer}
-                                                />
-                                              </div>
-                                            )}
-                                          </div>
-                                          <span 
-                                            className={`text-xs px-3 py-1.5 rounded border whitespace-nowrap ml-2 flex items-center gap-1.5 font-semibold ${badge.textColor} border-current ${
-                                              badge.isBadge ? 'shadow-lg shadow-yellow-500/20 ring-1 ring-offset-0 ring-current' : ''
-                                            }`}
-                                            style={badge.isBadge ? {
-                                              backgroundColor: badge.bgColor,
-                                              borderColor: badge.borderColor,
-                                              color: badge.textColor,
-                                            } : undefined}
-                                          >
-                                            {badge.label === 'Centurion' && (
-                                              <div className="w-5 h-2.5">
-                                                <CenturionSVG />
-                                              </div>
-                                            )}
-                                            {badge.label === 'Imperator' && (
-                                              <div className="w-5 h-2.5">
-                                                <ImperatorSVG />
-                                              </div>
-                                            )}
-                                            {badge.label}
-                                          </span>
+                                    <div className={`p-2 rounded-lg ${roleColor} flex-shrink-0`}>
+                                      <RoleIcon className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between gap-2 mb-2">
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                          <h5 className="font-semibold text-white truncate">{shipData.name}</h5>
+                                          {isConcept && (
+                                            <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded flex-shrink-0">Concept</span>
+                                          )}
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2 text-xs">
-                                          <div>
-                                            <span className="text-slate-400">{t('fleet.role')}:</span>
-                                            <span className="ml-1 text-white">{normalizeRole(shipData.role)}</span>
-                                          </div>
-                                          <div>
-                                            <span className="text-slate-400">{t('fleet.crew')}:</span>
-                                            <span className="ml-1 text-white">
-                                              {shipData.crew.min === shipData.crew.max
-                                                ? shipData.crew.min
-                                                : `${shipData.crew.min}-${shipData.crew.max}`}
-                                            </span>
-                                          </div>
+                                        <span 
+                                          className={`text-xs px-3 py-1.5 rounded border whitespace-nowrap flex items-center gap-1.5 font-semibold flex-shrink-0 ${badge.textColor} border-current ${
+                                            badge.isBadge ? 'shadow-lg shadow-yellow-500/20 ring-1 ring-offset-0 ring-current' : ''
+                                          }`}
+                                          style={badge.isBadge ? {
+                                            backgroundColor: badge.bgColor,
+                                            borderColor: badge.borderColor,
+                                            color: badge.textColor,
+                                          } : undefined}
+                                        >
+                                          {badge.label === 'Centurion' && (
+                                            <div className="w-5 h-2.5">
+                                              <CenturionSVG />
+                                            </div>
+                                          )}
+                                          {badge.label === 'Imperator' && (
+                                            <div className="w-5 h-2.5">
+                                              <ImperatorSVG />
+                                            </div>
+                                          )}
+                                          {badge.label}
+                                        </span>
+                                      </div>
+                                      {manufacturerLogo && (
+                                        <div className="mb-2 flex items-center justify-center">
+                                          <img 
+                                            src={manufacturerLogo} 
+                                            alt={shipData.manufacturer}
+                                            className="h-16 w-auto object-contain brightness-0 invert opacity-100"
+                                            title={shipData.manufacturer}
+                                          />
+                                        </div>
+                                      )}
+                                      <div className="space-y-1 text-xs">
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-400">{t('fleet.role')}:</span>
+                                          <span className="text-white">{normalizeRole(shipData.role)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-400">{t('fleet.crew')}:</span>
+                                          <span className="text-white">
+                                            {shipData.crew.min === shipData.crew.max
+                                              ? shipData.crew.min
+                                              : `${shipData.crew.min}-${shipData.crew.max}`}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
                                     {canManage && (
                                       <button
                                         onClick={() => handleDeleteShip(ship.id)}
-                                        className="ml-2 p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
                                         title="Remove vehicle"
                                       >
                                         <Trash2 className="w-4 h-4" />
