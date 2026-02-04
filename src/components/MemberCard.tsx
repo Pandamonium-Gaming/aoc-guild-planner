@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Trash2, Edit2, Check, X, AlertTriangle, Star } from 'lucide-react';
 import { CharacterWithProfessions, RankLevel, RANK_COLORS } from '@/lib/types';
+import { SUBSCRIBER_COLORS, SUBSCRIBER_TIERS } from '@/games/starcitizen/config/subscriber-ships';
 import { getRankSummary, checkRankLimits, PROFESSIONS_BY_TIER, TIER_CONFIG } from '@/lib/professions';
 import { RACES, ARCHETYPES, getClassName, RaceId, ArchetypeId } from '@/lib/characters';
 import { ProfessionSelector } from './ProfessionSelector';
@@ -53,6 +54,9 @@ export function CharacterCard({
   const className = character.primary_archetype 
     ? getClassName(character.primary_archetype as ArchetypeId, character.secondary_archetype as ArchetypeId | null)
     : null;
+
+  const subscriberTier = character.subscriber_tier || null;
+  const subscriberSince = character.subscriber_since ? new Date(character.subscriber_since) : null;
 
   const handleSave = async () => {
     if (editName.trim() && editName !== character.name) {
@@ -147,6 +151,18 @@ export function CharacterCard({
                   {character.level > 1 && (
                     <span className="text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
                       Lv.{character.level}
+                    </span>
+                  )}
+                  {gameSlug === 'starcitizen' && subscriberTier && (
+                    <span
+                      className="text-xs px-2 py-0.5 rounded border"
+                      style={{
+                        borderColor: SUBSCRIBER_COLORS[subscriberTier].primary,
+                        color: SUBSCRIBER_COLORS[subscriberTier].primary,
+                        backgroundColor: SUBSCRIBER_COLORS[subscriberTier].bg,
+                      }}
+                    >
+                      {SUBSCRIBER_TIERS[subscriberTier].icon} {SUBSCRIBER_TIERS[subscriberTier].label}
                     </span>
                   )}
                 </div>
@@ -292,6 +308,35 @@ export function CharacterCard({
       {/* Expanded content - Non-profession content for Star Citizen */}
       {isExpanded && gameSlug === 'starcitizen' && (
         <div className="border-t border-slate-800 p-4 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+              <div className="text-xs text-slate-500">Subscriber Tier</div>
+              <div className="text-sm text-slate-200">
+                {subscriberTier ? SUBSCRIBER_TIERS[subscriberTier].label : 'None'}
+              </div>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+              <div className="text-xs text-slate-500">Subscriber Since</div>
+              <div className="text-sm text-slate-200">
+                {subscriberSince ? subscriberSince.toLocaleDateString('en-GB') : '—'}
+              </div>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+              <div className="text-xs text-slate-500">Ships Synced For</div>
+              <div className="text-sm text-slate-200">
+                {character.subscriber_ships_month || '—'}
+              </div>
+            </div>
+            {subscriberTier && (
+              <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+                <div className="text-xs text-slate-500">Perks</div>
+                <div className="text-sm text-slate-200">
+                  {SUBSCRIBER_TIERS[subscriberTier].shipsPerMonth} ship(s)/month ·
+                  {` ${SUBSCRIBER_TIERS[subscriberTier].insurance}`}
+                </div>
+              </div>
+            )}
+          </div>
           {/* Debug info for editability - only show if window.DEBUG_PERMISSIONS is true */}
           {typeof window !== 'undefined' && window.DEBUG_PERMISSIONS && (
             <div className="text-xs text-slate-400 border-t border-slate-700 pt-2">

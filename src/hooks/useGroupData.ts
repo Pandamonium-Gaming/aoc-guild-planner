@@ -15,6 +15,13 @@ export interface CharacterData {
   level?: number;
   is_main?: boolean;
   user_id?: string | null; // Allow setting user_id for ownership
+  preferred_role?: string | null;
+  rank?: string | null;
+  ror_faction?: string | null;
+  ror_class?: string | null;
+  subscriber_tier?: 'centurion' | 'imperator' | null;
+  subscriber_since?: string | null;
+  subscriber_ships_month?: string | null;
 }
 
 interface UseGroupDataReturn {
@@ -130,12 +137,13 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
     const { data: { user } } = await supabase.auth.getUser();
 
     // If setting as main, first unmark any other main characters for this user
-    if (data.is_main && user) {
+    const targetUserId = data.user_id !== undefined ? data.user_id : (user?.id || null);
+    if (data.is_main && targetUserId) {
       await supabase
         .from('members')
         .update({ is_main: false })
         .eq('group_id', group.id)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .eq('is_main', true);
     }
 
@@ -243,15 +251,18 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       }
     }
 
-    // If setting as main, first unmark any other main characters for this user
-    if (data.is_main === true && user) {
-      await supabase
-        .from('members')
-        .update({ is_main: false })
-        .eq('group_id', group?.id || '')
-        .eq('user_id', user.id)
-        .eq('is_main', true)
-        .neq('id', id); // Don't update the character we're about to update
+    // If setting as main, first unmark any other main characters for the target user
+    if (data.is_main === true) {
+      const targetUserId = (data as any).user_id ?? character.user_id;
+      if (targetUserId) {
+        await supabase
+          .from('members')
+          .update({ is_main: false })
+          .eq('group_id', group?.id || '')
+          .eq('user_id', targetUserId)
+          .eq('is_main', true)
+          .neq('id', id); // Don't update the character we're about to update
+      }
     }
 
     // Claim ownership if character doesn't have a user_id

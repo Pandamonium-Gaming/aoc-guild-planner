@@ -31,6 +31,8 @@ interface CharacterFormData {
   ror_faction?: string | null;
   ror_class?: string | null;
   subscriber_tier?: 'centurion' | 'imperator' | null;
+  subscriber_since?: string | null;
+  subscriber_ships_month?: string | null;
   ships?: Array<{
     ship_id: string;
     ownership_type: 'owned-pledge' | 'owned-auec' | 'concept-pledge' | 'loaner';
@@ -70,6 +72,8 @@ export function CharacterForm({
     ror_faction: (initialData as any)?.ror_faction || null,
     ror_class: (initialData as any)?.ror_class || null,
     subscriber_tier: (initialData as any)?.subscriber_tier || null,
+    subscriber_since: (initialData as any)?.subscriber_since || null,
+    subscriber_ships_month: (initialData as any)?.subscriber_ships_month || null,
     ships: initialData?.ships || [],
     vehicles: initialData?.vehicles || [],
   });
@@ -468,6 +472,24 @@ export function CharacterForm({
                   </p>
                 )}
               </div>
+              {(formData.subscriber_since || formData.subscriber_ships_month) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400">
+                  {formData.subscriber_since && (
+                    <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+                      <div className="text-slate-500">Subscriber Since</div>
+                      <div className="text-slate-200">
+                        {new Date(formData.subscriber_since).toLocaleDateString('en-GB')}
+                      </div>
+                    </div>
+                  )}
+                  {formData.subscriber_ships_month && (
+                    <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+                      <div className="text-slate-500">Ships Synced For</div>
+                      <div className="text-slate-200">{formData.subscriber_ships_month}</div>
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
 

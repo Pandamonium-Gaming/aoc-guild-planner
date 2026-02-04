@@ -60,12 +60,20 @@ export interface Character {
   id: string;
   group_id: string;
   user_id: string | null;
+  game_slug?: string | null;
   name: string;
   race: Race | null;
   primary_archetype: Archetype | null;
   secondary_archetype: Archetype | null;
   level: number;
   is_main: boolean;
+  preferred_role?: string | null;
+  rank?: string | null;
+  ror_faction?: string | null;
+  ror_class?: string | null;
+  subscriber_tier?: 'centurion' | 'imperator' | null;
+  subscriber_since?: string | null;
+  subscriber_ships_month?: string | null;
   created_at: string;
 }
 
