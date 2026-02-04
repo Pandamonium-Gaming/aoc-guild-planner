@@ -119,7 +119,7 @@ export function GroupHeader({
                       icon={game.icon}
                       iconUrl={game.iconUrl}
                       alt={game.name}
-                      size={20}
+                      size={32}
                     />
                     <span className="hidden md:inline">{game.name}</span>
                     {game.archived && (

@@ -315,7 +315,7 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
                         icon={game.icon}
                         iconUrl={game.iconUrl}
                         alt={game.name}
-                        size={48}
+                        size={80}
                       />
                     </div>
                     <h3 className="text-lg font-semibold text-white group-hover/link:text-cyan-400 transition-colors">
