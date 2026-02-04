@@ -11,6 +11,7 @@ import { CharacterWithProfessions } from '@/lib/types';
 import shipsData from '@/config/games/star-citizen-ships.json';
 import { getManufacturerLogo } from '@/config/games/star-citizen-utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SUBSCRIBER_COLORS } from '@/games/starcitizen/config/subscriber-ships';
 
 interface ShipData {
   id: string;
@@ -31,7 +32,8 @@ interface CharacterShip {
   id: string;
   character_id: string;
   ship_id: string;
-  ownership_type: 'pledged' | 'in-game' | 'loaner';
+  ownership_type: 'pledged' | 'in-game' | 'loaner' | 'subscriber';
+  notes?: string | null;
   created_at: string;
 }
 
@@ -143,6 +145,42 @@ function getRoleColor(role: string) {
   if (roleLower.includes('starter') || roleLower.includes('generalist')) return 'text-cyan-400 bg-cyan-500/10';
   if (roleLower.includes('military') || roleLower.includes('vehicle')) return 'text-lime-400 bg-lime-500/10';
   return 'text-slate-400 bg-slate-500/10';
+}
+
+function getOwnershipBadge(ship: CharacterShip) {
+  if (ship.ownership_type === 'subscriber') {
+    const match = ship.notes?.match(/(centurion|imperator)\s+subscriber/i);
+    if (match) {
+      const tier = match[1].toLowerCase() as 'centurion' | 'imperator';
+      const colors = SUBSCRIBER_COLORS[tier];
+      return {
+        label: tier.charAt(0).toUpperCase() + tier.slice(1),
+        className: 'bg-amber-500/10',
+        style: {
+          backgroundColor: colors.bg,
+          color: colors.primary,
+        },
+      };
+    }
+
+    return {
+      label: 'Subscriber',
+      className: 'bg-amber-500/20 text-amber-400',
+      style: undefined,
+    };
+  }
+
+  return {
+    label:
+      ship.ownership_type === 'pledged' ? 'Pledged' :
+      ship.ownership_type === 'in-game' ? 'In-Game' :
+      'Loaner',
+    className:
+      ship.ownership_type === 'pledged' ? 'bg-green-500/20 text-green-400' :
+      ship.ownership_type === 'in-game' ? 'bg-cyan-500/20 text-cyan-400' :
+      'bg-blue-500/20 text-blue-400',
+    style: undefined,
+  };
 }
 
 export function ShipsView({ characters, userId, canManage, groupId, gameSlug = 'aoc' }: ShipsViewProps) {  const { t } = useLanguage();  const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
@@ -428,19 +466,17 @@ export function ShipsView({ characters, userId, canManage, groupId, gameSlug = '
                               <div className="pt-2 border-t border-slate-700">
                                 <p className="text-xs text-slate-400 mb-2">Owned by:</p>
                                 <div className="space-y-1">
-                                  {ships.map(ship => (
+                                  {ships.map(ship => {
+                                    const badge = getOwnershipBadge(ship);
+                                    return (
                                     <div key={ship.id} className="flex items-center justify-between text-sm">
                                       <span className="text-slate-300">{ship.characterName}</span>
-                                      <span className={`text-xs px-2 py-0.5 rounded ${
-                                        ship.ownership_type === 'pledged' ? 'bg-green-500/20 text-green-400' :
-                                        ship.ownership_type === 'in-game' ? 'bg-cyan-500/20 text-cyan-400' :
-                                        'bg-blue-500/20 text-blue-400'
-                                      }`}>
-                                        {ship.ownership_type === 'pledged' ? 'Pledged' :
-                                         ship.ownership_type === 'in-game' ? 'In-Game' : 'Loaner'}
+                                      <span className={`text-xs px-2 py-0.5 rounded ${badge.className}`} style={badge.style}>
+                                        {badge.label}
                                       </span>
                                     </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
@@ -516,19 +552,17 @@ export function ShipsView({ characters, userId, canManage, groupId, gameSlug = '
                               <div className="pt-2 border-t border-slate-700">
                                 <p className="text-xs text-slate-400 mb-2">Owned by:</p>
                                 <div className="space-y-1">
-                                  {ships.map(ship => (
+                                  {ships.map(ship => {
+                                    const badge = getOwnershipBadge(ship);
+                                    return (
                                     <div key={ship.id} className="flex items-center justify-between text-sm">
                                       <span className="text-slate-300">{ship.characterName}</span>
-                                      <span className={`text-xs px-2 py-0.5 rounded ${
-                                        ship.ownership_type === 'pledged' ? 'bg-green-500/20 text-green-400' :
-                                        ship.ownership_type === 'in-game' ? 'bg-cyan-500/20 text-cyan-400' :
-                                        'bg-blue-500/20 text-blue-400'
-                                      }`}>
-                                        {ship.ownership_type === 'pledged' ? 'Pledged' :
-                                         ship.ownership_type === 'in-game' ? 'In-Game' : 'Loaner'}
+                                      <span className={`text-xs px-2 py-0.5 rounded ${badge.className}`} style={badge.style}>
+                                        {badge.label}
                                       </span>
                                     </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
