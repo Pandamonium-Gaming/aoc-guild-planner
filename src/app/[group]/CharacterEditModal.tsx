@@ -32,6 +32,7 @@ export function CharacterEditModal({ editingCharacter, onSubmit, onCancel }: Cha
       }}
       onCancel={onCancel}
       isEditing
+      characterId={editingCharacter.id}
     />
   );
 }

@@ -34,6 +34,7 @@ export function CharacterEditModal({ editingCharacter, onSubmit, onCancel, gameS
       onCancel={onCancel}
       isEditing
       gameSlug={gameSlug}
+      characterId={editingCharacter.id}
     />
   );
 }

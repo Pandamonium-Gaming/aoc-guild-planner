@@ -59,3 +59,6 @@ BEGIN
   
   RAISE NOTICE 'Subscriber ship sync complete';
 END $$;
+
+-- Track this migration
+INSERT INTO migration_history (filename) VALUES ('066_sync_existing_subscriber_ships.sql') ON CONFLICT DO NOTHING;

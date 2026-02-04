@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Sword, Star, Ship, Truck } from 'lucide-react';
+import { X, Sword, Star, Ship, Truck, RefreshCw } from 'lucide-react';
 import { Race, Archetype } from '@/lib/types';
 import { 
   RACES, 
@@ -17,7 +17,9 @@ import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG, getClassesByFaction, RORRol
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
 import ShipSelector from './ShipSelector';
-import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS } from '@/games/starcitizen/config/subscriber-ships';
+import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS, getCurrentMonthKey, getSubscriberShips } from '@/games/starcitizen/config/subscriber-ships';
+import { syncSubscriberShips } from '@/lib/subscriberShips';
+import { supabase } from '@/lib/supabase';
 import { CenturionSVG, ImperatorSVG } from './SubscriberIcons';
 
 interface CharacterFormData {
@@ -52,6 +54,7 @@ interface CharacterFormProps {
   onCancel: () => void;
   isEditing?: boolean;
   gameSlug?: string;
+  characterId?: string; // Character ID when editing (for re-sync ships)
 }
 
 export function CharacterForm({ 
@@ -59,7 +62,8 @@ export function CharacterForm({
   onSubmit, 
   onCancel,
   isEditing = false,
-  gameSlug = 'aoc'
+  gameSlug = 'aoc',
+  characterId
 }: CharacterFormProps) {
   const [formData, setFormData] = useState<CharacterFormData>({
     name: initialData?.name || '',
@@ -82,6 +86,8 @@ export function CharacterForm({
   const [error, setError] = useState<string | null>(null);
   const [showShipsSection, setShowShipsSection] = useState(false);
   const [showVehiclesSection, setShowVehiclesSection] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
   const { t } = useLanguage();
 
   const isAoC = gameSlug === 'aoc';
@@ -117,6 +123,35 @@ export function CharacterForm({
       setError(err instanceof Error ? err.message : 'Failed to save character');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResyncShips = async () => {
+    if (!isEditing || !characterId || !formData.subscriber_tier) return;
+    
+    setIsSyncing(true);
+    setSyncSuccess(false);
+    setError(null);
+    
+    try {
+      const result = await syncSubscriberShips(
+        supabase,
+        characterId,
+        formData.subscriber_tier,
+      );
+      
+      if (result.success) {
+        const currentMonth = getCurrentMonthKey();
+        setFormData({ ...formData, subscriber_ships_month: currentMonth });
+        setSyncSuccess(true);
+        setTimeout(() => setSyncSuccess(false), 3000);
+      } else {
+        setError(result.error || 'Failed to sync ships');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sync ships');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -497,10 +532,25 @@ export function CharacterForm({
                   />
                 </div>
               )}
-              {formData.subscriber_ships_month && (
-                <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
-                  <div className="text-xs text-slate-500">Ships Synced For</div>
-                  <div className="text-sm text-slate-200">{formData.subscriber_ships_month}</div>
+              {formData.subscriber_tier && (
+                <div className="space-y-2">
+                  {formData.subscriber_ships_month && (
+                    <div className="bg-slate-800/50 rounded-lg border border-slate-700 px-3 py-2">
+                      <div className="text-xs text-slate-500">Ships Synced For</div>
+                      <div className="text-sm text-slate-200">{formData.subscriber_ships_month}</div>
+                    </div>
+                  )}
+                  {isEditing && characterId && (
+                    <button
+                      type="button"
+                      onClick={handleResyncShips}
+                      disabled={isSyncing}
+                      className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
+                      {isSyncing ? 'Syncing...' : syncSuccess ? '✓ Ships Updated!' : 'Re-sync Subscriber Ships'}
+                    </button>
+                  )}
                 </div>
               )}
             </>
