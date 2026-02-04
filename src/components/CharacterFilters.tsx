@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Search, X, Filter, ChevronDown } from 'lucide-react';
 import { RACES, ARCHETYPES, RaceId, ArchetypeId } from '@/lib/characters';
 import { getClassById, ROR_CLASSES, ROR_ROLE_CONFIG } from '@/games/returnofreckooning/config';
+import { STARCITIZEN_CONFIG } from '@/games/starcitizen/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface CharacterFilters {
@@ -211,14 +212,17 @@ export function CharacterFiltersBar({
           {gameSlug === 'starcitizen' && (
             <div>
               <label htmlFor="filter-sc-role" className="text-xs text-slate-400 mb-1 block">Role</label>
-              <input
+              <select
                 id="filter-sc-role"
-                type="text"
                 value={filters.scRole}
                 onChange={(e) => onChange({ ...filters, scRole: e.target.value })}
-                placeholder="Filter by role..."
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">All Roles</option>
+                {STARCITIZEN_CONFIG.data.roles.pilot_roles.map((role) => (
+                  <option key={role.id} value={role.id}>{role.icon} {role.name}</option>
+                ))}
+              </select>
             </div>
           )}
 
