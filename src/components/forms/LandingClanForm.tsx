@@ -1,6 +1,7 @@
 import { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { User } from '@supabase/supabase-js';
 
 interface LandingClanFormProps {
   groupName: string;
