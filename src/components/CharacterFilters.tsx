@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Search, X, Filter, ChevronDown } from 'lucide-react';
 import { RACES, ARCHETYPES, RaceId, ArchetypeId } from '@/lib/characters';
 import { getClassById, ROR_CLASSES, ROR_ROLE_CONFIG } from '@/games/returnofreckooning/config';
-import { STARCITIZEN_CONFIG } from '@/games/starcitizen/config';
+import { getGameConfig } from '@/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface CharacterFilters {
@@ -57,6 +57,10 @@ export function CharacterFiltersBar({
 }: CharacterFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { t } = useLanguage();
+  
+  // Get game-specific roles
+  const gameConfig = getGameConfig(gameSlug);
+  const gameRoles = (gameConfig as any)?.roles || [];
   
   const hasActiveFilters = 
     filters.search !== '' || 
@@ -219,8 +223,8 @@ export function CharacterFiltersBar({
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="">All Roles</option>
-                {STARCITIZEN_CONFIG.data.roles.pilot_roles.map((role) => (
-                  <option key={role.id} value={role.id}>{role.icon} {role.name}</option>
+                {gameRoles.map((role: any) => (
+                  <option key={role.id} value={role.id}>{role.name}</option>
                 ))}
               </select>
             </div>
