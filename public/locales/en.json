@@ -99,8 +99,14 @@
     "creator": "creator"
   },
   "group": {
+    "joinClan": "Join Group",
+    "applyToJoin": "Apply to Join",
+    "applyDescription": "Apply to join {{name}}. An admin will review your application.",
     "applicationPending": "Application Pending",
     "pendingApproval": "Your application to join {{name}} is pending review by an admin or officer.",
+    "accessAfterApproval": "You'll be able to access group data once approved.",
+    "loginRequired": "Login Required",
+    "signInToAccess": "Sign in with Discord to access {{name}}",
     "notFound": "Group Not Found",
     "doesNotExist": "The group '{{name}}' doesn't exist.",
     "errorLoading": "Error Loading Group",
