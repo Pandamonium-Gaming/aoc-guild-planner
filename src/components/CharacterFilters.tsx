@@ -14,9 +14,13 @@ export interface CharacterFilters {
   hasProfessions: boolean | null; // null = any, true = has some, false = none
   // Star Citizen filters
   scRole: string | ''; // preferred_role
+  subscriberTier: string | ''; // subscriber_tier (centurion | imperator)
   // Return of Reckoning filters
   rorFaction: string | ''; // ror_faction
   rorClass: string | ''; // ror_class
+  rorRole: string | ''; // role/title
+  // Universal filters
+  characterType: 'all' | 'main' | 'alt'; // filter by main/alt characters
 }
 
 interface CharacterFiltersProps {
@@ -35,8 +39,11 @@ export const DEFAULT_FILTERS: CharacterFilters = {
   maxLevel: 50,
   hasProfessions: null,
   scRole: '',
+  subscriberTier: '',
   rorFaction: '',
   rorClass: '',
+  rorRole: '',
+  characterType: 'all',
 };
 
 export function CharacterFiltersBar({
@@ -57,8 +64,11 @@ export function CharacterFiltersBar({
     filters.maxLevel < 50 ||
     filters.hasProfessions !== null ||
     filters.scRole !== '' ||
+    filters.subscriberTier !== '' ||
     filters.rorFaction !== '' ||
-    filters.rorClass !== '';
+    filters.rorClass !== '' ||
+    filters.rorRole !== '' ||
+    filters.characterType !== 'all';
 
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
@@ -242,6 +252,53 @@ export function CharacterFiltersBar({
               />
             </div>
           )}
+
+          {/* Return of Reckoning role filter */}
+          {gameSlug === 'ror' && (
+            <div>
+              <label htmlFor="filter-ror-role" className="text-xs text-slate-400 mb-1 block">Role</label>
+              <input
+                id="filter-ror-role"
+                type="text"
+                value={filters.rorRole}
+                onChange={(e) => onChange({ ...filters, rorRole: e.target.value })}
+                placeholder="Filter by role..."
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          )}
+
+          {/* Star Citizen subscriber status filter */}
+          {gameSlug === 'star_citizen' && (
+            <div>
+              <label htmlFor="filter-subscriber" className="text-xs text-slate-400 mb-1 block">Subscriber Status</label>
+              <select
+                id="filter-subscriber"
+                value={filters.subscriberTier}
+                onChange={(e) => onChange({ ...filters, subscriberTier: e.target.value })}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">All</option>
+                <option value="centurion">Centurion</option>
+                <option value="imperator">Imperator</option>
+              </select>
+            </div>
+          )}
+
+          {/* Main / Alt filter - all games */}
+          <div>
+            <label htmlFor="filter-char-type" className="text-xs text-slate-400 mb-1 block">Character Type</label>
+            <select
+              id="filter-char-type"
+              value={filters.characterType}
+              onChange={(e) => onChange({ ...filters, characterType: e.target.value as 'all' | 'main' | 'alt' })}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+            >
+              <option value="all">All</option>
+              <option value="main">Main Characters</option>
+              <option value="alt">Alts</option>
+            </select>
+          </div>
         </div>
       )}
 
@@ -277,8 +334,10 @@ export function filterCharacters<T extends {
   user_id?: string | null;
   is_main?: boolean;
   preferred_role?: string | null;
+  subscriber_tier?: string | null;
   ror_faction?: string | null;
   ror_class?: string | null;
+  rank?: string | null;
 }>(
   characters: T[],
   filters: CharacterFilters
@@ -337,6 +396,11 @@ export function filterCharacters<T extends {
       return false;
     }
 
+    // Star Citizen subscriber tier filter
+    if (filters.subscriberTier && char.subscriber_tier !== filters.subscriberTier) {
+      return false;
+    }
+
     // Return of Reckoning faction filter
     if (filters.rorFaction && char.ror_faction !== filters.rorFaction) {
       return false;
@@ -345,6 +409,22 @@ export function filterCharacters<T extends {
     // Return of Reckoning class filter
     if (filters.rorClass && char.ror_class !== filters.rorClass) {
       return false;
+    }
+
+    // Return of Reckoning role/rank filter
+    if (filters.rorRole && char.rank !== filters.rorRole) {
+      return false;
+    }
+
+    // Character type filter (main/alt)
+    if (filters.characterType !== 'all') {
+      const isMain = char.is_main === true;
+      if (filters.characterType === 'main' && !isMain) {
+        return false;
+      }
+      if (filters.characterType === 'alt' && isMain) {
+        return false;
+      }
     }
 
     return true;
