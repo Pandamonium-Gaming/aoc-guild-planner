@@ -12,6 +12,11 @@ export interface CharacterFilters {
   minLevel: number;
   maxLevel: number;
   hasProfessions: boolean | null; // null = any, true = has some, false = none
+  // Star Citizen filters
+  scRole: string | ''; // preferred_role
+  // Return of Reckoning filters
+  rorFaction: string | ''; // ror_faction
+  rorClass: string | ''; // ror_class
 }
 
 interface CharacterFiltersProps {
@@ -29,6 +34,9 @@ export const DEFAULT_FILTERS: CharacterFilters = {
   minLevel: 1,
   maxLevel: 50,
   hasProfessions: null,
+  scRole: '',
+  rorFaction: '',
+  rorClass: '',
 };
 
 export function CharacterFiltersBar({
@@ -47,7 +55,10 @@ export function CharacterFiltersBar({
     filters.archetype !== '' || 
     filters.minLevel > 1 || 
     filters.maxLevel < 50 ||
-    filters.hasProfessions !== null;
+    filters.hasProfessions !== null ||
+    filters.scRole !== '' ||
+    filters.rorFaction !== '' ||
+    filters.rorClass !== '';
 
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
@@ -184,6 +195,53 @@ export function CharacterFiltersBar({
               </select>
             </div>
           )}
+
+          {/* Star Citizen role filter */}
+          {gameSlug === 'star_citizen' && (
+            <div>
+              <label htmlFor="filter-sc-role" className="text-xs text-slate-400 mb-1 block">Role</label>
+              <input
+                id="filter-sc-role"
+                type="text"
+                value={filters.scRole}
+                onChange={(e) => onChange({ ...filters, scRole: e.target.value })}
+                placeholder="Filter by role..."
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          )}
+
+          {/* Return of Reckoning faction filter */}
+          {gameSlug === 'ror' && (
+            <div>
+              <label htmlFor="filter-ror-faction" className="text-xs text-slate-400 mb-1 block">Faction</label>
+              <select
+                id="filter-ror-faction"
+                value={filters.rorFaction}
+                onChange={(e) => onChange({ ...filters, rorFaction: e.target.value })}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">All Factions</option>
+                <option value="Destruction">Destruction</option>
+                <option value="Order">Order</option>
+              </select>
+            </div>
+          )}
+
+          {/* Return of Reckoning class filter */}
+          {gameSlug === 'ror' && (
+            <div>
+              <label htmlFor="filter-ror-class" className="text-xs text-slate-400 mb-1 block">Class</label>
+              <input
+                id="filter-ror-class"
+                type="text"
+                value={filters.rorClass}
+                onChange={(e) => onChange({ ...filters, rorClass: e.target.value })}
+                placeholder="Filter by class..."
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -218,6 +276,9 @@ export function filterCharacters<T extends {
   professions: unknown[];
   user_id?: string | null;
   is_main?: boolean;
+  preferred_role?: string | null;
+  ror_faction?: string | null;
+  ror_class?: string | null;
 }>(
   characters: T[],
   filters: CharacterFilters
@@ -269,6 +330,21 @@ export function filterCharacters<T extends {
       if (filters.hasProfessions !== hasSome) {
         return false;
       }
+    }
+
+    // Star Citizen role filter
+    if (filters.scRole && char.preferred_role !== filters.scRole) {
+      return false;
+    }
+
+    // Return of Reckoning faction filter
+    if (filters.rorFaction && char.ror_faction !== filters.rorFaction) {
+      return false;
+    }
+
+    // Return of Reckoning class filter
+    if (filters.rorClass && char.ror_class !== filters.rorClass) {
+      return false;
     }
 
     return true;
