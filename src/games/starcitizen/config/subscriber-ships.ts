@@ -65,8 +65,8 @@ export const SUBSCRIBER_TIERS = {
 
 export interface SubscriberShipMonth {
   label: string; // e.g., "January 2026"
-  centurion: string[]; // Ships for base subscribers
-  imperator: string[]; // Ships for premium subscribers (includes centurion ships)
+  centurion: string[]; // Ship IDs for base subscribers (from star-citizen-ships.json)
+  imperator: string[]; // Ship IDs for premium subscribers (from star-citizen-ships.json)
   flair?: string; // Monthly cosmetic item
   notes?: string;
 }
@@ -74,15 +74,15 @@ export interface SubscriberShipMonth {
 export const SUBSCRIBER_SHIPS: Record<string, SubscriberShipMonth> = {
   '2026-01': {
     label: 'January 2026',
-    centurion: ['Aegis Sabre'],
-    imperator: ['Aegis Sabre', 'Sabre Firebird', 'Sabre Peregrine'],
+    centurion: ['sabre'],
+    imperator: ['sabre', 'sabre-firebird', 'sabre-peregrine'],
     flair: "CC's Conversions Azreal Helmet",
     notes: 'Sabre (12m insurance for Centurion, 24m for Imperator)',
   },
   '2026-02': {
     label: 'February 2026',
-    centurion: ['MISC Starlancer MAX'],
-    imperator: ['MISC Starlancer MAX', 'MISC Starlancer TAC'],
+    centurion: ['starlancer-max'],
+    imperator: ['starlancer-max', 'starlancer-tac'],
     flair: 'Coramor Décor Collection (Pink Heart Lamp, Carmilla Nightstand)',
     notes: 'Starlancer MAX (12m insurance for Centurion, 24m for Imperator)',
   },
