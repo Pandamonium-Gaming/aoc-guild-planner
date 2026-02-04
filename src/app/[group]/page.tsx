@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AlertCircle, LogOut, ChevronRight, Home, Plus, Trash2, Shield, Loader, Archive } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { GameIcon } from '@/components/common/GameIcon';
 import { getGroupBySlug } from '@/lib/auth';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -22,7 +23,7 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
   const router = useRouter();
   const { user, profile, loading: authLoading, signIn, signOut } = useAuthContext();
   const { t } = useLanguage();
-  const ALL_AVAILABLE_GAMES = getAllGames().map(g => ({ slug: g.id, name: g.name, icon: g.icon }));
+  const ALL_AVAILABLE_GAMES = getAllGames().map(g => ({ slug: g.id, name: g.name, icon: g.icon, iconUrl: g.iconUrl }));
 
   const [groupId, setGroupId] = useState<string | null>(null);
   const [groupData, setGroupData] = useState<any>(null);
@@ -261,8 +262,13 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
                   disabled={addingGame === game.slug}
                   className="text-left p-3 bg-slate-700/50 hover:bg-slate-600/50 disabled:opacity-50 disabled:cursor-not-allowed rounded border border-slate-600 hover:border-orange-500 transition-colors flex items-center justify-between"
                 >
-                  <div>
-                    <span className="text-2xl block mb-1">{game.icon}</span>
+                  <div className="flex items-center gap-3">
+                    <GameIcon 
+                      icon={game.icon}
+                      iconUrl={game.iconUrl}
+                      alt={game.name}
+                      size={32}
+                    />
                     <span className="text-white font-medium">{game.name}</span>
                   </div>
                   {addingGame === game.slug && <Loader className="w-4 h-4 text-orange-400 animate-spin" />}
@@ -304,7 +310,14 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
                     onClick={() => router.push(`/${groupSlug}/${game.slug}`)}
                     className="flex-1 text-left group/link cursor-pointer"
                   >
-                    <span className="text-3xl block mb-2">{game.icon}</span>
+                    <div className="mb-3">
+                      <GameIcon 
+                        icon={game.icon}
+                        iconUrl={game.iconUrl}
+                        alt={game.name}
+                        size={48}
+                      />
+                    </div>
                     <h3 className="text-lg font-semibold text-white group-hover/link:text-cyan-400 transition-colors">
                       {game.name}
                     </h3>

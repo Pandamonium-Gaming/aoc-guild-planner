@@ -54,7 +54,7 @@ export function GameLayout({ params, children, activeTab, characterCount }: Game
 
   const { isArchived: isGameArchived } = useGameArchiveStatus(groupSlug, gameSlug);
 
-  const [enabledGames, setEnabledGames] = useState<Array<{ slug: string; name: string; icon: string; archived: boolean }>>([]);
+  const [enabledGames, setEnabledGames] = useState<Array<{ slug: string; name: string; icon: string; iconUrl?: string; archived: boolean }>>([]);
 
   const displayName = profile?.display_name || user?.email || 'User';
   const guildIconUrl = group?.group_icon_url || undefined;
@@ -74,6 +74,7 @@ export function GameLayout({ params, children, activeTab, characterCount }: Game
             slug: game.id,
             name: game.name,
             icon: game.icon,
+            iconUrl: game.iconUrl,
             archived: status?.archived || false
           };
         })
