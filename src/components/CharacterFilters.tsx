@@ -208,7 +208,7 @@ export function CharacterFiltersBar({
           )}
 
           {/* Star Citizen role filter */}
-          {gameSlug === 'star_citizen' && (
+          {gameSlug === 'star-citizen' && (
             <div>
               <label htmlFor="filter-sc-role" className="text-xs text-slate-400 mb-1 block">Role</label>
               <input
@@ -276,7 +276,7 @@ export function CharacterFiltersBar({
           )}
 
           {/* Star Citizen subscriber status filter */}
-          {gameSlug === 'star_citizen' && (
+          {gameSlug === 'star-citizen' && (
             <div>
               <label htmlFor="filter-subscriber" className="text-xs text-slate-400 mb-1 block">Subscriber Status</label>
               <select
