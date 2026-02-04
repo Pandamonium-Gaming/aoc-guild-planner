@@ -162,14 +162,14 @@ export function CharacterCard({
                   )}
                   {gameSlug === 'starcitizen' && subscriberTier && (
                     <span
-                      className="text-xs px-2 py-0.5 rounded border flex items-center gap-1"
+                      className="text-sm font-bold px-3 py-1 rounded-md border-2 flex items-center gap-2 shadow-md"
                       style={{
                         borderColor: SUBSCRIBER_COLORS[subscriberTier].primary,
                         color: SUBSCRIBER_COLORS[subscriberTier].primary,
                         backgroundColor: SUBSCRIBER_COLORS[subscriberTier].bg,
                       }}
                     >
-                      <div className="w-4 h-2">
+                      <div className="w-10 h-5">
                         {subscriberTier === 'centurion' ? <CenturionSVG /> : <ImperatorSVG />}
                       </div>
                       {SUBSCRIBER_TIERS[subscriberTier].label}

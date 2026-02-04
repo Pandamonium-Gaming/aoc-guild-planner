@@ -11,6 +11,7 @@
         "git add": true,
         "git commit": true,
         "Set-Content": true,
-        "npx markdownlint-cli2": true
+        "npx markdownlint-cli2": true,
+        "Move-Item": true
     }
 }
