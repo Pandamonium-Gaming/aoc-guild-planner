@@ -139,19 +139,19 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
         .eq('is_main', true);
     }
 
+    const insertPayload = {
+      ...buildMemberUpdate(data as Partial<CharacterData> & Record<string, unknown>, gameSlug || 'aoc'),
+      group_id: group.id,
+      user_id: data.user_id !== undefined ? data.user_id : (user?.id || null),
+      name: data.name,
+      level: data.level || 1,
+      is_main: data.is_main || false,
+      game_slug: gameSlug || 'aoc',
+    };
+
     const { error: insertError } = await supabase
       .from('members')
-      .insert({ 
-        group_id: group.id, 
-        user_id: data.user_id !== undefined ? data.user_id : (user?.id || null),
-        name: data.name,
-        race: data.race || null,
-        primary_archetype: data.primary_archetype || null,
-        secondary_archetype: data.secondary_archetype || null,
-        level: data.level || 1,
-        is_main: data.is_main || false,
-        game_slug: gameSlug || 'aoc',
-      })
+      .insert(insertPayload)
       .select();
 
     if (insertError) {
@@ -161,6 +161,37 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
     }
 
     await fetchData();
+  };
+
+  const buildMemberUpdate = (
+    data: Partial<CharacterData> & Record<string, unknown>,
+    effectiveGame: string
+  ) => {
+    const payload: Record<string, unknown> = {};
+
+    if ('name' in data) payload.name = data.name;
+    if ('level' in data) payload.level = data.level;
+    if ('is_main' in data) payload.is_main = data.is_main;
+    if ('user_id' in data) payload.user_id = data.user_id;
+    if ('preferred_role' in data) payload.preferred_role = data.preferred_role;
+    if ('rank' in data) payload.rank = data.rank;
+
+    if (effectiveGame === 'aoc') {
+      if ('race' in data) payload.race = data.race ?? null;
+      if ('primary_archetype' in data) payload.primary_archetype = data.primary_archetype ?? null;
+      if ('secondary_archetype' in data) payload.secondary_archetype = data.secondary_archetype ?? null;
+    }
+
+    if (effectiveGame === 'ror') {
+      if ('ror_faction' in data) payload.ror_faction = data.ror_faction ?? null;
+      if ('ror_class' in data) payload.ror_class = data.ror_class ?? null;
+    }
+
+    if (effectiveGame === 'starcitizen') {
+      if ('subscriber_tier' in data) payload.subscriber_tier = data.subscriber_tier ?? null;
+    }
+
+    return payload;
   };
 
   // Update character
@@ -225,7 +256,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
     // Claim ownership if character doesn't have a user_id
     // This allows users to take ownership of existing characters by editing them
-    const updateData = { ...data };
+    const updateData = { ...data } as Partial<CharacterData> & Record<string, unknown>;
     if (user) {
       const character = characters.find(c => c.id === id);
       if (character && !character.user_id) {
@@ -233,9 +264,14 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       }
     }
 
+    const characterGame = (character as any)?.game_slug as string | undefined;
+    const dataGame = updateData.game_slug as string | undefined;
+    const effectiveGame = characterGame || gameSlug || dataGame || 'aoc';
+    const memberData = buildMemberUpdate(updateData, effectiveGame);
+
     const { error: updateError } = await supabase
       .from('members')
-      .update(updateData)
+      .update(memberData)
       .eq('id', id)
       .select();
 
