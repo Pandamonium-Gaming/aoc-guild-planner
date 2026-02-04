@@ -3,13 +3,13 @@
 import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, LogOut, ChevronRight, Home, Plus, Trash2, Shield, Loader } from 'lucide-react';
+import { AlertCircle, LogOut, ChevronRight, Home, Plus, Trash2, Shield, Loader, Archive } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGroupBySlug } from '@/lib/auth';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { usePermissions } from '@/hooks/usePermissions';
-import { getGroupGames, addGameToGroup, removeGameFromGroup } from '@/lib/group-games';
+import { getGroupGames, getGroupGamesWithStatus, addGameToGroup, removeGameFromGroup } from '@/lib/group-games';
 import { getAllGames } from '@/lib/games';
 import { ClanLoadingScreen } from '@/components/screens/ClanLoadingScreen';
 import { ClanErrorScreen } from '@/components/screens/ClanErrorScreen';
@@ -30,6 +30,7 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
   const [checkError, setCheckError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [enabledGames, setEnabledGames] = useState<string[]>(ALL_AVAILABLE_GAMES.map(g => g.slug)); // Default to all games
+  const [gamesWithStatus, setGamesWithStatus] = useState<Array<{ slug: string; archived: boolean }>>([]);
   const [showAddGame, setShowAddGame] = useState(false);
   const [loadingGames, setLoadingGames] = useState(false);
   const [addingGame, setAddingGame] = useState<string | null>(null);
@@ -77,13 +78,20 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
   const loadGroupGames = async (gid: string) => {
     setLoadingGames(true);
     try {
-      const games = await getGroupGames(gid);
+      const gamesStatus = await getGroupGamesWithStatus(gid);
       // If games are configured, use them; otherwise show all available games
-      setEnabledGames(games.length > 0 ? games : ALL_AVAILABLE_GAMES.map(g => g.slug));
+      if (gamesStatus.length > 0) {
+        setEnabledGames(gamesStatus.map(g => g.game_slug));
+        setGamesWithStatus(gamesStatus.map(g => ({ slug: g.game_slug, archived: g.archived })));
+      } else {
+        setEnabledGames(ALL_AVAILABLE_GAMES.map(g => g.slug));
+        setGamesWithStatus(ALL_AVAILABLE_GAMES.map(g => ({ slug: g.slug, archived: false })));
+      }
     } catch (err) {
       console.error('Error loading group games:', err);
       // On error, show all games by default
       setEnabledGames(ALL_AVAILABLE_GAMES.map(g => g.slug));
+      setGamesWithStatus(ALL_AVAILABLE_GAMES.map(g => ({ slug: g.slug, archived: false })));
     } finally {
       setLoadingGames(false);
     }
@@ -269,13 +277,25 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
 
         {/* Game cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ALL_AVAILABLE_GAMES.filter(g => enabledGames.includes(g.slug)).map((game) => (
+          {ALL_AVAILABLE_GAMES.filter(g => enabledGames.includes(g.slug)).map((game) => {
+            const gameStatus = gamesWithStatus.find(gs => gs.slug === game.slug);
+            const isArchived = gameStatus?.archived || false;
+            
+            return (
             <div
               key={game.slug}
               className="group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-left"
             >
               {/* Background gradient on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+              {/* Archived badge */}
+              {isArchived && (
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 bg-amber-900/40 border border-amber-700/50 rounded-full">
+                  <Archive className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-xs font-medium text-amber-300">Archived</span>
+                </div>
+              )}
 
               {/* Content */}
               <div className="relative">
@@ -305,7 +325,7 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
               </div>
 
               {/* Admin delete button */}
-              {canEditSettings && (
+              {canEditSettings && !isArchived && (
                 <button
                   onClick={() => handleRemoveGame(game.slug)}
                   disabled={removingGame === game.slug}
@@ -320,7 +340,8 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
                 </button>
               )}
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {enabledGames.length === 0 && (
