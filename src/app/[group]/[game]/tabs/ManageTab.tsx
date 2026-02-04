@@ -53,6 +53,29 @@ export function ManageTab({
     return rank?.hierarchy || 0;
   };
 
+  // Helper to check if current user can edit member's rank
+  const canEditMemberRank = (memberId: string, memberRole: string | null): boolean => {
+    // Can't edit your own rank
+    if (memberId === currentUserId) return false;
+    
+    // Admins can edit any rank
+    if (currentUserRole === 'admin') return true;
+    
+    // Officers can edit ranks of members and trials
+    if (currentUserRole === 'officer') {
+      return memberRole === 'member' || memberRole === 'trial';
+    }
+    
+    // Members and trials cannot edit ranks
+    return false;
+  };
+
+  // Helper to get current user's rank hierarchy
+  const getCurrentUserRankHierarchy = (): number => {
+    const currentUserMember = members.find(m => m.user_id === currentUserId);
+    return getRankHierarchy(currentUserMember?.guild_rank || null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Pending Applications */}
@@ -206,30 +229,41 @@ export function ManageTab({
                       </select>
 
                       {onUpdateRank && gameRanks.length > 0 && (
-                        <select
-                          value={member.guild_rank || ''}
-                          onChange={(e) => onUpdateRank(member.id, e.target.value || null)}
-                          className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-white text-sm cursor-pointer"
-                          title="Guild Rank"
-                        >
-                          <option value="">No Rank</option>
-                          {gameRanks
-                            .filter((rank: any) => {
-                              // Only allow managing ranks below your own
-                              if (currentUserRole === 'admin') return true;
-                              if (currentUserRole === 'officer') {
-                                const memberRankHierarchy = getRankHierarchy(member.guild_rank);
-                                const rankHierarchy = rank.hierarchy || 0;
-                                return rankHierarchy < getRankHierarchy(member.guild_rank) || memberRankHierarchy === 0;
-                              }
-                              return false;
-                            })
-                            .map((rank: any) => (
-                              <option key={rank.id} value={rank.id}>
-                                {rank.name}
-                              </option>
-                            ))}
-                        </select>
+                        canEditMemberRank(member.id, member.role) ? (
+                          <select
+                            value={member.guild_rank || ''}
+                            onChange={(e) => onUpdateRank(member.id, e.target.value || null)}
+                            className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-white text-sm cursor-pointer"
+                            title="Guild Rank"
+                          >
+                            <option value="">No Rank</option>
+                            {gameRanks
+                              .filter((rank: any) => {
+                                // Admins can assign any rank
+                                if (currentUserRole === 'admin') return true;
+                                
+                                // Officers can assign ranks below their own rank
+                                if (currentUserRole === 'officer') {
+                                  const currentUserRankLevel = getCurrentUserRankHierarchy();
+                                  const rankLevel = rank.hierarchy || 0;
+                                  return rankLevel < currentUserRankLevel;
+                                }
+                                
+                                return false;
+                              })
+                              .map((rank: any) => (
+                                <option key={rank.id} value={rank.id}>
+                                  {rank.name}
+                                </option>
+                              ))}
+                          </select>
+                        ) : (
+                          <div className="px-3 py-1 bg-slate-900 border border-slate-700 rounded text-slate-400 text-sm">
+                            {member.guild_rank 
+                              ? gameRanks.find((r: any) => r.id === member.guild_rank)?.name || 'Unknown Rank'
+                              : 'No Rank'}
+                          </div>
+                        )
                       )}
 
                       {onRemove && (

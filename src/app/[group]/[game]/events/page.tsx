@@ -2,11 +2,11 @@
 
 import { use } from 'react';
 import { GameLayout } from '../GameLayout';
-import { useAuthContext } from '@/components/AuthProvider';
+import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { useEvents } from '@/hooks/useEvents';
-import { EventsList } from '@/components/EventsList';
+import { EventsList } from '@/components/views/EventsList';
 
 export default function EventsPage({ params }: { params: Promise<{ group: string; game: string }> }) {
   const { group: groupSlug, game: gameSlug } = use(params);
@@ -43,7 +43,6 @@ export default function EventsPage({ params }: { params: Promise<{ group: string
         gameSlug={gameSlug}
         userId={user.id}
         characters={characters}
-        canManage={canManageMembers}
         onCreateEvent={async (eventData, sendDiscordNotification) => {
           await createEvent(eventData, sendDiscordNotification);
         }}

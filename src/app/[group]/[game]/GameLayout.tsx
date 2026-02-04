@@ -1,22 +1,24 @@
 'use client';
 
-import { use, ReactNode } from 'react';
-import { Tab } from '@/components/tabs';
+import { use, ReactNode, useState, useEffect } from 'react';
+import { Tab } from '@/components/common/tabs';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useAuthContext } from '@/components/AuthProvider';
+import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
-import { ClanLoadingScreen } from '@/components/ClanLoadingScreen';
-import { ClanErrorScreen } from '@/components/ClanErrorScreen';
-import { ClanLoginScreen } from '@/components/ClanLoginScreen';
+import { usePermissions } from '@/hooks/usePermissions';
+import { ClanLoadingScreen } from '@/components/screens/ClanLoadingScreen';
+import { ClanErrorScreen } from '@/components/screens/ClanErrorScreen';
+import { ClanLoginScreen } from '@/components/screens/ClanLoginScreen';
 import { GroupHeader } from './GroupHeader';
-import { ClanTabNav } from '@/components/ClanTabNav';
-import { InlineFooter } from '@/components/Footer';
-import { DynamicFavicon } from '@/components/DynamicFavicon';
+import { ClanTabNav } from '@/components/layout/ClanTabNav';
+import { InlineFooter } from '@/components/layout/Footer';
+import { DynamicFavicon } from '@/components/common/DynamicFavicon';
 import { Users, Clock, UserPlus, Loader2 } from 'lucide-react';
 import { getAllGames } from '@/lib/games';
+import { getGroupGamesWithStatus } from '@/lib/group-games';
 
 interface GameLayoutProps {
   params: Promise<{ group: string; game: string }>;
@@ -45,8 +47,38 @@ export function GameLayout({ params, children, activeTab, characterCount }: Game
     apply,
   } = useGroupMembership(group?.id || null, user?.id || null);
 
+  const { hasPermission } = usePermissions(group?.id || undefined);
+
+  const [enabledGames, setEnabledGames] = useState<Array<{ slug: string; name: string; icon: string; archived: boolean }>>([]);
+
   const displayName = profile?.display_name || user?.email || 'User';
   const guildIconUrl = group?.group_icon_url || undefined;
+
+  // Fetch game status info
+  useEffect(() => {
+    async function fetchGames() {
+      if (!group?.id) return;
+      
+      const gameStatuses = await getGroupGamesWithStatus(group.id);
+      const allGames = getAllGames();
+      
+      const gamesWithStatus = allGames
+        .map(game => {
+          const status = gameStatuses.find(gs => gs.game_slug === game.id);
+          return {
+            slug: game.id,
+            name: game.name,
+            icon: game.icon,
+            archived: status?.archived || false
+          };
+        })
+        .filter(game => gameStatuses.some(gs => gs.game_slug === game.slug)); // Only show games that are enabled
+      
+      setEnabledGames(gamesWithStatus);
+    }
+    
+    fetchGames();
+  }, [group?.id]);
 
   if (authLoading || groupLoading || membershipLoading) {
     return <ClanLoadingScreen />;
@@ -131,12 +163,6 @@ export function GameLayout({ params, children, activeTab, characterCount }: Game
     );
   }
 
-  const enabledGames = getAllGames().map(game => ({
-    slug: game.id,
-    name: game.name,
-    icon: game.icon
-  }));
-
   const resolvedCharacterCount = characterCount ?? characters.length;
 
   return (
@@ -162,7 +188,7 @@ export function GameLayout({ params, children, activeTab, characterCount }: Game
 
       <div className="shrink-0">
         <ClanTabNav
-          canManage={membership.role === 'admin' || membership.role === 'officer'}
+          canManage={hasPermission('settings_edit')}
           initialTab={activeTab}
           gameSlug={gameSlug}
           groupSlug={groupSlug}

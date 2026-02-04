@@ -2,15 +2,17 @@
 
 import { use, useEffect, useState } from 'react';
 import { GameLayout } from '../GameLayout';
-import { useAuthContext } from '@/components/AuthProvider';
+import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
+import { usePermissions } from '@/hooks/usePermissions';
 import { ManageTab } from '../tabs/ManageTab';
 import { GuildIconUploaderWrapper } from '../GuildIconUploaderWrapper';
-import { PermissionsSettings } from '@/components/PermissionsSettings';
-import { ClanSettings } from '@/components/ClanSettings';
-import { RecruitmentSettings } from '@/components/RecruitmentSettings';
+import { PermissionsSettings } from '@/components/settings/PermissionsSettings';
+import { ClanSettings } from '@/components/settings/ClanSettings';
+import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
+import { GameManagement } from '@/components/settings/GameManagement';
 import { getGroupBySlug } from '@/lib/auth';
 
 export default function SettingsPage({ params }: { params: Promise<{ group: string; game: string }> }) {
@@ -32,6 +34,11 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
     removeMember,
   } = useGroupMembership(group?.id || null, user?.id || null, gameSlug);
 
+  const { hasPermission } = usePermissions(group?.id || undefined);
+  const canViewPermissions = hasPermission('settings_view_permissions');
+  const canEditPermissions = hasPermission('settings_edit_permissions');
+  const canEditSettings = hasPermission('settings_edit');
+
   const [guildIconUrl, setGuildIconUrl] = useState(group?.group_icon_url || '');
 
   useEffect(() => {
@@ -51,7 +58,7 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
   return (
     <GameLayout params={params} activeTab="manage">
       <div className="space-y-6">
-        {membership.role === 'admin' && group && (
+        {canEditSettings && group && (
           <div>
             <h3 className="text-lg font-semibold text-white mb-2">Group Icon</h3>
             <GuildIconUploaderWrapper
@@ -76,11 +83,11 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
           t={t}
         />
 
-        {membership.role === 'admin' && group && (
+        {canEditPermissions && group && (
           <PermissionsSettings groupId={group.id} userRole={membership.role || 'member'} />
         )}
 
-        {membership.role === 'admin' && group && (
+        {canEditSettings && group && (
           <ClanSettings
             groupId={group.id}
             gameSlug={gameSlug}
@@ -98,6 +105,10 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
 
         {membership.role === 'admin' && group && (
           <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
+        )}
+
+        {membership.role === 'admin' && group && (
+          <GameManagement groupId={group.id} />
         )}
       </div>
     </GameLayout>
