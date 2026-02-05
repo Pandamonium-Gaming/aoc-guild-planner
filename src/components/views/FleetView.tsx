@@ -549,6 +549,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                             borderColor: badge.borderColor,
                                             color: badge.textColor,
                                           } : undefined}
+                                          title={ship.ownership_type === 'loaner' && ship.notes ? ship.notes : undefined}
                                         >
                                           {(badge.label === 'Centurion' || badge.label === 'Imperator') && (
                                             <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
@@ -657,6 +658,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
                                             borderColor: badge.borderColor,
                                             color: badge.textColor,
                                           } : undefined}
+                                          title={ship.ownership_type === 'loaner' && ship.notes ? ship.notes : undefined}
                                         >
                                           {(badge.label === 'Centurion' || badge.label === 'Imperator') && (
                                             <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
