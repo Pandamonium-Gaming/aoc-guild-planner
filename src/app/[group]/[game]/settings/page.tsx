@@ -104,7 +104,7 @@ export default function GameSettingsPage({ params }: { params: Promise<{ group: 
             scWelcomeEnabled={group.sc_welcome_enabled ?? true}
           />
         )}
-
-        {membership.role === 'admin' && group && (
-          <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
-        )}
+      </div>
+    </GameLayout>
+  );
+}
