@@ -4303,6 +4303,30 @@ CREATE POLICY "Only service role can update loaner matrix"
   FOR ALL
   USING (auth.jwt() ->> 'role' = 'service_role');
 
+-- Helper function to convert ship_id to display name
+CREATE OR REPLACE FUNCTION ship_id_to_display_name(ship_id TEXT)
+RETURNS TEXT AS $$
+DECLARE
+  parts TEXT[];
+  result TEXT;
+  part TEXT;
+BEGIN
+  -- Split on dashes and title-case each part
+  parts := string_to_array(ship_id, '-');
+  result := '';
+  
+  FOREACH part IN ARRAY parts
+  LOOP
+    IF result != '' THEN
+      result := result || ' ';
+    END IF;
+    result := result || initcap(part);
+  END LOOP;
+  
+  RETURN result;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 -- Function to automatically add loaner ships when a pledged ship is added
 CREATE OR REPLACE FUNCTION add_loaner_ships_for_pledge()
 RETURNS TRIGGER AS $$
@@ -4315,7 +4339,7 @@ BEGIN
       NEW.character_id,
       loaner_ship,
       'loaner',
-      'Auto-granted loaner for ' || NEW.ship_id || 
+      'Auto-granted loaner for ' || ship_id_to_display_name(NEW.ship_id) || 
       CASE 
         WHEN loaner_type = 'arena_commander' THEN ' (Arena Commander)'
         WHEN loaner_type = 'temporary' THEN ' (Temporary: ' || COALESCE(notes, 'see RSI') || ')'
