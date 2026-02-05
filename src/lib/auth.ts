@@ -19,7 +19,7 @@ export async function updateClanIconUrl(groupId: string, url: string) {
 import { supabase } from './supabase';
 import { getURL } from './url';
 
-export type UserRole = 'admin' | 'officer' | 'member' | 'pending' | null;
+export type UserRole = 'admin' | 'officer' | 'member' | 'trial' | 'pending' | null;
 
 export interface UserProfile {
   id: string;
@@ -153,15 +153,25 @@ export async function getGroupMembership(groupId: string, userId: string): Promi
  * Apply to join a clan (creates pending membership)
  */
 export async function applyToGroup(groupId: string, userId: string) {
+  const { data: group, error: groupError } = await supabase
+    .from('groups')
+    .select('approval_required, default_role')
+    .eq('id', groupId)
+    .maybeSingle();
+
+  if (groupError) throw groupError;
+
+  const approvalRequired = group?.approval_required ?? true;
+  const defaultRole = group?.default_role || 'trial';
+  const insertPayload = approvalRequired
+    ? { group_id: groupId, user_id: userId, role: 'pending' }
+    : { group_id: groupId, user_id: userId, role: defaultRole, approved_at: new Date().toISOString() };
+
   const { error } = await supabase
     .from('group_members')
-    .insert({
-      group_id: groupId,
-      user_id: userId,
-      role: 'pending',
-    })
+    .insert(insertPayload)
     .select();
-  
+
   if (error) throw error;
 }
 

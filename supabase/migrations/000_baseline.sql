@@ -4672,7 +4672,7 @@ CREATE POLICY "Public Access for Guild Icons"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'aoc-guild-icons');
 
--- Policy: Authenticated users can upload guild icons
+-- Policy: Group admins and officers can upload guild icons
 CREATE POLICY "Authenticated users can upload guild icons"
   ON storage.objects FOR INSERT
   TO authenticated
@@ -4687,7 +4687,7 @@ CREATE POLICY "Authenticated users can upload guild icons"
     )
   );
 
--- Policy: Authenticated users can update their guild icons (upsert)
+-- Policy: Group admins and officers can update their guild icons (upsert)
 CREATE POLICY "Authenticated users can update guild icons"
   ON storage.objects FOR UPDATE
   TO authenticated
@@ -4699,6 +4699,7 @@ CREATE POLICY "Authenticated users can update guild icons"
       WHERE user_id = auth.uid() 
         AND role IN ('admin', 'officer', 'member')
     )
+  );
   );
 
 -- Policy: Group admins/officers can delete guild icons

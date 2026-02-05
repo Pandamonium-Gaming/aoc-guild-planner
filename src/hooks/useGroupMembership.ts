@@ -224,11 +224,19 @@ export function useGroupMembership(groupId: string | null, userId: string | null
       : users?.discord_id;
     const groupIdForWebhook = memberData.group_id;
 
+    // Get the group's default role setting
+    const { data: groupData } = await supabase
+      .from('groups')
+      .select('default_role')
+      .eq('id', groupIdForWebhook)
+      .maybeSingle();
+    const defaultRole = groupData?.default_role || 'trial';
+
     // Update the member's role
     const { error } = await supabase
       .from('group_members')
       .update({
-        role: 'trial',
+        role: defaultRole,
         approved_at: new Date().toISOString(),
         approved_by: userId,
       })
