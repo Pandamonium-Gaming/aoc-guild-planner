@@ -117,6 +117,24 @@ export function MemberManagement({
       .map(([role]) => role as GroupRole);
   };
 
+  const getRoleRank = (role: string | null): number => {
+    const hierarchy = getRoleHierarchy();
+    return role && Object.prototype.hasOwnProperty.call(hierarchy, role)
+      ? hierarchy[role as GroupRole]
+      : 0;
+  };
+
+  const getMemberRank = (member: { role: string | null; is_creator: boolean }) =>
+    member.is_creator ? 6 : getRoleRank(member.role);
+
+  const getMemberRoleConfig = (member: { role: string | null; is_creator: boolean }) => {
+    if (member.is_creator) return ROLE_CONFIG.admin;
+    const validRole = (role: string | null): role is GroupRole =>
+      role !== null && Object.prototype.hasOwnProperty.call(ROLE_CONFIG, role);
+    const roleKey: GroupRole = validRole(member.role) ? member.role : 'member';
+    return ROLE_CONFIG[roleKey];
+  };
+
   return (
     <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
       <div className="space-y-6">
@@ -178,18 +196,30 @@ export function MemberManagement({
             Members ({members.length})
           </h3>
           <div className="space-y-2">
-            {members.map((member) => {
-              const availableRoles = getAvailableRoles(member.id);
-              const canEdit = availableRoles.length > 0;
-              const isCurrentUser = member.user_id === currentUserId;
+            {members
+              .slice()
+              .sort((a, b) => {
+                const roleDiff = getMemberRank(b) - getMemberRank(a);
+                if (roleDiff !== 0) return roleDiff;
+                const nameA = (a.user?.display_name || a.user?.discord_username || '').toLowerCase();
+                const nameB = (b.user?.display_name || b.user?.discord_username || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+              })
+              .map((member) => {
+                const availableRoles = getAvailableRoles(member.id);
+                const canEdit = availableRoles.length > 0;
+                const isCurrentUser = member.user_id === currentUserId;
+                const roleConfig = getMemberRoleConfig(member);
+                const roleLabel = member.is_creator ? 'Creator' : roleConfig.label;
 
               return (
                 <div
                   key={member.id}
-                  className="bg-slate-800/60 border border-slate-700 rounded-lg p-4"
+                  className={`bg-slate-800/60 border ${roleConfig.borderColor} rounded-lg p-4`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className={roleConfig.color}>{String.fromCharCode(9679)}</span>
                       {member.user?.discord_avatar ? (
                         <img
                           src={member.user.discord_avatar}
@@ -205,7 +235,7 @@ export function MemberManagement({
                         <div className="text-white font-medium truncate">
                           {member.user?.display_name || member.user?.discord_username || 'Unknown User'}
                           {isCurrentUser && <span className="text-slate-400 ml-2">(You)</span>}
-                          {member.is_creator && <span className="text-orange-400 ml-2">(Creator)</span>}
+                          <span className={`ml-2 text-sm ${roleConfig.color}`}>{roleLabel}</span>
                         </div>
                       </div>
                     </div>
