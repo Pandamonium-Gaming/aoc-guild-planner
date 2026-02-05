@@ -107,4 +107,4 @@ export default function GameSettingsPage({ params }: { params: Promise<{ group: 
 
         {membership.role === 'admin' && group && (
           <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
-}
+        )}
