@@ -1,11 +1,13 @@
 -- Add approval requirement flag and default role for group membership
 ALTER TABLE groups
-  ADD COLUMN approval_required BOOLEAN NOT NULL DEFAULT true,
-  ADD COLUMN default_role VARCHAR(20) NOT NULL DEFAULT 'trial'
+  ADD COLUMN IF NOT EXISTS approval_required BOOLEAN NOT NULL DEFAULT true,
+  ADD COLUMN IF NOT EXISTS default_role VARCHAR(20) NOT NULL DEFAULT 'trial'
     CHECK (default_role IN ('trial', 'member'));
 
 -- Allow auto-approved joins when approval is disabled
 -- The role must match the group's configured default_role
+DROP POLICY IF EXISTS "clan_members_insert_auto_approved" ON group_members;
+
 CREATE POLICY "clan_members_insert_auto_approved"
   ON group_members FOR INSERT
   WITH CHECK (
@@ -19,3 +21,7 @@ CREATE POLICY "clan_members_insert_auto_approved"
         AND g.default_role = group_members.role
     )
   );
+
+-- Record migration
+INSERT INTO migration_history (filename) VALUES ('001_group_join_settings.sql')
+  ON CONFLICT (filename) DO NOTHING;

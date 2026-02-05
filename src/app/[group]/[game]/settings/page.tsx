@@ -8,14 +8,12 @@ import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { usePermissions } from '@/hooks/usePermissions';
 import { ManageTab } from '../tabs/ManageTab';
-import { GuildIconUploaderWrapper } from '../GuildIconUploaderWrapper';
-import { PermissionsSettings } from '@/components/settings/PermissionsSettings';
 import { ClanSettings } from '@/components/settings/ClanSettings';
-import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
-import { GameManagement } from '@/components/settings/GameManagement';
 import { getGroupBySlug } from '@/lib/auth';
+import Link from 'next/link';
+import { Shield } from 'lucide-react';
 
-export default function SettingsPage({ params }: { params: Promise<{ group: string; game: string }> }) {
+export default function GameSettingsPage({ params }: { params: Promise<{ group: string; game: string }> }) {
   const { group: groupSlug, game: gameSlug } = use(params);
   const { user } = useAuthContext();
   const { t } = useLanguage();
@@ -35,21 +33,7 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
   } = useGroupMembership(group?.id || null, user?.id || null, gameSlug);
 
   const { hasPermission } = usePermissions(group?.id || undefined);
-  const canViewPermissions = hasPermission('settings_view_permissions');
-  const canEditPermissions = hasPermission('settings_edit_roles');
   const canEditSettings = hasPermission('settings_edit');
-
-  const [guildIconUrl, setGuildIconUrl] = useState(group?.group_icon_url || '');
-
-  useEffect(() => {
-    setGuildIconUrl(group?.group_icon_url || '');
-  }, [group?.group_icon_url]);
-
-  async function refreshGuildIcon() {
-    if (!groupSlug) return;
-    const latest = await getGroupBySlug(groupSlug);
-    if (latest?.group_icon_url) setGuildIconUrl(latest.group_icon_url);
-  }
 
   if (!group || !user || !membership) {
     return <GameLayout params={params} activeTab="manage"><div /></GameLayout>;
@@ -58,17 +42,28 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
   return (
     <GameLayout params={params} activeTab="manage">
       <div className="space-y-6">
-        {canEditSettings && group && (
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Group Icon</h3>
-            <GuildIconUploaderWrapper
-              groupId={group.id}
-              currentUrl={guildIconUrl}
-              onIconChange={refreshGuildIcon}
-            />
+        {/* Link to Group Settings */}
+        {membership.role === 'admin' && (
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-white mb-1">Group-Wide Settings</h3>
+                <p className="text-xs text-slate-400">
+                  Manage recruitment, permissions, games, and group icon
+                </p>
+              </div>
+              <Link
+                href={`/${groupSlug}/settings`}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg transition-colors"
+              >
+                <Shield className="w-4 h-4" />
+                Group Settings
+              </Link>
+            </div>
           </div>
         )}
 
+        {/* Member Management */}
         <ManageTab
           members={members}
           pendingMembers={pendingMembers}
@@ -83,10 +78,7 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
           t={t}
         />
 
-        {canEditPermissions && group && (
-          <PermissionsSettings groupId={group.id} userRole={membership.role || 'member'} />
-        )}
-
+        {/* Game-Specific Webhooks & Notifications */}
         {canEditSettings && group && (
           <ClanSettings
             groupId={group.id}
@@ -115,12 +107,4 @@ export default function SettingsPage({ params }: { params: Promise<{ group: stri
 
         {membership.role === 'admin' && group && (
           <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
-        )}
-
-        {membership.role === 'admin' && group && (
-          <GameManagement groupId={group.id} />
-        )}
-      </div>
-    </GameLayout>
-  );
 }

@@ -256,14 +256,26 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
               <p className="text-sm text-slate-400">Select a game</p>
             </div>
           </div>
-          <button
-            onClick={() => signOut()}
-            className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
-            title="Sign out"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="hidden sm:inline text-sm">{displayName}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {!membershipLoading && membership?.role === 'admin' && (
+              <Link
+                href={`/${groupSlug}/settings`}
+                className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+                title="Group Settings"
+              >
+                <Shield className="w-5 h-5" />
+                <span className="hidden sm:inline text-sm">Settings</span>
+              </Link>
+            )}
+            <button
+              onClick={() => signOut()}
+              className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
+              title="Sign out"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="hidden sm:inline text-sm">{displayName}</span>
+            </button>
+          </div>
         </div>
       </header>
 
