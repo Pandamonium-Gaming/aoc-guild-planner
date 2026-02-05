@@ -1,6 +1,8 @@
 # GitHub Copilot Instructions
 
-Quick reference for developing on Guild Planner. See [.ai-instructions.md](../.ai-instructions.md) for the comprehensive guide.
+Quick reference for developing on Guild Planner. See [.AI-INSTRUCTIONS.md](../.AI-INSTRUCTIONS.md) for the comprehensive guide.
+
+> **IMPORTANT**: Use PowerShell cmdlets instead of Unix commands (e.g., `Get-ChildItem` instead of `ls`). See the **PowerShell Commands Reference** section below.
 
 ## Code Patterns
 
@@ -48,6 +50,34 @@ try {
 }
 ```
 
+### External APIs
+
+**Before implementing code for a new external API:**
+
+1. Test the API request first using a tool like Postman or curl
+2. Verify the response format and status codes work as expected
+3. Check for rate limits, authentication requirements, and error responses
+4. **Only then** write the integration code
+
+This prevents wasting time on code that can't work due to API issues or incorrect assumptions.
+
+```typescript
+// Example: Test the API endpoint first before writing client code
+const testApiCall = async () => {
+  try {
+    const response = await fetch('https://api.example.com/data', {
+      headers: { 'Authorization': 'Bearer token' }
+    });
+    const data = await response.json();
+    console.log('API Response:', data);  // Verify structure
+  } catch (error) {
+    console.error('API Test Failed:', error);
+  }
+};
+
+// Once verified, write production code
+```
+
 ## Version Management
 
 ### Changelog
@@ -76,9 +106,9 @@ Format:
 
 ### Database Migrations
 
-```bash
+```powershell
 # Create new migration (sequential 3-digit number)
-touch supabase/migrations/001_feature_name.sql
+New-Item -Path "supabase/migrations/001_feature_name.sql" -ItemType File
 
 # Test locally first
 npx supabase db reset --linked  # in dev
@@ -151,7 +181,7 @@ console.error('API error:', { status, code, message });
 
 ## Environment
 
-```bash
+```powershell
 # Development
 npm run dev              # Start dev server
 # Uses .env.local.dev + dev Supabase project
@@ -162,11 +192,32 @@ npm run dev              # Start dev server
 
 ## Before Committing
 
-```bash
+```powershell
 npm run lint       # Fix style issues
 npm run type-check # Verify types
 ```
 
+## PowerShell Commands Reference
+
+**Prefer these PowerShell cmdlets over Unix-style commands:**
+
+```powershell
+# ✅ PowerShell - CORRECT
+Get-ChildItem                  # ls, dir
+Get-Content                    # cat
+Remove-Item                    # rm, del
+Copy-Item                      # cp
+Move-Item                      # mv
+New-Item -ItemType File        # touch
+Test-Path                      # test -f
+Select-Object -First 10        # head -n 10
+Select-Object -Last 10         # tail -n 10
+Get-Content | Select-Object -Last 10  # tail
+
+# ❌ Unix commands - AVOID (don't use)
+ls, dir, cat, rm, cp, mv, touch, tail, head
+```
+
 ***
 
-**For detailed information**, see [.ai-instructions.md](../.ai-instructions.md) in the project root.
+**For detailed information**, see [.AI-INSTRUCTIONS.md](../.AI-INSTRUCTIONS.md) in the project root.

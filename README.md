@@ -62,7 +62,7 @@ See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 ### For AI Agents & Contributors
 
 * **[.github/copilot-instructions.md](./.github/copilot-instructions.md)** - Quick reference for code patterns, version management, and logging (start here!)
-* **[.ai-instructions.md](./.ai-instructions.md)** - Comprehensive guide with lessons learned, security considerations, and troubleshooting
+* **[.AI-INSTRUCTIONS.md](./.AI-INSTRUCTIONS.md)** - Comprehensive guide with lessons learned, security considerations, and troubleshooting
 
 These documents cover critical lessons from development, including:
 
@@ -71,6 +71,11 @@ These documents cover critical lessons from development, including:
 * Role hierarchy and permission checks
 * Changelog maintenance
 * Common issues and solutions
+* **PowerShell commands** (preferred over Unix-style commands)
+
+### Development Environment
+
+> This project uses **PowerShell** for command-line operations. Use PowerShell cmdlets instead of Unix commands (e.g., `Get-ChildItem` instead of `ls`, `Remove-Item` instead of `rm`).
 
 ## Tech Stack
 
