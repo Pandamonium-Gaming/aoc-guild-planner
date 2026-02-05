@@ -145,6 +145,7 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
             onRemove={removeMember}
             currentUserId={user.id}
             currentUserRole={membership.role || 'member'}
+            currentUserIsCreator={membership.is_creator}
           />
 
           {/* Permissions Settings */}
