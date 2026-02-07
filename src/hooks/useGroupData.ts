@@ -6,6 +6,7 @@ import { Clan, CharacterWithProfessions, RankLevel, Race, Archetype } from '@/li
 import { canEditCharacter, canDeleteCharacter, canOfficerManageUser } from '@/lib/character-permissions';
 import { GroupRole } from '@/lib/permissions';
 import { syncSubscriberShips, updateSubscriberTier } from '@/lib/subscriberShips';
+import { handleAsyncError } from '@/lib/errorHandling';
 
 // Character data for creating/updating
 export interface CharacterData {
@@ -71,8 +72,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
       return existingClan as Clan | null;
     } catch (err) {
-      console.error('Error fetching clan:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load clan');
+      setError(handleAsyncError(err, 'Failed to load clan', { context: 'fetchClan', groupSlug }));
       return null;
     }
   }, [groupSlug]);
@@ -118,8 +118,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
       setCharacters(charactersWithProfessions);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(handleAsyncError(err, 'Failed to load data', { context: 'fetchData', groupSlug }));
     } finally {
       setLoading(false);
     }
@@ -166,8 +165,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       .select();
 
     if (insertError) {
-      console.error('Error adding character:', insertError);
-      setError(insertError.message);
+      setError(handleAsyncError(insertError, 'Failed to add character', { context: 'addCharacter', gameSlug: targetGameSlug }));
       throw insertError;
     }
 
@@ -436,8 +434,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
       .select();
 
     if (deleteError) {
-      console.error('Error deleting character:', deleteError);
-      setError(deleteError.message);
+      setError(handleAsyncError(deleteError, 'Failed to delete character', { context: 'deleteCharacter', characterId: id }));
       throw deleteError;
     }
 
