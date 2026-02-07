@@ -12,7 +12,7 @@ export default function FleetPage({ params }: { params: Promise<{ group: string;
   const { group: groupSlug, game: gameSlug } = use(params);
   const { user } = useAuthContext();
   const { group, characters } = useGroupData(groupSlug, gameSlug);
-  const { membership } = useGroupMembership(group?.id || null, user?.id || null);
+  useGroupMembership(group?.id || null, user?.id || null);
   const { hasPermission } = usePermissions(group?.id);
 
   // Check if user has permission to create ships (add ships to their own characters)

@@ -13,7 +13,7 @@ export default function EventsPage({ params }: { params: Promise<{ group: string
   const { user, profile } = useAuthContext();
 
   const { group, characters } = useGroupData(groupSlug, gameSlug);
-  const { canManageMembers } = useGroupMembership(group?.id || null, user?.id || null, gameSlug);
+  useGroupMembership(group?.id || null, user?.id || null, gameSlug);
 
   const {
     events,
