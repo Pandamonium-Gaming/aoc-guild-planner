@@ -469,7 +469,7 @@ npm run build       # Build must succeed
 * [TESTING.md](./TESTING.md) - How to write and run tests
 * [This file](./TESTING_ROADMAP.md) - What to test next
 
-### Questions?
+### Questions
 
 * Ask in team chat or create an issue
 * Check existing tests for patterns

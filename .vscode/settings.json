@@ -27,7 +27,10 @@
             "matchCommandLine": true
         },
         ".\\switch-env.ps1": true,
-        "npm install": true
+        "npm install": true,
+        "tee": true,
+        "Resolve-Path": true,
+        "Group-Object": true
     },
     "codeQL.githubDatabase.download": "never"
 }

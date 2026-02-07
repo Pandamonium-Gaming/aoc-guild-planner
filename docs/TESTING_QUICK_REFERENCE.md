@@ -107,7 +107,7 @@ npm run test:coverage
 * Business logic: 70%+
 * UI components: 50%+
 
-## Need Help?
+## Need Help
 
 1. Read [TESTING.md](./TESTING.md) for detailed guide
 2. Check [TESTING\_ROADMAP.md](./TESTING_ROADMAP.md) for what needs testing

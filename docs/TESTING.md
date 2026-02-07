@@ -85,10 +85,10 @@ jest.mock('../supabase', () => ({
 
 ### High Priority (Security & Core Logic)
 
-✅ **Permission System** (`permissions.ts`) - CRITICAL\
-✅ **Authentication** (`auth.ts`) - CRITICAL\
-✅ **Role Management** (`canManageRole`, hierarchy) - CRITICAL\
-✅ **Utility Functions** (`utils.ts`)\
+✅ **Permission System** (`permissions.ts`) - CRITICAL  
+✅ **Authentication** (`auth.ts`) - CRITICAL  
+✅ **Role Management** (`canManageRole`, hierarchy) - CRITICAL  
+✅ **Utility Functions** (`utils.ts`)  
 ✅ **Game Validation** (`gameValidation.ts`)
 
 ### Medium Priority
@@ -217,6 +217,6 @@ npm run build      # Ensure build succeeds
 
 Consider setting up GitHub Actions to run tests automatically on PRs.
 
-***
+---
 
 **Found a bug through tests?** That's the point! Update the code, verify the test passes, and commit both.
